@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
@@ -26,24 +26,12 @@ interface Workshop {
   price: string
 }
 
-const mapContainerStyle = {
-  width: '1384px',   // Largura fixa
-  height: '805px',   // Altura fixa
-  borderRadius: '0.5rem',
-  margin: '0 auto',  // Centraliza o mapa horizontalmente (opcional)
-};
-
-const center = {
-  lat: -23.5505,
-  lng: -46.6333
-}
 
 export default function Home() {
   const [, setUserData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showMap, setShowMap] = useState(false)
-  const [workshops, setWorkshops] = useState<Workshop[]>([])
-  const [map, setMap] = useState<google.maps.Map | null>(null)
+  const [workshops, ] = useState<Workshop[]>([])
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
@@ -114,9 +102,6 @@ export default function Home() {
     setWorkshops(mockWorkshops)
   }, [])*/
 
-  const onMapLoad = useCallback((map: google.maps.Map) => {
-    setMap(map)
-  }, [])
 
   if (loading) {
     return (
