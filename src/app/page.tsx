@@ -31,7 +31,7 @@ export default function Home() {
   const [, setUserData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showMap, setShowMap] = useState(false)
-  const [workshops, ] = useState<Workshop[]>([])
+  const [workshops, setWorkshops] = useState<Workshop[]>([])
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
@@ -77,19 +77,19 @@ export default function Home() {
     fetchUserData()
   }, [])
 
-  /*useEffect(() => {
+  useEffect(() => {
     // Mock data - substitua por chamada real ao Supabase
     const mockWorkshops: Workshop[] = [
        {
         id: 1,
-        name: "Oficina Central",
-        address: "Av. Paulista, 1000, São Paulo",
+        name: "Chapadinha Auto Center",
+        address: "Jardim das Margaridas, São Luis",
         lat: -23.5635,
         lng: -46.6543,
         rating: 4.8,
         price: "R$120/hora"
       },
-      {
+      /*{
         id: 2,
         name: "Auto Serviço Premium",
         address: "Rua Augusta, 1500, São Paulo",
@@ -97,10 +97,10 @@ export default function Home() {
         lng: -46.6592,
         rating: 4.6,
         price: "R$150/hora"
-      }
+      }*/
     ]
     setWorkshops(mockWorkshops)
-  }, [])*/
+  }, [])
 
 
   if (loading) {
