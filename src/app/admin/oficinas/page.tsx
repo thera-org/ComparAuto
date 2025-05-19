@@ -77,16 +77,13 @@ export default function OficinasPage() {
   const fetchOficinas = async () => {
     try {
       // Buscar usuários que são mecânicos
-      const { data: usersData, error: usersError } = await supabase.from("users").select("*").eq("role", "mechanic")
-
+      const { data: usersData, error: usersError } = await supabase.from("usuarios").select("*").eq("tipo", "mechanic")
       if (usersError) throw usersError
       setUsers(usersData || [])
 
       // Buscar oficinas
       const { data, error } = await supabase.from("oficinas").select("*").order("nome")
-
       if (error) throw error
-
       setOficinas(data || [])
       setFilteredOficinas(data || [])
       setLoading(false)

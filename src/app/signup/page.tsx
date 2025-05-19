@@ -29,7 +29,7 @@ export default function SignupPage() {
     try {
       setLoading(true);
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -41,6 +41,17 @@ export default function SignupPage() {
 
       if (error) {
         throw error;
+      }
+
+      // Salvar na tabela usuarios (garante que email e id fiquem salvos)
+      if (data?.user) {
+        await supabase.from("usuarios").insert({
+          id: data.user.id,
+          nome: formData.nome,
+          email: formData.email,
+          tipo: "user",
+          criado_em: new Date().toISOString(),
+        });
       }
 
       router.push("/login");

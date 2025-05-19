@@ -21,7 +21,6 @@ import {
 } from "recharts"
 import { Users, Wrench, FileText, TrendingUp } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useRouter } from "next/navigation"
 
 interface StatsData {
   users: number
@@ -48,8 +47,6 @@ interface StatCardProps {
 }
 
 export default function AdminDashboard() {
-  const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<StatsData>({
     users: 0,
     mechanics: 0,
@@ -113,28 +110,6 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        router.replace("/login");
-        return;
-      }
-      const userId = sessionData.session.user.id;
-      const { data: usuario, error } = await supabase
-        .from("usuarios")
-        .select("tipo")
-        .eq("id", userId)
-        .single();
-      if (error || !usuario || usuario.tipo !== "admin") {
-        router.replace("/login");
-        return;
-      }
-      setIsAdmin(true);
-    };
-    checkAdmin();
-  }, [router]);
-
-  useEffect(() => {
     fetchStats()
 
     // Configurar atualização periódica das estatísticas
@@ -142,10 +117,6 @@ export default function AdminDashboard() {
 
     return () => clearInterval(interval)
   }, [])
-
-  if (isAdmin === null) {
-    return <div className="flex items-center justify-center h-screen">Verificando permissão...</div>;
-  }
 
   // Cores para o gráfico de pizza
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28"]

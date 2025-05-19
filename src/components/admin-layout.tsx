@@ -11,7 +11,6 @@ import { LayoutDashboard, Users, Wrench, Menu, LogOut, Search } from "lucide-rea
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import AdminAuthGate from "@/components/AdminAuthGate"
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -67,77 +66,69 @@ export default function AdminLayout({ children, searchPlaceholder = "Buscar...",
   )
 
   return (
-    <AdminAuthGate>
-      <div className="min-h-screen bg-slate-50 flex">
-        {/* Sidebar para desktop */}
-        <aside className="hidden md:flex md:w-64 flex-col bg-white border-r shadow-sm">
-          <div className="p-4 border-b">
-            <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
-          </div>
-
-          <div className="flex-1 overflow-auto">{renderNavigation()}</div>
-
-          <div className="p-4 border-t mt-auto">
-            <div className="flex items-center justify-between">
-              <UserAvatar />
-              <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sair">
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </aside>
-
-        {/* Conteúdo principal */}
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <header className="bg-white border-b h-16 flex items-center px-4 shadow-sm">
-            {isMobile && (
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="mr-4">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-64 p-0">
-                  {(
-                    <>
-                      <div className="p-4 border-b">
-                        <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
-                      </div>
-                      <div className="flex-1 overflow-auto">{renderNavigation()}</div>
-                      <div className="p-4 border-t mt-auto">
-                        <Button variant="outline" className="w-full" onClick={handleSignOut}>
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Sair
-                        </Button>
-                      </div>
-                    </>
-                  ) as React.ReactNode}
-                </SheetContent>
-              </Sheet>
-            )}
-
-            {onSearch && (
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder={searchPlaceholder}
-                  className="pl-8 w-full"
-                  onChange={(e) => onSearch(e.target.value)}
-                />
-              </div>
-            )}
-
-            <div className="ml-auto">
-              <UserAvatar />
-            </div>
-          </header>
-
-          {/* Conteúdo da página */}
-          <main className="flex-1 overflow-auto p-6">{children}</main>
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* Sidebar para desktop */}
+      <aside className="hidden md:flex md:w-64 flex-col bg-white border-r shadow-sm">
+        <div className="p-4 border-b">
+          <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
         </div>
+        <div className="flex-1 overflow-auto">{renderNavigation()}</div>
+        <div className="p-4 border-t mt-auto">
+          <div className="flex items-center justify-between">
+            <UserAvatar />
+            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sair">
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </aside>
+      {/* Conteúdo principal */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-white border-b h-16 flex items-center px-4 shadow-sm">
+          {isMobile && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="mr-4">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0">
+                {(
+                  <>
+                    <div className="p-4 border-b">
+                      <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
+                    </div>
+                    <div className="flex-1 overflow-auto">{renderNavigation()}</div>
+                    <div className="p-4 border-t mt-auto">
+                      <Button variant="outline" className="w-full" onClick={handleSignOut}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sair
+                      </Button>
+                    </div>
+                  </>
+                ) as React.ReactNode}
+              </SheetContent>
+            </Sheet>
+          )}
+          {onSearch && (
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder={searchPlaceholder}
+                className="pl-8 w-full"
+                onChange={(e) => onSearch(e.target.value)}
+              />
+            </div>
+          )}
+          <div className="ml-auto">
+            <UserAvatar />
+          </div>
+        </header>
+        {/* Conteúdo da página */}
+        <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
-    </AdminAuthGate>
+    </div>
   )
 }

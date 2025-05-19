@@ -24,8 +24,8 @@ interface User {
   id: string
   nome: string
   email: string
-  role: string
-  created_at?: string
+  tipo: string
+  criado_em?: string
 }
 
 export default function UsersPage() {
@@ -34,24 +34,35 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [newRole, setNewRole] = useState("")
+  const [newTipo, setNewTipo] = useState("")
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
+      // Buscar todos os usuários
+      const { data: usuarios, error: usuariosError } = await supabase
         .from('usuarios')
         .select('*')
         .order('criado_em', { ascending: false });
+      if (usuariosError) throw usuariosError
 
-      if (error) throw error
+      // Buscar todos os emails na tabela auth.users
+      // O correto é buscar na tabela 'users' do Supabase Auth, não 'auth.users'
+      const { data: authUsers, error: authError } = await supabase
+        .from('users')
+        .select('id, email');
+      if (authError) throw authError
 
-      const formattedUsers: User[] = data.map((user) => ({
-        id: user.id,
-        nome: user.nome || "Sem nome",
-        email: user.email,
-        role: user.role || "user",
-        created_at: user.created_at,
-      }))
+      // Montar lista de usuários com email
+      const formattedUsers: User[] = usuarios.map((user) => {
+        const authUser = authUsers.find((au) => au.id === user.id)
+        return {
+          id: user.id,
+          nome: user.nome || "Sem nome",
+          email: authUser?.email || "",
+          tipo: user.tipo || "user",
+          criado_em: user.criado_em,
+        }
+      })
 
       setUsers(formattedUsers)
       setFilteredUsers(formattedUsers)
@@ -74,32 +85,27 @@ export default function UsersPage() {
     setFilteredUsers(filtered)
   }
 
-  const confirmRoleChange = (user: User, role: string) => {
+  const confirmTipoChange = (user: User, tipo: string) => {
     setSelectedUser(user)
-    setNewRole(role)
+    setNewTipo(tipo)
     setShowConfirmDialog(true)
   }
 
-  const updateRole = async () => {
-    if (!selectedUser || !newRole) return
-
+  const updateTipo = async () => {
+    if (!selectedUser || !newTipo) return
     try {
-      const { error } = await supabase.from("users").update({ role: newRole }).eq("id", selectedUser.id)
-
+      const { error } = await supabase.from("usuarios").update({ tipo: newTipo }).eq("id", selectedUser.id)
       if (error) throw error
-
-      // Atualiza a lista local
-      setUsers(users.map((user) => (user.id === selectedUser.id ? { ...user, role: newRole } : user)))
-      setFilteredUsers(filteredUsers.map((user) => (user.id === selectedUser.id ? { ...user, role: newRole } : user)))
-
+      setUsers(users.map((user) => (user.id === selectedUser.id ? { ...user, tipo: newTipo } : user)))
+      setFilteredUsers(filteredUsers.map((user) => (user.id === selectedUser.id ? { ...user, tipo: newTipo } : user)))
       setShowConfirmDialog(false)
     } catch (error) {
       console.error("Erro ao atualizar função:", error)
     }
   }
 
-  const getRoleBadge = (role: string) => {
-    switch (role) {
+  const getTipoBadge = (tipo: string) => {
+    switch (tipo) {
       case "admin":
         return (
           <Badge variant="default" className="bg-red-500">
@@ -117,8 +123,8 @@ export default function UsersPage() {
     }
   }
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
+  const getTipoIcon = (tipo: string) => {
+    switch (tipo) {
       case "admin":
         return <Shield className="h-4 w-4 mr-2" />
       case "mechanic":
@@ -135,7 +141,6 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold tracking-tight">Usuários</h1>
           <p className="text-muted-foreground mt-1">Gerencie os usuários do sistema</p>
         </div>
-
         <div className="rounded-md border bg-white overflow-hidden">
           <Table>
             <TableHeader>
@@ -171,7 +176,7 @@ export default function UsersPage() {
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">{user.nome}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{getRoleBadge(user.role)}</TableCell>
+                    <TableCell>{getTipoBadge(user.tipo)}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -182,22 +187,22 @@ export default function UsersPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => confirmRoleChange(user, "admin")}
-                            disabled={user.role === "admin"}
+                            onClick={() => confirmTipoChange(user, "admin")}
+                            disabled={user.tipo === "admin"}
                           >
                             <Shield className="h-4 w-4 mr-2" />
                             <span>Tornar Admin</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => confirmRoleChange(user, "mechanic")}
-                            disabled={user.role === "mechanic"}
+                            onClick={() => confirmTipoChange(user, "mechanic")}
+                            disabled={user.tipo === "mechanic"}
                           >
                             <Wrench className="h-4 w-4 mr-2" />
                             <span>Tornar Oficina</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => confirmRoleChange(user, "user")}
-                            disabled={user.role === "user"}
+                            onClick={() => confirmTipoChange(user, "user")}
+                            disabled={user.tipo === "user"}
                           >
                             <UserIcon className="h-4 w-4 mr-2" />
                             <span>Tornar Cliente</span>
@@ -218,20 +223,19 @@ export default function UsersPage() {
           </Table>
         </div>
       </div>
-
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Alterar função do usuário</AlertDialogTitle>
             <AlertDialogDescription>
               Você está prestes a alterar a função de <strong>{selectedUser?.nome}</strong> para{" "}
-              <strong>{newRole}</strong>. Esta ação não pode ser desfeita.
+              <strong>{newTipo}</strong>. Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={updateRole}>
-              {getRoleIcon(newRole)}
+            <AlertDialogAction onClick={updateTipo}>
+              {getTipoIcon(newTipo)}
               Confirmar
             </AlertDialogAction>
           </AlertDialogFooter>
