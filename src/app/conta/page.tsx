@@ -3,21 +3,8 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from "react"
 import { supabase } from "@/lib/supabase"
 import Image from "next/image"
+import type { UserProfile } from "@/types/user"
 
-interface UserMetadata {
-  full_name?: string
-  avatar_url?: string
-}
-
-interface UserProfile {
-  id: string
-  email: string
-  nome?: string
-  role?: string
-  telefone?: string
-  endereco?: string
-  user_metadata?: UserMetadata
-}
 
 export default function ContaPage() {
   const [user, setUser] = useState<UserProfile | null>(null)
@@ -49,11 +36,11 @@ export default function ContaPage() {
       const merged = { ...user, ...userDoc }
       setUser(merged)
       setForm({
-        nome: merged.nome || merged.user_metadata?.full_name || "",
+        nome: merged.nome || "",
         email: merged.email || "",
         telefone: merged.telefone || "",
         endereco: merged.endereco || "",
-        avatar_url: merged.user_metadata?.avatar_url || ""
+        avatar_url: merged.avatar_url || ""
       })
       setLoading(false)
     }
@@ -94,7 +81,8 @@ export default function ContaPage() {
         .update({
           nome: form.nome,
           telefone: form.telefone,
-          endereco: form.endereco
+          endereco: form.endereco,
+          avatar_url
         })
         .eq("id", user.id)
 
@@ -102,14 +90,6 @@ export default function ContaPage() {
       if (form.email !== user.email) {
         await supabase.auth.updateUser({ email: form.email })
       }
-
-      // Atualiza avatar no user_metadata
-      await supabase.auth.updateUser({
-        data: {
-          full_name: form.nome,
-          avatar_url
-        }
-      })
     }
 
     setEdit(false)
@@ -118,11 +98,11 @@ export default function ContaPage() {
   }
 
   if (loading) {
-    return <div className="p-8 text-center">Carregando...</div>
+    return <div style={{textAlign: 'center', marginTop: 40}}>Carregando dados do usuário...</div>
   }
 
   if (!user) {
-    return <div className="p-8 text-center">Faça login para acessar sua conta.</div>
+    return <div style={{color: 'red', textAlign: 'center', marginTop: 40}}>Erro ao carregar usuário. Faça login novamente.</div>
   }
 
   return (
@@ -200,7 +180,7 @@ export default function ContaPage() {
           <>
             <div className="flex items-center gap-4">
       <Image
-        src={user.user_metadata?.avatar_url || "/placeholder.svg"}
+        src={user.avatar_url || "/placeholder.svg"}
         alt="Avatar"
         width={64}
         height={64}
@@ -214,7 +194,7 @@ export default function ContaPage() {
               </button>
             </div>
             <div>
-              <span className="font-medium">Nome:</span> {user.nome || user.user_metadata?.full_name}
+              <span className="font-medium">Nome:</span> {user.nome}
             </div>
             <div>
               <span className="font-medium">E-mail:</span> {user.email}
@@ -226,7 +206,7 @@ export default function ContaPage() {
               <span className="font-medium">Endereço:</span> {user.endereco || "-"}
             </div>
             <div>
-              <span className="font-medium">Função:</span> {user.role || "usuário"}
+              <span className="font-medium">Função:</span> usuário
             </div>
           </>
         )}

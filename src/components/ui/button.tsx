@@ -36,6 +36,11 @@ export interface ButtonProps
   asChild?: boolean
 }
 
+/**
+ * Botão reutilizável com suporte a variantes e acessibilidade.
+ * @param props Propriedades do botão
+ * @returns Elemento de botão estilizado
+ */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
