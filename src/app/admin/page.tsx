@@ -75,14 +75,25 @@ export default function AdminDashboard() {
       const totalServices = services?.length || 0
 
       // Calcular crescimento (exemplo: comparando com o mês anterior)
-      // Aqui estou simulando um valor, mas você pode calcular com base em dados reais
-      const growth = Math.round(Math.random() * 30)
+      // Calcular crescimento com base em dados reais (comparando com o mês anterior)
+      const { data: previousMonthUsers, error: previousMonthError } = await supabase
+        .from("users")
+        .select("*")
+        .gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString())
+        .lt("created_at", new Date(new Date().setDate(1)).toISOString())
+
+      if (previousMonthError) throw previousMonthError
+
+      const previousMonthCount = previousMonthUsers?.length || 0
+      const growth = previousMonthCount > 0
+        ? ((totalUsers - previousMonthCount) / previousMonthCount) * 100
+        : 0
 
       setStats({
         users: totalUsers,
         mechanics: totalMechanics,
         services: totalServices,
-        growth: growth,
+        growth: Math.round(growth),
       })
 
       // Preparar dados para o gráfico de serviços por mês
