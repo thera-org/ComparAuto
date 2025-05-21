@@ -50,7 +50,7 @@ export default function WorkshopMap({
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [mapCenter, setMapCenter] = useState(initialCenter || defaultCenter)
-  const [, setLoading] = useState(!initialWorkshops)
+  const [loading, setLoading] = useState(!initialWorkshops)
   const mapRef = useRef<google.maps.Map | null>(null)
 
   const { isLoaded, loadError } = useLoadScript({
