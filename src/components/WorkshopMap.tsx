@@ -31,6 +31,9 @@ interface WorkshopMapProps {
   workshops?: Workshop[]
   height?: string
   onWorkshopSelect?: (workshop: Workshop) => void
+  selectLocationMode?: boolean
+  onLocationSelect?: (lat: number, lng: number) => void
+  marker?: { lat: number; lng: number } | null
 }
 
 const mapContainerStyle = {
@@ -45,12 +48,13 @@ export default function WorkshopMap({
   workshops: initialWorkshops,
   height = "500px",
   onWorkshopSelect,
+  selectLocationMode = false,
+  onLocationSelect,
+  marker,
 }: WorkshopMapProps) {
   const [workshops, setWorkshops] = useState<Workshop[]>(initialWorkshops || [])
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null)
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [mapCenter, setMapCenter] = useState(initialCenter || defaultCenter)
-  const [loading, setLoading] = useState(!initialWorkshops)
   const mapRef = useRef<google.maps.Map | null>(null)
 
   const { isLoaded, loadError } = useLoadScript({
@@ -62,7 +66,6 @@ export default function WorkshopMap({
     if (initialWorkshops) return
 
     try {
-      setLoading(true)
       const { data, error } = await supabase
         .from("oficinas")
         .select("id, nome, endereco, latitude, longitude, foto_url, telefone")
@@ -73,20 +76,16 @@ export default function WorkshopMap({
       setWorkshops(data || [])
     } catch (error) {
       console.error("Error fetching workshops:", error)
-    } finally {
-      setLoading(false)
     }
   }, [initialWorkshops])
-
-  useEffect(() => {
-    fetchWorkshops()
-  }, [fetchWorkshops])
 
   useEffect(() => {
     if (initialWorkshops) {
       setWorkshops(initialWorkshops)
+    } else {
+      fetchWorkshops()
     }
-  }, [initialWorkshops])
+  }, [initialWorkshops, fetchWorkshops])
 
   // This ensures the Google Maps script is loaded without exposing the API key in the client bundle
   useEffect(() => {
@@ -121,7 +120,6 @@ export default function WorkshopMap({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           }
-          setUserLocation(location)
           setMapCenter(location)
 
           // If we have a map reference, animate to the user's location
@@ -150,6 +148,13 @@ export default function WorkshopMap({
     }
   }
 
+  // Handler para clique no mapa
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (selectLocationMode && onLocationSelect && e.latLng) {
+      onLocationSelect(e.latLng.lat(), e.latLng.lng());
+    }
+  };
+
   if (loadError) {
     return <div className="text-center p-4">Erro ao carregar o mapa. Por favor, tente novamente mais tarde.</div>
   }
@@ -163,76 +168,64 @@ export default function WorkshopMap({
   }
 
   return (
-    <div className="relative">
-      <GoogleMap
-        mapContainerStyle={{ ...mapContainerStyle, height }}
-        center={mapCenter}
-        zoom={13}
-        onLoad={onMapLoad}
-        options={{
-          fullscreenControl: false,
-          streetViewControl: false,
-          mapTypeControl: false,
-          zoomControl: true,
-        }}
-      >
-        {/* User location marker */}
-        {userLocation && (
-          <Marker
-            position={userLocation}
-            icon={{
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 7,
-              fillColor: "#4285F4",
-              fillOpacity: 1,
-              strokeColor: "#ffffff",
-              strokeWeight: 2,
-            }}
-          />
-        )}
-
-        {/* Workshop markers */}
-        {workshops.map((workshop) => (
-          <Marker
-            key={workshop.id}
-            position={{ lat: workshop.latitude, lng: workshop.longitude }}
-            onClick={() => handleMarkerClick(workshop)}
-          />
-        ))}
-
-        {/* Info window for selected workshop */}
-        {selectedWorkshop && (
-          <InfoWindow
-            position={{ lat: selectedWorkshop.latitude, lng: selectedWorkshop.longitude }}
-            onCloseClick={() => setSelectedWorkshop(null)}
-          >
-            <div className="p-1 max-w-[250px]">
-              <h3 className="font-medium text-sm">{selectedWorkshop.nome}</h3>
-              <p className="text-xs text-gray-600 mt-1">{selectedWorkshop.endereco}</p>
-              {selectedWorkshop.telefone && (
-                <p className="text-xs mt-1">
-                  <span className="font-medium">Tel:</span> {selectedWorkshop.telefone}
-                </p>
-              )}
-              <div className="mt-2">
-                <Link href={`/oficinas/${selectedWorkshop.id}`} className="text-xs text-blue-600 hover:underline">
-                  Ver detalhes
-                </Link>
+    <div style={{ ...mapContainerStyle, height }} className="relative">
+      {isLoaded ? (
+        <GoogleMap
+          mapContainerStyle={{ width: "100%", height }}
+          center={mapCenter}
+          zoom={13}
+          onLoad={onMapLoad}
+          onClick={handleMapClick}
+        >
+          {/* Marker de seleção de localização */}
+          {selectLocationMode && marker && (
+            <Marker position={marker} />
+          )}
+          {/* Workshop markers (apenas se não estiver em modo de seleção) */}
+          {!selectLocationMode && workshops.map((workshop) => (
+            <Marker
+              key={workshop.id}
+              position={{ lat: workshop.latitude, lng: workshop.longitude }}
+              onClick={() => handleMarkerClick(workshop)}
+            />
+          ))}
+          {/* Info window para oficina selecionada */}
+          {!selectLocationMode && selectedWorkshop && (
+            <InfoWindow
+              position={{ lat: selectedWorkshop.latitude, lng: selectedWorkshop.longitude }}
+              onCloseClick={() => setSelectedWorkshop(null)}
+            >
+              <div className="p-1 max-w-[250px]">
+                <h3 className="font-medium text-sm">{selectedWorkshop.nome}</h3>
+                <p className="text-xs text-gray-600 mt-1">{selectedWorkshop.endereco}</p>
+                {selectedWorkshop.telefone && (
+                  <p className="text-xs mt-1">
+                    <span className="font-medium">Tel:</span> {selectedWorkshop.telefone}
+                  </p>
+                )}
+                <div className="mt-2">
+                  <Link href={`/oficinas/${selectedWorkshop.id}`} className="text-xs text-blue-600 hover:underline">
+                    Ver detalhes
+                  </Link>
+                </div>
               </div>
-            </div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
-
-      {/* Location button */}
-      <Button
-        onClick={getUserLocation}
-        className="absolute bottom-4 right-4 bg-white text-black hover:bg-gray-100 shadow-md"
-        size="sm"
-      >
-        <Navigation className="h-4 w-4 mr-2" />
-        Minha Localização
-      </Button>
+            </InfoWindow>
+          )}
+        </GoogleMap>
+      ) : (
+        <Skeleton className="w-full h-full min-h-[300px]" />
+      )}
+      {/* Botão de localização do usuário (apenas se não estiver em modo de seleção) */}
+      {!selectLocationMode && (
+        <Button
+          onClick={getUserLocation}
+          className="absolute bottom-4 right-4 bg-white text-black hover:bg-gray-100 shadow-md"
+          size="sm"
+        >
+          <Navigation className="h-4 w-4 mr-2" />
+          Minha Localização
+        </Button>
+      )}
     </div>
-  )
+  );
 }

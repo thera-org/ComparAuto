@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import Header from "@/components/Header"
@@ -9,7 +10,8 @@ import { Button } from "@/components/ui/button"
 import { MapPin, Heart, Star, List, Search, Filter, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import WorkshopMap from "@/components/WorkshopMap"
+
+const WorkshopMap = dynamic(() => import("@/components/WorkshopMap"), { ssr: false })
 
 interface UserData {
   nome?: string
@@ -18,26 +20,7 @@ interface UserData {
   photoURL?: string
 }
 
-interface Workshop {
-  id: number
-  name: string
-  address: string
-  lat: number
-  lng: number
-  rating: number
-  price: string
-  nome?: string
-  endereco?: string
-  latitude?: number
-  longitude?: number
-  foto_url?: string
-  telefone?: string
-  email?: string
-  descricao?: string
-}
-
-// Definir tipo local para WorkshopMap para evitar erro de importação de tipo
-interface WorkshopMapType {
+interface Oficina {
   id: string
   nome: string
   endereco: string
@@ -45,32 +28,17 @@ interface WorkshopMapType {
   longitude: number
   foto_url?: string
   telefone?: string
-  email?: string
-  descricao?: string
-}
-
-function toMapWorkshop(w: Workshop): WorkshopMapType {
-  return {
-    id: String(w.id),
-    nome: w.name || w.nome || "",
-    endereco: w.address || w.endereco || "",
-    latitude: w.lat ?? w.latitude ?? 0,
-    longitude: w.lng ?? w.longitude ?? 0,
-    foto_url: w.foto_url,
-    telefone: w.telefone,
-    email: w.email,
-    descricao: w.descricao,
-  }
+  status?: string
 }
 
 export default function Home() {
   const [, setUserData] = useState<UserData | null>(null)
+  const [oficinas, setOficinas] = useState<Oficina[]>([])
   const [loading, setLoading] = useState(true)
   const [showMap, setShowMap] = useState(false)
-  const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [filteredWorkshops, setFilteredWorkshops] = useState<Workshop[]>([])
+  const [filteredOficinas, setFilteredOficinas] = useState<Oficina[]>([])
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -113,48 +81,34 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    // Mock data - substitua por chamada real ao Supabase
-    const mockWorkshops: Workshop[] = [
-       {
-        id: 1,
-        name: "Chapadinha Auto Center",
-        address: "Jardim das Margaridas, São Luis",
-        lat: -23.5635,
-        lng: -46.6543,
-        rating: 4.8,
-        price: "R$120/hora"
-      },
-      /*{
-        id: 2,
-        name: "Auto Serviço Premium",
-        address: "Rua Augusta, 1500, São Paulo",
-        lat: -23.5586,
-        lng: -46.6592,
-        rating: 4.6,
-        price: "R$150/hora"
-      }*/
-    ]
-    setWorkshops(mockWorkshops)
+    async function fetchOficinas() {
+      const { data } = await supabase
+        .from("oficinas")
+        .select("id, nome, endereco, latitude, longitude, foto_url, telefone, status")
+        .not("latitude", "is", null)
+        .not("longitude", "is", null)
+      setOficinas((data as Oficina[]) || [])
+      setLoading(false)
+    }
+    fetchOficinas()
   }, [])
 
   useEffect(() => {
-    // Filtro por busca e categoria
-    let filtered = workshops
+    let filtered = oficinas
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
-        (workshop) =>
-          (workshop.name?.toLowerCase().includes(term) ||
-            workshop.address?.toLowerCase().includes(term) ||
-            workshop.descricao?.toLowerCase().includes(term))
+        (oficina) =>
+          oficina.nome?.toLowerCase().includes(term) ||
+          oficina.endereco?.toLowerCase().includes(term)
       )
     }
     if (selectedCategory) {
-      // Simulação de filtro por categoria
+      // Filtro por categoria pode ser implementado aqui se houver campo
       filtered = filtered.filter(() => true)
     }
-    setFilteredWorkshops(filtered)
-  }, [searchTerm, selectedCategory, workshops])
+    setFilteredOficinas(filtered)
+  }, [searchTerm, selectedCategory, oficinas])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -273,12 +227,12 @@ export default function Home() {
       <main className="flex-1 container mx-auto px-4 py-8">
         {!showMap ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredWorkshops.map((workshop) => (
-              <div key={workshop.id} className="space-y-2">
+            {filteredOficinas.map((oficina) => (
+              <div key={oficina.id} className="space-y-2">
                 <div className="relative aspect-square rounded-xl overflow-hidden">
                   <Image
-                    src={workshop.foto_url || "/placeholder.svg"}
-                    alt={workshop.name ? String(workshop.name) : workshop.nome || "Oficina"}
+                    src={oficina.foto_url || "/placeholder.svg"}
+                    alt={oficina.nome || "Oficina"}
                     fill
                     className="object-cover"
                   />
@@ -287,30 +241,36 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="flex justify-between">
-                  <h3 className="font-medium">{workshop.name || workshop.nome}</h3>
+                  <h3 className="font-medium">{oficina.nome}</h3>
+                  {/* Rating pode ser implementado se existir campo */}
                   <div className="flex items-center">
                     <Star className="h-4 w-4 fill-current" />
-                    <span className="ml-1">{workshop.rating || "Novo"}</span>
+                    <span className="ml-1">Novo</span>
                   </div>
                 </div>
-                <p className="text-gray-500">{workshop.address || workshop.endereco}</p>
+                <p className="text-gray-500">{oficina.endereco}</p>
                 <p>
-                  <span className="font-medium">{workshop.price || "Serviços a partir de R$50"}</span>
+                  <span className="font-medium">Serviços a partir de R$50</span>
                 </p>
               </div>
             ))}
           </div>
         ) : (
           <WorkshopMap
-            workshops={filteredWorkshops
-              .filter((w) => (w.lat ?? w.latitude) && (w.lng ?? w.longitude))
-              .map(toMapWorkshop)
-            }
+            workshops={filteredOficinas.map((oficina) => ({
+              id: String(oficina.id),
+              nome: oficina.nome,
+              endereco: oficina.endereco,
+              latitude: oficina.latitude,
+              longitude: oficina.longitude,
+              foto_url: oficina.foto_url,
+              telefone: oficina.telefone,
+            }))}
             height="600px"
           />
         )}
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10">
-          <Button 
+          <Button
             onClick={() => setShowMap(!showMap)}
             className="rounded-full bg-gray-900 text-white px-4 py-3 shadow-lg gap-2"
           >

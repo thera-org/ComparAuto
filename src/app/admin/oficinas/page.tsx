@@ -23,6 +23,7 @@ import { Pencil, Plus, MapPin, Phone, Mail } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useRouter } from "next/navigation"
 
 interface Oficina {
   id: string
@@ -42,7 +43,7 @@ const oficinaSchema = z.object({
   endereco: z.string().min(5, { message: "Endereço deve ter pelo menos 5 caracteres" }),
   descricao: z.string().optional(),
   status: z.string(),
-  user_id: z.string().uuid({ message: "ID de usuário inválido" }),
+  user_id: z.string().uuid({ message: "ID de usuário inválido" }).optional().or(z.literal("")).optional(),
 })
 
 export default function OficinasPage() {
@@ -60,6 +61,7 @@ export default function OficinasPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [currentOficina, setCurrentOficina] = useState<Oficina | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof oficinaSchema>>({
     resolver: zodResolver(oficinaSchema),
@@ -124,18 +126,7 @@ export default function OficinasPage() {
   }
 
   const handleAddNew = () => {
-    setCurrentOficina(null)
-    setIsEditing(false)
-    form.reset({
-      nome: "",
-      email: "",
-      telefone: "",
-      endereco: "",
-      descricao: "",
-      status: "ativo",
-      user_id: users.length > 0 ? users[0].id : "",
-    })
-    setDialogOpen(true)
+    router.push("/admin/oficinas/nova");
   }
 
   const onSubmit = async (data: z.infer<typeof oficinaSchema>) => {
@@ -401,18 +392,18 @@ export default function OficinasPage() {
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione um usuário" />
+                          <SelectValue placeholder="Selecione um usuário (opcional)" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {users.map((user) => (
                           <SelectItem key={user.id} value={user.id}>
-                            {user.nome || user.email}
+                            {user.nome ? `${user.nome} (${user.email})` : user.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>Usuário que terá acesso a esta oficina</FormDescription>
+                    <FormDescription>Usuário que terá acesso a esta oficina (opcional)</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

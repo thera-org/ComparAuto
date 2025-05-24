@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import UserAvatar from "@/app/admin/user-avatar"
 import { LayoutDashboard, Users, Wrench, Menu, LogOut, Search } from "lucide-react"
@@ -20,7 +20,9 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children, searchPlaceholder = "Buscar...", onSearch }: AdminLayoutProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
+  const [adminName, setAdminName] = useState<string | null>(null)
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -32,9 +34,30 @@ export default function AdminLayout({ children, searchPlaceholder = "Buscar...",
     return () => window.removeEventListener("resize", checkScreenSize)
   }, [])
 
+  useEffect(() => {
+    // Tenta pegar o nome do admin do localStorage
+    const adminData = localStorage.getItem("adminData")
+    if (adminData) {
+      try {
+        const parsed = JSON.parse(adminData)
+        setAdminName(parsed.nome || parsed.username || "Administrador")
+      } catch {
+        setAdminName("Administrador")
+      }
+    } else {
+      setAdminName("Administrador")
+    }
+  }, [])
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     window.location.href = "/login"
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin")
+    localStorage.removeItem("adminData")
+    router.push("/admin/login")
   }
 
   const navItems = [
@@ -122,8 +145,16 @@ export default function AdminLayout({ children, searchPlaceholder = "Buscar...",
               />
             </div>
           )}
-          <div className="ml-auto">
-            <UserAvatar />
+          <div className="ml-auto flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              Admin: <strong>{adminName}</strong>
+            </span>
+            <Button
+              onClick={handleLogout}
+              className="px-3 py-1 rounded bg-neutral-900 text-white hover:bg-neutral-700 text-sm font-medium"
+            >
+              Logout
+            </Button>
           </div>
         </header>
         {/* Conteúdo da página */}

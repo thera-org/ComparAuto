@@ -59,34 +59,56 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      // Buscar usuários
-      const { data: users, error: usersError } = await supabase.from("users").select("*")
+      // Buscar usuários da tabela correta
+      const { data: usuarios, error: usuariosError } = await supabase.from("usuarios").select("*")
+      if (usuariosError) throw usuariosError
 
-      if (usersError) throw usersError
-
-      // Buscar serviços
-      const { data: services, error: servicesError } = await supabase.from("services").select("*")
-
-      if (servicesError) throw servicesError
+      // Buscar serviços (se existir a tabela "servicos", senão deixa zerado)
+      let totalServices = 0
+      try {
+        const { data: servicos, error: servicosError } = await supabase.from("servicos").select("*")
+        if (servicosError) {
+          // Se a tabela não existir, ignora o erro e mantém 0
+          if (!servicosError.message.includes('does not exist')) throw servicosError
+        } else {
+          totalServices = servicos?.length || 0
+        }
+      } catch {
+        totalServices = 0
+      }
 
       // Calcular estatísticas
-      const totalUsers = users?.length || 0
-      const totalMechanics = users?.filter((u) => u.role === "mechanic").length || 0
-      const totalServices = services?.length || 0
+      const totalUsers = usuarios?.length || 0
+      const totalMechanics = usuarios?.filter((u) => u.tipo === "oficina").length || 0
 
-      // Calcular crescimento (exemplo: comparando com o mês anterior)
-      // Calcular crescimento com base em dados reais (comparando com o mês anterior)
+      // Calcular crescimento mensal (comparando com o mês anterior)
+      const now = new Date()
+      const firstDayThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      const lastDayLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
+
+      // Buscar usuários criados no mês anterior
       const { data: previousMonthUsers, error: previousMonthError } = await supabase
-        .from("users")
-        .select("*")
-        .gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString())
-        .lt("created_at", new Date(new Date().setDate(1)).toISOString())
+        .from("usuarios")
+        .select("id,criado_em")
+        .gte("criado_em", firstDayLastMonth.toISOString())
+        .lte("criado_em", lastDayLastMonth.toISOString())
 
       if (previousMonthError) throw previousMonthError
 
+      // Buscar usuários criados no mês atual
+      const { data: thisMonthUsers, error: thisMonthError } = await supabase
+        .from("usuarios")
+        .select("id,criado_em")
+        .gte("criado_em", firstDayThisMonth.toISOString())
+        .lte("criado_em", now.toISOString())
+
+      if (thisMonthError) throw thisMonthError
+
       const previousMonthCount = previousMonthUsers?.length || 0
+      const thisMonthCount = thisMonthUsers?.length || 0
       const growth = previousMonthCount > 0
-        ? ((totalUsers - previousMonthCount) / previousMonthCount) * 100
+        ? ((thisMonthCount - previousMonthCount) / previousMonthCount) * 100
         : 0
 
       setStats({
@@ -96,8 +118,7 @@ export default function AdminDashboard() {
         growth: Math.round(growth),
       })
 
-      // Preparar dados para o gráfico de serviços por mês
-      // Simulando dados para o exemplo
+      // Simular dados de serviços por mês (até ter dados reais)
       const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"]
       const servicesByMonth = months.map((month) => ({
         name: month,
@@ -105,11 +126,11 @@ export default function AdminDashboard() {
       }))
       setServiceData(servicesByMonth)
 
-      // Preparar dados para o gráfico de pizza de usuários por função
+      // Gráfico de pizza de usuários por função
       const userRoles = [
-        { name: "Clientes", value: users?.filter((u) => u.role === "user").length || 0 },
-        { name: "Mecânicos", value: totalMechanics },
-        { name: "Admins", value: users?.filter((u) => u.role === "admin").length || 0 },
+        { name: "Clientes", value: usuarios?.filter((u) => u.tipo === "cliente").length || 0 },
+        { name: "Oficinas", value: totalMechanics },
+        { name: "Admins", value: usuarios?.filter((u) => u.tipo === "admin").length || 0 },
       ]
       setUserRoleData(userRoles)
 
