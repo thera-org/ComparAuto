@@ -7,7 +7,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { MapPin, Heart, Star, List, Search, Filter, X } from "lucide-react"
+import { MapPin, Heart, Star, List, Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 
@@ -149,28 +149,26 @@ export default function Home() {
       <div className="border-b sticky top-[72px] bg-white z-40">
         <div className="container mx-auto px-4">
           <div className="py-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <div className="flex justify-center mb-4">
+              <div className="relative w-full max-w-2xl flex items-center bg-white rounded-full shadow-lg px-4 py-2 border border-gray-200">
+                <Search className="text-gray-400 h-5 w-5 mr-2" />
                 <Input
                   type="text"
                   placeholder="Buscar oficinas, serviços..."
-                  className="pl-9 pr-4"
+                  className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-base"
                   value={searchTerm}
                   onChange={handleSearch}
+                  style={{ boxShadow: 'none' }}
                 />
                 {searchTerm && (
                   <button
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 ml-2"
                     onClick={() => setSearchTerm("")}
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-5 w-5" />
                   </button>
                 )}
               </div>
-              <Button variant="outline" size="icon" className="shrink-0">
-                <Filter className="h-4 w-4" />
-              </Button>
             </div>
             <div className="flex items-center overflow-x-auto py-2 scrollbar-hide gap-4">
               {categories.map((category) => (

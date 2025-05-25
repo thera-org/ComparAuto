@@ -120,11 +120,3 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    @apply border;
-  }
-  body {
-    @apply text-black;
-  }
-}
