@@ -258,6 +258,20 @@ export default function OficinasPage() {
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Editar</span>
                       </Button>
+                      {oficina.status === "pendente" && (
+                        <>
+                          <Button size="sm" className="ml-2" onClick={async () => {
+                            await supabase.from("oficinas").update({ status: "ativo" }).eq("id", oficina.id);
+                            setOficinas(oficinas.map(o => o.id === oficina.id ? { ...o, status: "ativo" } : o));
+                            setFilteredOficinas(filteredOficinas.map(o => o.id === oficina.id ? { ...o, status: "ativo" } : o));
+                          }}>Aprovar</Button>
+                          <Button size="sm" variant="destructive" className="ml-2" onClick={async () => {
+                            await supabase.from("oficinas").update({ status: "inativo" }).eq("id", oficina.id);
+                            setOficinas(oficinas.map(o => o.id === oficina.id ? { ...o, status: "inativo" } : o));
+                            setFilteredOficinas(filteredOficinas.map(o => o.id === oficina.id ? { ...o, status: "inativo" } : o));
+                          }}>Recusar</Button>
+                        </>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
