@@ -41,7 +41,7 @@ const mapContainerStyle = {
   borderRadius: "0.5rem",
 }
 
-const defaultCenter = { lat: -23.5505, lng: -46.6333 } // São Paulo as default
+const saoLuisCenter = { lat: -2.5307, lng: -44.3068 }; // Centro de São Luís do Maranhão
 
 export default function WorkshopMap({
   initialCenter,
@@ -54,7 +54,7 @@ export default function WorkshopMap({
 }: WorkshopMapProps) {
   const [workshops, setWorkshops] = useState<Workshop[]>(initialWorkshops || [])
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null)
-  const [mapCenter, setMapCenter] = useState(initialCenter || defaultCenter)
+  const [mapCenter, setMapCenter] = useState(initialCenter || saoLuisCenter)
   const mapRef = useRef<google.maps.Map | null>(null)
 
   const { isLoaded, loadError } = useLoadScript({
@@ -168,7 +168,7 @@ export default function WorkshopMap({
   }
 
   return (
-    <div style={{ ...mapContainerStyle, height }} className="relative">
+    <div style={{ ...mapContainerStyle, height, background: 'linear-gradient(135deg, #e0e7ff 0%, #fef9c3 100%)', boxShadow: '0 4px 32px 0 rgba(0,0,0,0.10)' }} className="relative border-2 border-blue-200 rounded-2xl overflow-hidden">
       {isLoaded ? (
         <GoogleMap
           mapContainerStyle={{ width: "100%", height }}
@@ -176,6 +176,12 @@ export default function WorkshopMap({
           zoom={13}
           onLoad={onMapLoad}
           onClick={handleMapClick}
+          options={{
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: true,
+            zoomControl: true,
+          }}
         >
           {/* Marker de seleção de localização */}
           {selectLocationMode && marker && (
@@ -219,7 +225,7 @@ export default function WorkshopMap({
       {!selectLocationMode && (
         <Button
           onClick={getUserLocation}
-          className="absolute bottom-4 right-4 bg-white text-black hover:bg-gray-100 shadow-md"
+          className="absolute top-4 left-4 bg-white text-black hover:bg-gray-100 shadow-md z-10"
           size="sm"
         >
           <Navigation className="h-4 w-4 mr-2" />
