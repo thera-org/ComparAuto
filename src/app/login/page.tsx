@@ -30,7 +30,16 @@ export default function LoginPage() {
     const checkAuth = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error) return;
-      if (user) router.replace("/");
+      if (user) {
+        // Se veio com redirect, manda para lá
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get("redirect");
+        if (redirect) {
+          router.replace(redirect);
+        } else {
+          router.replace("/");
+        }
+      }
     };
     checkAuth();
   }, [router]);

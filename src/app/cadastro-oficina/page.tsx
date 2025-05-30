@@ -1,9 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function CadastroOficina() {
+  const router = useRouter();
+
+  // Handler for CTA button
+  async function handleCadastroClick(e: React.MouseEvent) {
+    e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      // Not logged in, redirect to login with redirect param
+      router.push("/login?redirect=/cadastro-oficina/formulario");
+    } else {
+      // Logged in, go to form
+      router.push("/cadastro-oficina/formulario");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white flex flex-col items-center py-0 px-0">
       {/* HERO SECTION */}
@@ -11,7 +27,7 @@ export default function CadastroOficina() {
         <Image src="/logo.png" alt="ComparAuto Logo" width={90} height={90} className="mx-auto mb-4" />
         <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">Sua oficina no topo do Brasil!</h1>
         <p className="text-lg md:text-2xl text-blue-100 mb-6 max-w-2xl mx-auto">Cadastre sua oficina na ComparAuto e conquiste novos clientes todos os dias. Visibilidade, confiança e crescimento para o seu negócio!</p>
-        <Link href="#cadastro" className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-full shadow-lg text-lg transition">Quero minha oficina na ComparAuto</Link>
+        <button onClick={handleCadastroClick} className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-full shadow-lg text-lg transition">Quero minha oficina na ComparAuto</button>
       </section>
 
       {/* BENEFÍCIOS */}
@@ -75,7 +91,7 @@ export default function CadastroOficina() {
       {/* CALL TO ACTION */}
       <section id="cadastro" className="w-full bg-yellow-400 py-12 px-4 flex flex-col items-center">
         <h3 className="text-2xl font-bold text-blue-900 mb-4">Pronto para crescer com a ComparAuto?</h3>
-        <Link href="/cadastro-oficina/formulario" className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 px-10 rounded-full shadow-lg text-xl transition mb-2">Cadastrar minha oficina agora</Link>
+        <button onClick={handleCadastroClick} className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 px-10 rounded-full shadow-lg text-xl transition mb-2">Cadastrar minha oficina agora</button>
         <span className="text-blue-900 text-md">É rápido, gratuito e sem compromisso!</span>
       </section>
 
