@@ -115,14 +115,14 @@ export default function AdminDashboard() {
         users: totalUsers,
         mechanics: totalMechanics,
         services: totalServices,
-        growth: Math.round(growth),
-      })
+        growth: Math.round(growth),      })
 
+      // TODO: Substituir dados simulados por dados reais do banco
       // Simular dados de serviços por mês (até ter dados reais)
       const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"]
       const servicesByMonth = months.map((month) => ({
         name: month,
-        serviços: Math.floor(Math.random() * 50) + 10,
+        serviços: Math.floor(Math.random() * 50) + 10, // TODO: Buscar dados reais de serviços
       }))
       setServiceData(servicesByMonth)
 

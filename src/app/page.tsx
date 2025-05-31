@@ -40,6 +40,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [filteredOficinas, setFilteredOficinas] = useState<Oficina[]>([])
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -89,14 +90,22 @@ export default function Home() {
         .not("longitude", "is", null)
       setOficinas((data as Oficina[]) || [])
       setLoading(false)
-    }
-    fetchOficinas()
+    }    fetchOficinas()
   }, [])
+
+  // Debounce para o searchTerm para melhorar performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 300) // 300ms de delay
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
 
   useEffect(() => {
     let filtered = oficinas
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
+    if (debouncedSearchTerm) {
+      const term = debouncedSearchTerm.toLowerCase()
       filtered = filtered.filter(
         (oficina) =>
           oficina.nome?.toLowerCase().includes(term) ||
@@ -107,7 +116,7 @@ export default function Home() {
       filtered = filtered.filter((oficina) => oficina.category === selectedCategory)
     }
     setFilteredOficinas(filtered)
-  }, [searchTerm, selectedCategory, oficinas])
+  }, [debouncedSearchTerm, selectedCategory, oficinas])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
