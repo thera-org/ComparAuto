@@ -123,9 +123,9 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({ provider });
-      if (error) setError("Erro ao entrar com " + provider);
+      if (error) setError("Erro ao entrar com " + provider.charAt(0).toUpperCase() + provider.slice(1));
     } catch {
-      setError("Erro inesperado ao entrar com " + provider);
+      setError("Erro inesperado ao entrar com " + provider.charAt(0).toUpperCase() + provider.slice(1));
     } finally {
       setLoading(false);
     }
