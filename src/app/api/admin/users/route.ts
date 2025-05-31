@@ -26,19 +26,18 @@ export async function GET(request: Request) {
     const providedToken = authHeader.slice(7); // Remove "Bearer "
     const expectedToken = process.env.ADMIN_API_KEY;
     
-    if (!expectedToken || providedToken.length !== expectedToken.length) {
+    if (!expectedToken) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
     }
     
     // Usar comparação segura contra timing attacks
-    let isValid = true;
-    for (let i = 0; i < providedToken.length; i++) {
-      if (providedToken[i] !== expectedToken[i]) {
-        isValid = false;
-      }
-    }
+    const providedTokenBuffer = Buffer.from(providedToken);
+    const expectedTokenBuffer = Buffer.from(expectedToken);
     
-    if (!isValid) {
+    if (
+      providedTokenBuffer.length !== expectedTokenBuffer.length ||
+      !crypto.timingSafeEqual(providedTokenBuffer, expectedTokenBuffer)
+    ) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
     }
     // Buscar todos os usuários da tabela usuarios
