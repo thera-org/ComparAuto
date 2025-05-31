@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 // Criar cliente Supabase com service role key para operações admin
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   {
     auth: {
