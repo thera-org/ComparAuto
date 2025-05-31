@@ -1,24 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ComparAuto
 
-## Getting Started aaaaaa
+Plataforma para comparar preços de serviços automotivos.
 
-First, run the development server:
+## Como rodar localmente
+
+1. Instale as dependências:
+
+```bash
+npm install
+```
+
+2. Configure as variáveis de ambiente:
+
+Crie um arquivo `.env.local` na raiz com:
+
+```
+SUPABASE_URL=...
+SUPABASE_ANON_KEY=...
+```
+
+3. Rode o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Recomenda-se o deploy na [Vercel](https://vercel.com/). Basta importar o repositório e configurar as variáveis de ambiente.
+
+## Tecnologias principais
+- Next.js
+- React
+- TypeScript
+- Supabase
+- Tailwind CSS
+- Radix UI
+
+## Scripts úteis
+- `npm run dev` — inicia o servidor de desenvolvimento
+- `npm run build` — gera build de produção
+- `npm run start` — inicia o servidor em produção
+- `npm run lint` — executa o linter
+
+## Contribuição
+Pull requests são bem-vindos!
 
 ## Learn More
 

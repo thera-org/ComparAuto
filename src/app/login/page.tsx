@@ -1,126 +1,163 @@
 "use client";
-
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
-import "../signup/signup.css";
+import { Eye, EyeOff, AlertCircle, Loader2, LogIn, Facebook, Apple } from "lucide-react";
+import Image from "next/image";
+import styles from './login.module.css';
+
+// Regex simples para e-mail
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [blockedUntil, setBlockedUntil] = useState<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Checa autenticação ao montar
   useEffect(() => {
     const checkAuth = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (error) {
-        console.error("Error checking auth:", error);
-        return;
-      }
-
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) return;
       if (user) {
-        router.replace("/");
+        // Se veio com redirect, manda para lá
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get("redirect");
+        if (redirect) {
+          router.replace(redirect);
+        } else {
+          router.replace("/");
+        }
       }
     };
-
     checkAuth();
   }, [router]);
 
+  // Bloqueio temporário após 5 tentativas
+  useEffect(() => {
+    if (loginAttempts >= 5) {
+      const until = Date.now() + 30000;
+      setBlockedUntil(until);
+      timerRef.current = setTimeout(() => {
+        setLoginAttempts(0);
+        setBlockedUntil(null);
+      }, 30000);
+    }
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [loginAttempts]);
+
+  // Validação em tempo real
+  useEffect(() => {
+    if (formData.email && !emailRegex.test(formData.email)) {
+      setEmailError("E-mail inválido");
+    } else {
+      setEmailError("");
+    }
+    if (formData.password && formData.password.length < 6) {
+      setPasswordError("A senha deve ter pelo menos 6 caracteres");
+    } else {
+      setPasswordError("");
+    }
+  }, [formData]);
+
+  // Manipula mudança dos campos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };  // Submissão do login
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
-
+    if (blockedUntil && Date.now() < blockedUntil) {
+      const remainingTime = Math.ceil((blockedUntil - Date.now()) / 1000);
+      setError(`Login temporariamente bloqueado. Tente novamente em ${remainingTime} segundos.`);
+      return;
+    }
+    if (emailError || passwordError) return;
+    setLoading(true);
     try {
-      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
-
+      
       if (error) {
+        setLoginAttempts((a) => a + 1);
         if (error.message.includes("Invalid login credentials")) {
-          setError("Email ou senha incorretos. Tente novamente.");
+          setError("E-mail ou senha incorretos.");
+        } else if (error.message.includes("Email not confirmed")) {
+          setError("Por favor, confirme seu e-mail antes de fazer login.");
         } else if (error.message.includes("Too many requests")) {
           setError("Muitas tentativas de login. Tente novamente mais tarde.");
         } else {
           setError("Falha ao fazer login. Verifique suas informações.");
         }
         return;
+      }      // Login bem-sucedido
+      if (data.session) {
+        // Reset login attempts on successful login
+        setLoginAttempts(0);
+        
+        // Verifica se há parâmetro de redirect
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get("redirect");
+        
+        if (redirect) {
+          router.replace(redirect);
+        } else {
+          router.replace("/");
+        }
       }
-
-      if (data.user) {
-        router.replace("/");
-      }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Erro inesperado ao fazer login.");
     } finally {
       setLoading(false);
     }
   }
 
-  const handleGoogleLogin = async () => {
+  // Login com Google/Facebook/Apple
+  const handleOAuthLogin = async (provider: "google" | "facebook" | "apple") => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-      });
-
-      if (error) {
-        console.error(error);
-        setError("Erro ao entrar com Google. Tente novamente.");
-        return;
-      }
-
-      if (data) {
-        router.replace("/");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Erro inesperado ao entrar com Google.");
+      const { error } = await supabase.auth.signInWithOAuth({ provider });
+      if (error) setError("Erro ao entrar com " + provider.charAt(0).toUpperCase() + provider.slice(1));
+    } catch {
+      setError("Erro inesperado ao entrar com " + provider.charAt(0).toUpperCase() + provider.slice(1));
     } finally {
       setLoading(false);
     }
   };
 
+  // Bloqueio de login
+  const isBlocked = blockedUntil && Date.now() < blockedUntil;
+  const blockSeconds = isBlocked ? Math.ceil((blockedUntil! - Date.now()) / 1000) : 0;
+  // Renderização principal
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <h1 className="auth-title">Login</h1>
-          <p className="auth-subtitle">Entre com suas credenciais para acessar sua conta</p>
-        </div>
-
+    <div className={styles.loginContainer}> 
+      <div className={styles.loginCard}> 
+        <div className={styles.loginHeader}>
+          <Image src="/logo.png" alt="ComparAuto Logo" width={60} height={60} className={styles.logo} />
+          <h1 className={styles.title}>Login</h1>
+          <p className={styles.subtitle}>Entre com suas credenciais para acessar sua conta</p>
+        </div>        {/* Mensagem de erro global */}
         {error && (
-          <div className="auth-alert error">
-            <AlertCircle size={16} />
+          <div className={styles.errorMessage} role="alert">
+            <AlertCircle size={18} />
             <span>{error}</span>
           </div>
-        )}
-
-        <form onSubmit={handleLogin} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+        )}        {/* Formulário de login */}
+        <form onSubmit={handleLogin} className={styles.form} autoComplete="on">
+          <div className={styles.inputGroup}>
+            <label htmlFor="email" className={styles.label}>Email</label>
             <input
               id="email"
               name="email"
@@ -129,12 +166,16 @@ export default function LoginPage() {
               onChange={handleChange}
               placeholder="seu@email.com"
               required
+              aria-label="E-mail"
+              aria-invalid={!!emailError}
+              className={`${styles.input} ${emailError ? styles.error : ""}`}
+              autoFocus
             />
+            {emailError && <span className={styles.inputError} role="alert">{emailError}</span>}
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Senha</label>
-            <div className="password-input">
+          <div className={styles.inputGroup}>
+            <label htmlFor="password" className={styles.label}>Senha</label>
+            <div className={styles.passwordContainer}>
               <input
                 id="password"
                 name="password"
@@ -143,70 +184,87 @@ export default function LoginPage() {
                 onChange={handleChange}
                 placeholder="Digite sua senha"
                 required
+                aria-label="Senha"
+                aria-invalid={!!passwordError}
+                className={`${styles.input} ${passwordError ? styles.error : ""}`}
               />
               <button
                 type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
+                className={styles.passwordToggle}
+                onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                title={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                tabIndex={0}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            <div className="forgot-password">
-              <Link href="/forgot-password" className="link">
+            {passwordError && <span className={styles.inputError} role="alert">{passwordError}</span>}
+            <div className={styles.forgotPassword}>
+              <Link href="/forgot-password" className={styles.forgotPasswordLink}>
                 Esqueceu sua senha?
               </Link>
             </div>
           </div>
-
-          <div className="remember-me">
-            <input type="checkbox" id="remember" />
+          <div className={styles.rememberMe}>
+            <input type="checkbox" id="remember" className={styles.checkbox} />
             <label htmlFor="remember">Lembrar de mim</label>
           </div>
-
-          <button type="submit" className="auth-button primary" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={Boolean(loading || emailError || passwordError || isBlocked)}
+            aria-disabled={Boolean(loading || emailError || passwordError || isBlocked) ? "true" : undefined}
+          >
+            {loading ? <Loader2 className={styles.spinning} size={20} /> : <LogIn size={20} />}
+            {isBlocked ? `Aguarde ${blockSeconds}s` : loading ? "Entrando..." : "Entrar"}
           </button>
-        </form>
-
-        <div className="auth-divider">
-          <span>ou</span>
+        </form><div className={styles.divider}>
+          <span className={styles.dividerLine} />
+          <span className={styles.dividerText}>ou</span>
+          <span className={styles.dividerLine} />
         </div>
-
-        <button
-          onClick={handleGoogleLogin}
-          className="auth-button google"
-          disabled={loading}
-          aria-label="Entrar com Google"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
-            <path
-              fill="#FFC107"
-              d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
-            />
-            <path
-              fill="#FF3D00"
-              d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
-            />
-            <path
-              fill="#4CAF50"
-              d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
-            />
-            <path
-              fill="#1976D2"
-              d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
-            />
-          </svg>
-          Entrar com Google
-        </button>
-
-        <p className="auth-link">
-          Não tem uma conta?{" "}
-          <Link href="/signup" className="link">
+        <div className={styles.oauthButtons}>
+          <button
+            onClick={() => handleOAuthLogin("google")}
+            className={styles.oauthButton}
+            disabled={loading}
+            aria-label="Entrar com Google"
+            title="Entrar com Google"
+            type="button"
+          >
+            <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
+            Entrar com Google
+          </button>
+          <button
+            onClick={() => handleOAuthLogin("facebook")}
+            className={`${styles.oauthButton} ${styles.facebook}`}
+            disabled={loading}
+            aria-label="Entrar com Facebook"
+            title="Entrar com Facebook"
+            type="button"
+          >
+            <Facebook size={20} />
+            Entrar com Facebook
+          </button>
+          <button
+            onClick={() => handleOAuthLogin("apple")}
+            className={`${styles.oauthButton} ${styles.apple}`}
+            disabled={loading}
+            aria-label="Entrar com Apple"
+            title="Entrar com Apple"
+            type="button"
+          >
+            <Apple size={20} />
+            Entrar com Apple
+          </button>
+        </div>
+        <div className={styles.signupPrompt}>
+          Não tem uma conta?{' '}
+          <Link href="/signup" className={styles.signupLink}>
             Crie agora
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );

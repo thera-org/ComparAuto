@@ -7,98 +7,66 @@ export default function Footer() {
   return (
     <footer className="border-t bg-white">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-bold mb-4">Support</h3>
+            <h3 className="font-bold mb-4">ComparAuto</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Help Center
+                <Link href="/" className="text-sm text-gray-600 hover:underline">
+                  Início
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  AirCover
+                <Link href="/ajuda" className="text-sm text-gray-600 hover:underline">
+                  Ajuda
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Safety information
+                <Link href="/cadastro-oficina" className="text-sm text-gray-600 hover:underline">
+                  Cadastre sua oficina
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Supporting people with disabilities
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Cancellation options
+                <Link href="/mensagens" className="text-sm text-gray-600 hover:underline">
+                  Mensagens
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="font-bold mb-4">Community</h3>
+            <h3 className="font-bold mb-4">Conta</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Disaster relief housing
+                <Link href="/login" className="text-sm text-gray-600 hover:underline">
+                  Login
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Combating discrimination
+                <Link href="/signup" className="text-sm text-gray-600 hover:underline">
+                  Criar conta
+                </Link>
+              </li>
+              <li>
+                <Link href="/conta" className="text-sm text-gray-600 hover:underline">
+                  Minha conta
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="font-bold mb-4">Hosting</h3>
+            <h3 className="font-bold mb-4">Sobre</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Airbnb your home
-                </Link>
+                <a href="mailto:contato@comparauto.com" className="text-sm text-gray-600 hover:underline">
+                  contato@comparauto.com
+                </a>
               </li>
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  AirCover for Hosts
-                </Link>
+                <span className="text-sm text-gray-600">© {new Date().getFullYear()} ComparAuto</span>
               </li>
               <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Hosting resources
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Community forum
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-bold mb-4">Airbnb</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Newsroom
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  New features
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-sm text-gray-600 hover:underline">
-                  Investors
+                <Link href="/ajuda" className="text-sm text-gray-600 hover:underline">
+                  Termos de uso
                 </Link>
               </li>
             </ul>
@@ -106,30 +74,12 @@ export default function Footer() {
         </div>
         <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
-            <p className="text-sm">© 2023 Airbnb, Inc.</p>
-            <div className="flex gap-4">
-              <Link href="#" className="text-sm text-gray-600 hover:underline">
-                Privacy
-              </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:underline">
-                Terms
-              </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:underline">
-                Sitemap
-              </Link>
-            </div>
+            <p className="text-sm">Desenvolvido por ComparAuto</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center">
               <Globe className="h-5 w-5 mr-2" />
-              <Link href="#" className="text-sm font-medium hover:underline">
-                English (US)
-              </Link>
-            </div>
-            <div>
-              <Link href="#" className="text-sm font-medium hover:underline">
-                $ USD
-              </Link>
+              <span className="text-sm font-medium">Português (BR)</span>
             </div>
           </div>
         </div>
