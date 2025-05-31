@@ -12,38 +12,38 @@ export default function ContaPage() {
   const [edit, setEdit] = useState(false)
   const [form, setForm] = useState({
     nome: "",
-    email: "",
-    telefone: "",
+    email: "",    telefone: "",
     endereco: "",
     avatar_url: ""
   })
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser()
-      if (error || !user) {
-        setUser(null)
-        setLoading(false)
-        return
-      }
-      const { data: userDoc } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single()
-      const merged = { ...user, ...userDoc }
-      setUser(merged)
-      setForm({
-        nome: merged.nome || "",
-        email: merged.email || "",
-        telefone: merged.telefone || "",
-        endereco: merged.endereco || "",
-        avatar_url: merged.avatar_url || ""
-      })
+  const fetchUser = async () => {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error || !user) {
+      setUser(null)
       setLoading(false)
+      return
     }
+    const { data: userDoc } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", user.id)
+      .single()
+    const merged = { ...user, ...userDoc }
+    setUser(merged)
+    setForm({
+      nome: merged.nome || "",
+      email: merged.email || "",
+      telefone: merged.telefone || "",
+      endereco: merged.endereco || "",
+      avatar_url: merged.avatar_url || ""
+    })
+    setLoading(false)
+  }
+
+  useEffect(() => {
     fetchUser()
   }, [])
 

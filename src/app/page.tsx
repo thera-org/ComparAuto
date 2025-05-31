@@ -29,6 +29,7 @@ interface Oficina {
   foto_url?: string
   telefone?: string
   status?: string
+  category?: string
 }
 
 export default function Home() {
@@ -79,12 +80,11 @@ export default function Home() {
 
     fetchUserData()
   }, [])
-
   useEffect(() => {
     async function fetchOficinas() {
       const { data } = await supabase
         .from("oficinas")
-        .select("id, nome, endereco, latitude, longitude, foto_url, telefone, status")
+        .select("id, nome, endereco, latitude, longitude, foto_url, telefone, status, category")
         .not("latitude", "is", null)
         .not("longitude", "is", null)
       setOficinas((data as Oficina[]) || [])
