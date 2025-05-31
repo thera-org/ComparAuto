@@ -94,7 +94,7 @@ export default function ContaPage() {
 
     setEdit(false)
     setSaving(false)
-    window.location.reload()
+    fetchUser()
   }
 
   if (loading) {
