@@ -15,9 +15,23 @@ const supabaseAdmin = createClient(
 
 export async function GET(request: Request) {
   try {
-    // Verificar autorização
+    // Verificar autorização com método mais robusto
     const authHeader = request.headers.get('Authorization');
-    if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_API_KEY}`) {
+    const expectedAuth = `Bearer ${process.env.ADMIN_API_KEY}`;
+    
+    if (!authHeader || !expectedAuth || authHeader.length !== expectedAuth.length) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
+    }
+    
+    // Usar comparação segura contra timing attacks
+    let isValid = true;
+    for (let i = 0; i < authHeader.length; i++) {
+      if (authHeader[i] !== expectedAuth[i]) {
+        isValid = false;
+      }
+    }
+    
+    if (!isValid) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
     }
     // Buscar todos os usuários da tabela usuarios
