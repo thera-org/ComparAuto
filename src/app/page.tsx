@@ -104,8 +104,7 @@ export default function Home() {
       )
     }
     if (selectedCategory) {
-      // Filtro por categoria pode ser implementado aqui se houver campo
-      filtered = filtered.filter(() => true)
+      filtered = filtered.filter((oficina) => oficina.category === selectedCategory)
     }
     setFilteredOficinas(filtered)
   }, [searchTerm, selectedCategory, oficinas])
