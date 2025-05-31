@@ -27,17 +27,17 @@ export async function GET(request: Request) {
     const expectedToken = process.env.ADMIN_API_KEY;
     
     if (!expectedToken) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
-    }
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });    }
     
     // Usar comparação segura contra timing attacks
-    const providedTokenBuffer = Buffer.from(providedToken);
-    const expectedTokenBuffer = Buffer.from(expectedToken);
+    let isValid = true;
+    for (let i = 0; i < providedToken.length; i++) {
+      if (providedToken[i] !== expectedToken[i]) {
+        isValid = false;
+      }
+    }
     
-    if (
-      providedTokenBuffer.length !== expectedTokenBuffer.length ||
-      !crypto.timingSafeEqual(providedTokenBuffer, expectedTokenBuffer)
-    ) {
+    if (!isValid) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
     }
     // Buscar todos os usuários da tabela usuarios
