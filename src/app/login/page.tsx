@@ -102,10 +102,11 @@ export default function LoginPage() {
           setError("Falha ao fazer login. Verifique suas informações.");
         }
         return;
-      }
-
-      // Login bem-sucedido
+      }      // Login bem-sucedido
       if (data.session) {
+        // Reset login attempts on successful login
+        setLoginAttempts(0);
+        
         // Verifica se há parâmetro de redirect
         const params = new URLSearchParams(window.location.search);
         const redirect = params.get("redirect");

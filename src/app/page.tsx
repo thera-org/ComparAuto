@@ -11,7 +11,10 @@ import { MapPin, Heart, Star, List, Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 
-const WorkshopMap = dynamic(() => import("@/components/WorkshopMap"), { ssr: false })
+const WorkshopMap = dynamic(() => import("@/components/WorkshopMap"), { 
+  ssr: false,
+  loading: () => <div>Loading map...</div>
+})
 
 interface UserData {
   nome?: string
