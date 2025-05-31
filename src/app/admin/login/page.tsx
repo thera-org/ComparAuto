@@ -14,23 +14,43 @@ export default function AdminLogin() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { data } = await supabase
-      .from("usuarios")
-      .select("*")
-      .eq("tipo", "admin")
-      .eq("username", form.username)
-      .eq("senha", form.senha)
-      .single();
-    setLoading(false);
-    if (data) {
-      localStorage.setItem("admin", "true");
-      router.push("/admin/usuarios");
-    } else {
+    
+    try {
+      // Usar autenticação do Supabase em vez de comparação direta
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: form.username + '@admin.comparauto.com', // Converter username para email
+        password: form.senha
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      if (authData.user) {
+        // Verificar se o usuário é admin na tabela usuarios
+        const { data: userData } = await supabase
+          .from("usuarios")
+          .select("tipo")
+          .eq("id", authData.user.id)
+          .eq("tipo", "admin")
+          .single();
+
+        if (userData) {
+          localStorage.setItem("admin", "true");
+          router.push("/admin/usuarios");
+        } else {
+          await supabase.auth.signOut();
+          alert("Acesso não autorizado");
+        }
+      }
+    } catch (error) {
+      console.error("Erro no login:", error);
       alert("Usuário ou senha inválidos");
+    } finally {
+      setLoading(false);
     }
   };
   return (
