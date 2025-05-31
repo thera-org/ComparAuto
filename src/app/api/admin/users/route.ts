@@ -17,16 +17,23 @@ export async function GET(request: Request) {
   try {
     // Verificar autorização com método mais robusto
     const authHeader = request.headers.get('Authorization');
-    const expectedAuth = `Bearer ${process.env.ADMIN_API_KEY}`;
     
-    if (!authHeader || !expectedAuth || authHeader.length !== expectedAuth.length) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
+    }
+    
+    // Extrair token do cabeçalho Bearer
+    const providedToken = authHeader.slice(7); // Remove "Bearer "
+    const expectedToken = process.env.ADMIN_API_KEY;
+    
+    if (!expectedToken || providedToken.length !== expectedToken.length) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
     }
     
     // Usar comparação segura contra timing attacks
     let isValid = true;
-    for (let i = 0; i < authHeader.length; i++) {
-      if (authHeader[i] !== expectedAuth[i]) {
+    for (let i = 0; i < providedToken.length; i++) {
+      if (providedToken[i] !== expectedToken[i]) {
         isValid = false;
       }
     }

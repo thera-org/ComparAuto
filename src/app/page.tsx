@@ -74,23 +74,30 @@ export default function Home() {
         }
       } else {
         setUserData(null)
-      }
-
-      setLoading(false)
+      }      setLoading(false)
     }
 
     fetchUserData()
   }, [])
+
   useEffect(() => {
     async function fetchOficinas() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("oficinas")
         .select("id, nome, endereco, latitude, longitude, foto_url, telefone, status, category")
         .not("latitude", "is", null)
         .not("longitude", "is", null)
-      setOficinas((data as Oficina[]) || [])
+      
+      if (error) {
+        console.error("Erro ao buscar oficinas:", error)
+        setOficinas([])
+      } else {
+        setOficinas((data as Oficina[]) || [])
+      }
       setLoading(false)
-    }    fetchOficinas()
+    }
+    
+    fetchOficinas()
   }, [])
 
   // Debounce para o searchTerm para melhorar performance
