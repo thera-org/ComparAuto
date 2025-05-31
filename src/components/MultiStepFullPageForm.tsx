@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, ChangeEvent, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface FormType {
   // Passo 0: Oficina
@@ -123,7 +124,7 @@ const diasSemana = [
   "Domingo",
 ];
 
-function validateStep(step: number, form: FormType): boolean {
+function validateStep(step: number, form: FormType, userData?: { nome: string; email: string; avatar_url: string } | null): boolean {
   switch (step) {
     case 0:
       return !!form.nome_oficina;
@@ -141,12 +142,13 @@ function validateStep(step: number, form: FormType): boolean {
     case 3:
       return form.servicosSelecionados.length > 0 && form.servicosSelecionados.every(s => s.valor);
     case 4:
-      return form.diasSelecionados.length > 0;
+      return form.diasSelecionados.length > 0 && !!form.horario_abertura && !!form.horario_fechamento;
     case 5:
       return form.pagamentosSelecionados.length > 0;
     case 6:
       return !!form.imagens && form.imagens.length > 0;
     case 7:
+      if (userData) return true;
       return (
         !!form.email_login &&
         !!form.senha &&
@@ -160,11 +162,164 @@ function validateStep(step: number, form: FormType): boolean {
 }
 
 export default function MultiStepFullPageForm() {
+  const router = useRouter();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormType>(initialForm);
   const [touched, setTouched] = useState<Partial<Record<keyof FormType, boolean>>>(
     {}
-  );
+  );  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmitOficina = async () => {
+    try {
+      setSubmitting(true);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+
+      // Verificar se o usuário existe na tabela usuarios
+      const { data: usuarioExiste, error: usuarioCheckError } = await supabase
+        .from('usuarios')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle(); // Use maybeSingle() em vez de single()
+
+      // Se não existir, criar o registro
+      if (!usuarioExiste && !usuarioCheckError) {
+        const { error: criarUsuarioError } = await supabase
+          .from('usuarios')
+          .insert({
+            id: user.id,
+            nome: user.user_metadata?.full_name || user.email,
+            email: user.email,
+            tipo: 'cliente'
+          });
+
+        if (criarUsuarioError) throw criarUsuarioError;
+      }
+
+      // Upload de imagens se houver
+      const imagensUrls: string[] = [];
+      if (form.imagens && form.imagens.length > 0) {
+        for (let i = 0; i < form.imagens.length; i++) {
+          const file = form.imagens[i];
+          const fileName = `${user.id}/${Date.now()}_${file.name}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('oficinas-imagens')
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('oficinas-imagens')
+            .getPublicUrl(fileName);
+
+          imagensUrls.push(publicUrl);
+        }
+      }
+
+      // Inserir dados na tabela principal oficinas
+      const { data: oficinaData, error: oficinaError } = await supabase
+        .from('oficinas')
+        .insert({
+          nome: form.nome_oficina,
+          endereco: `${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''}, ${form.bairro}, ${form.cidade} - ${form.estado}`,
+          telefone: form.telefone_fixo || form.whatsapp,
+          email: form.email,
+          descricao: form.descricao,
+          status: 'pendente',
+          user_id: user.id,
+          cnpj_cpf: form.cnpj_cpf,
+          razao_social: form.razao_social,
+          rua: form.rua,
+          numero: form.numero,
+          complemento: form.complemento,
+          bairro: form.bairro,
+          cidade: form.cidade,
+          estado: form.estado,
+          cep: form.cep,
+          telefone_fixo: form.telefone_fixo,
+          whatsapp: form.whatsapp,
+          site: form.site,
+          horario_funcionamento: `${form.horario_abertura} - ${form.horario_fechamento}`
+        })
+        .select()
+        .single();
+
+      if (oficinaError) throw oficinaError;
+
+      const oficinaId = oficinaData.id;
+
+      // Inserir serviços
+      if (form.servicosSelecionados && form.servicosSelecionados.length > 0) {
+        const servicosData = form.servicosSelecionados.map(servico => ({
+          oficina_id: oficinaId,
+          servico_nome: servico.nome,
+          servico_outros: form.servico_outros || null
+        }));
+
+        const { error: servicosError } = await supabase
+          .from('oficina_servicos')
+          .insert(servicosData);
+
+        if (servicosError) throw servicosError;
+      }
+
+      // Inserir formas de pagamento
+      if (form.pagamentosSelecionados && form.pagamentosSelecionados.length > 0) {
+        const pagamentosData = form.pagamentosSelecionados.map(pagamento => ({
+          oficina_id: oficinaId,
+          forma_pagamento: pagamento,
+          pagamento_outros: form.pagamento_outros || null
+        }));
+
+        const { error: pagamentosError } = await supabase
+          .from('oficina_pagamentos')
+          .insert(pagamentosData);
+
+        if (pagamentosError) throw pagamentosError;
+      }
+
+      // Inserir horários
+      if (form.diasSelecionados && form.diasSelecionados.length > 0) {
+        const horariosData = form.diasSelecionados.map(dia => ({
+          oficina_id: oficinaId,
+          dia_semana: dia,
+          horario_abertura: form.horario_abertura,
+          horario_fechamento: form.horario_fechamento
+        }));
+
+        const { error: horariosError } = await supabase
+          .from('oficina_horarios')
+          .insert(horariosData);
+
+        if (horariosError) throw horariosError;
+      }
+
+      // Inserir imagens
+      if (imagensUrls.length > 0) {
+        const imagensData = imagensUrls.map((url, index) => ({
+          oficina_id: oficinaId,
+          url_imagem: url,
+          descricao: `Imagem ${index + 1}`,
+          ordem: index
+        }));
+
+        const { error: imagensError } = await supabase
+          .from('oficina_imagens')
+          .insert(imagensData);
+
+        if (imagensError) throw imagensError;
+      }
+
+      setStep(9); // Go to confirmation step
+    } catch (error) {
+      console.error('Erro ao enviar dados da oficina:', error);
+      alert('Erro ao enviar dados da oficina. Tente novamente.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -185,12 +340,11 @@ export default function MultiStepFullPageForm() {
   };
 
   const handleNext = () => {
-    if (validateStep(step, form)) setStep((s) => s + 1);
+    if (validateStep(step, form, userData)) setStep((s) => s + 1);
     else setTouched((t) => ({ ...t, [`step${step}`]: true }));
   };
 
   const handlePrev = () => setStep((s) => Math.max(0, s - 1));
-
   // Busca endereço por CEP
   useEffect(() => {
     if (form.cep && form.cep.length === 8) {
@@ -202,7 +356,6 @@ export default function MultiStepFullPageForm() {
           }
         });
     }
-    // eslint-disable-next-line
   }, [form.cep]);
 
   // Busca usuário logado para passo de conta
@@ -502,6 +655,31 @@ export default function MultiStepFullPageForm() {
                 </label>
               ))}
             </div>
+            
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="font-medium">Horário de abertura *</label>
+                <input
+                  name="horario_abertura"
+                  type="time"
+                  value={form.horario_abertura}
+                  onChange={handleChange}
+                  className="px-4 py-3 rounded-lg border border-gray-300 w-full"
+                  required
+                />
+              </div>
+              <div>
+                <label className="font-medium">Horário de fechamento *</label>
+                <input
+                  name="horario_fechamento"
+                  type="time"
+                  value={form.horario_fechamento}
+                  onChange={handleChange}
+                  className="px-4 py-3 rounded-lg border border-gray-300 w-full"
+                  required
+                />
+              </div>
+            </div>
           </div>
         );
       case 5:
@@ -563,7 +741,51 @@ export default function MultiStepFullPageForm() {
         );
       case 8:
         return (
-          <TermosScrollStep onAvancar={() => setStep(9)} />
+          <TermosScrollStep onAvancar={handleSubmitOficina} submitting={submitting} />
+        );
+      case 9:
+        return (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
+            <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center gap-6 max-w-lg w-full text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-green-800">Oficina Enviada!</h2>
+                <p className="text-gray-600">
+                  Sua oficina foi enviada para análise da nossa equipe. 
+                  Você receberá um e-mail de confirmação em breve.
+                </p>
+              </div>
+
+              <div className="bg-blue-50 rounded-lg p-4 w-full">
+                <h3 className="font-semibold text-blue-800 mb-2">Entre em contato conosco:</h3>
+                <div className="space-y-2 text-sm text-blue-700">
+                  <p>📧 Email: suporte@comparauto.com</p>
+                  <p>📱 WhatsApp: (11) 99999-9999</p>
+                  <p>🕒 Horário: Segunda a Sexta, 8h às 18h</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 w-full">
+                <button
+                  onClick={() => router.push('/conta')}
+                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                >
+                  Ir para Minha Conta
+                </button>
+                <button
+                  onClick={() => router.push('/')}
+                  className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition"
+                >
+                  Voltar ao Início
+                </button>
+              </div>
+            </div>
+          </div>
         );
       default:
         return null;
@@ -579,65 +801,65 @@ export default function MultiStepFullPageForm() {
         >
           {renderStep()}
         </form>
-      </main>
-      {/* Indicador de passos na base */}
-      <footer className="w-full py-6 bg-white/80 shadow-inner flex flex-col gap-4">
-        <div className="flex justify-center gap-2 md:gap-4">
-          {steps.map((s, i) => (
-            <div key={s.label} className="flex flex-col items-center">
-              <div
-                className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-lg font-bold transition-all duration-200 ${
-                  i === step
-                    ? "border-blue-700 bg-blue-100 text-blue-900 shadow-lg"
-                    : "border-gray-300 bg-gray-100 text-gray-400"
-                }`}
-              >
-                {i + 1}
+      </main>      {/* Indicador de passos na base - hide for confirmation step */}
+      {step !== 9 && (
+        <footer className="w-full py-6 bg-white/80 shadow-inner flex flex-col gap-4">
+          <div className="flex justify-center gap-2 md:gap-4">
+            {steps.map((s, i) => (
+              <div key={s.label} className="flex flex-col items-center">
+                <div
+                  className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-lg font-bold transition-all duration-200 ${
+                    i === step
+                      ? "border-blue-700 bg-blue-100 text-blue-900 shadow-lg"
+                      : "border-gray-300 bg-gray-100 text-gray-400"
+                  }`}
+                >
+                  {i + 1}
+                </div>
+                <span
+                  className={`text-xs mt-1 ${
+                    i === step ? "text-blue-800 font-semibold" : "text-gray-400"
+                  }`}
+                >
+                  {s.label}
+                </span>
               </div>
-              <span
-                className={`text-xs mt-1 ${
-                  i === step ? "text-blue-800 font-semibold" : "text-gray-400"
-                }`}
+            ))}
+          </div>
+          <div className="flex justify-between items-center max-w-2xl mx-auto w-full mt-4 px-2">
+            {step > 0 ? (
+              <button
+                type="button"
+                onClick={handlePrev}
+                className="px-6 py-3 rounded-full bg-gray-100 hover:bg-gray-200 text-blue-800 font-semibold shadow transition"
               >
-                {s.label}
-              </span>
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-between items-center max-w-2xl mx-auto w-full mt-4 px-2">
-          {step > 0 ? (
+                Voltar
+              </button>
+            ) : (
+              <div />
+            )}
             <button
               type="button"
-              onClick={handlePrev}
-              className="px-6 py-3 rounded-full bg-gray-100 hover:bg-gray-200 text-blue-800 font-semibold shadow transition"
+              onClick={handleNext}
+              disabled={!validateStep(step, form, userData)}
+              className={`px-8 py-3 rounded-full font-bold shadow transition text-white ${
+                validateStep(step, form, userData)
+                  ? "bg-blue-700 hover:bg-blue-800"
+                  : "bg-blue-200 cursor-not-allowed"
+              }`}
             >
-              Voltar
+              Avançar
             </button>
-          ) : (
-            <div />
-          )}
-          <button
-            type="button"
-            onClick={handleNext}
-            disabled={!validateStep(step, form)}
-            className={`px-8 py-3 rounded-full font-bold shadow transition text-white ${
-              validateStep(step, form)
-                ? "bg-blue-700 hover:bg-blue-800"
-                : "bg-blue-200 cursor-not-allowed"
-            }`}
-          >
-            Avançar
-          </button>
-        </div>
-      </footer>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
 
 // Componente TermosScrollStep
-import { useRef, useState as useStateReact } from "react";
-function TermosScrollStep({ onAvancar }: { onAvancar: () => void }) {
-  const [scrolled, setScrolled] = useStateReact(false);
+function TermosScrollStep({ onAvancar, submitting }: { onAvancar: () => void, submitting: boolean }) {
+  const [scrolled, setScrolled] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -660,11 +882,11 @@ function TermosScrollStep({ onAvancar }: { onAvancar: () => void }) {
       </div>
       <button
         type="button"
-        disabled={!scrolled}
+        disabled={!scrolled || submitting}
         onClick={onAvancar}
         className={`px-8 py-3 rounded-full font-bold shadow transition text-white ${scrolled ? "bg-blue-700 hover:bg-blue-800" : "bg-blue-200 cursor-not-allowed"}`}
       >
-        Avançar
+        {submitting ? "Enviando..." : "Avançar"}
       </button>
     </div>
   );

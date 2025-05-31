@@ -222,34 +222,38 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <main className="flex-1 container mx-auto px-4 py-8">
-        {!showMap ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <main className="flex-1 container mx-auto px-4 py-8">        {!showMap ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
             {filteredOficinas.map((oficina) => (
-              <div key={oficina.id} className="space-y-2">
-                <div className="relative aspect-square rounded-xl overflow-hidden">
+              <div key={oficina.id} className="group cursor-pointer">
+                <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
                   <Image
                     src={oficina.foto_url || "/placeholder.svg"}
                     alt={oficina.nome || "Oficina"}
                     fill
-                    className="object-cover"
+                    className="object-cover group-hover:scale-105 transition-transform duration-200"
                   />
-                  <Button variant="ghost" size="icon" className="absolute top-2 right-2 text-white hover:text-rose-500">
-                    <Heart className="h-5 w-5" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-3 right-3 h-8 w-8 bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:scale-110 transition-all duration-200"
+                  >
+                    <Heart className="h-4 w-4 text-white" />
                   </Button>
                 </div>
-                <div className="flex justify-between">
-                  <h3 className="font-medium">{oficina.nome}</h3>
-                  {/* Rating pode ser implementado se existir campo */}
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-current" />
-                    <span className="ml-1">Novo</span>
+                <div className="space-y-1">
+                  <div className="flex items-start justify-between">
+                    <h3 className="font-semibold text-gray-900 leading-tight truncate pr-2">{oficina.nome}</h3>
+                    <div className="flex items-center flex-shrink-0">
+                      <Star className="h-3.5 w-3.5 fill-current text-gray-900" />
+                      <span className="ml-1 text-sm font-medium">Novo</span>
+                    </div>
                   </div>
+                  <p className="text-gray-500 text-sm truncate">{oficina.endereco}</p>
+                  <p className="text-gray-900 font-medium text-sm">
+                    Serviços a partir de <span className="font-semibold">R$50</span>
+                  </p>
                 </div>
-                <p className="text-gray-500">{oficina.endereco}</p>
-                <p>
-                  <span className="font-medium">Serviços a partir de R$50</span>
-                </p>
               </div>
             ))}
           </div>
