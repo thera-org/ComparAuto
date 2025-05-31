@@ -199,7 +199,7 @@ export default function Home() {
                   {selectedCategory && (
                     <Badge variant="outline" className="flex items-center gap-1">
                       {categories.find((c) => c.id === selectedCategory)?.name}
-                      <button onClick={() => setSelectedCategory(null)}>
+                      <button onClick={() => setSelectedCategory(null)} aria-label="Remover filtro de categoria">
                         <X className="h-3 w-3 ml-1" />
                       </button>
                     </Badge>
