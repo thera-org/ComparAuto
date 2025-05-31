@@ -39,9 +39,12 @@ export async function GET(request: Request) {
       // Continue sem os dados de auth se houver erro
     }
 
+    // Criar um mapa de lookup para authUsers
+    const authUserMap = new Map(authUsers?.map((au) => [au.id, au]))
+
     // Combinar dados
     const formattedUsers = usuarios?.map((user) => {
-      const authUser = authUsers?.find((au) => au.id === user.id)
+      const authUser = authUserMap.get(user.id)
       return {
         id: user.id,
         nome: user.nome || 'Sem nome',
