@@ -76,7 +76,11 @@ export default function LoginPage() {
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
-    if (blockedUntil && Date.now() < blockedUntil) return;
+    if (blockedUntil && Date.now() < blockedUntil) {
+      const remainingTime = Math.ceil((blockedUntil - Date.now()) / 1000);
+      setError(`Login temporariamente bloqueado. Tente novamente em ${remainingTime} segundos.`);
+      return;
+    }
     if (emailError || passwordError) return;
     setLoading(true);
     try {
