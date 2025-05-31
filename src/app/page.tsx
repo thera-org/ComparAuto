@@ -77,7 +77,8 @@ export default function Home() {
         }
       } else {
         setUserData(null)
-      }      setLoading(false)
+      }
+      setLoading(false)
     }
 
     fetchUserData()
