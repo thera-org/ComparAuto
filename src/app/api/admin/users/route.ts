@@ -13,8 +13,13 @@ const supabaseAdmin = createClient(
   }
 )
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Verificar autorização
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_API_KEY}`) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
     // Buscar todos os usuários da tabela usuarios
     const { data: usuarios, error: usuariosError } = await supabaseAdmin
       .from('usuarios')
