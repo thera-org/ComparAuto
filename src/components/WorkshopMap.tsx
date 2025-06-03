@@ -30,10 +30,14 @@ interface WorkshopMapProps {
 const saoLuisCenter = { lat: -2.5307, lng: -44.3068 }
 
 const getMapContainerStyle = (height: string) => ({
-  width: "100%",
-  height: height,
+  width: "calc(100% - 32px)",
+  height: `calc(${height} - 32px)`,
   position: "relative" as const,
-  zIndex: 1
+  zIndex: 1,
+  margin: "16px",
+  borderRadius: "8px",
+  overflow: "hidden",
+  border: "1px solid #e5e7eb"
 })
 
 const mapOptions = {
