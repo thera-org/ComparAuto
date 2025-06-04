@@ -26,11 +26,26 @@ export default function AjudaPage() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Fazer a lógica de envio do formulário aqui por email
-    setEnviado(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setEnviado(true);
+  try {
+    const res = await fetch('/api/ajuda', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
+    if (res.ok) {
+      setEnviado(true);
+      setForm({ nome: "", email: "", mensagem: "" });
+    } else {
+      alert('Erro ao enviar mensagem. Tente novamente.');
+    }
+  } catch {
+    alert('Erro ao enviar mensagem. Tente novamente.');
   }
+  setEnviado(false);
+};
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
@@ -91,12 +106,9 @@ export default function AjudaPage() {
                 required
               />
             </div>
-            <button
-              type="submit"
-              className="bg-primary text-white px-4 py-2 rounded"
-            >
-              Enviar
-            </button>
+            <button type="submit" disabled={enviado} className="border rounded text-black px-4 py-2">
+  {enviado ? "Enviando..." : "Enviar"}
+</button>
           </form>
         )}
       </div>
