@@ -1,13 +1,14 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import OfficeCard from "@/components/OfficeCard"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { MapPin, Heart, Star, List, Search, X } from "lucide-react"
+import { MapPin, List, Search, X, Wrench } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 
@@ -46,6 +47,8 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [filteredOficinas, setFilteredOficinas] = useState<Oficina[]>([])
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(true)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -76,8 +79,7 @@ export default function Home() {
           }
         } catch (error) {
           console.error("Unexpected error fetching user data:", error)
-        }
-      } else {
+        }      } else {
         setUserData(null)
       }
       setLoading(false)
@@ -88,19 +90,52 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchOficinas() {
-      const { data, error } = await supabase
-        .from("oficinas")
-        .select("id, nome, endereco, latitude, longitude, foto_url, telefone, status, category")
-        .not("latitude", "is", null)
-        .not("longitude", "is", null)
-      
-      if (error) {
-        console.error("Erro ao buscar oficinas:", error)
+      try {
+        console.log("Iniciando busca de oficinas...")
+        
+        // Primeiro, vamos verificar se conseguimos conectar com o Supabase
+        const { data: testConnection, error: connectionError } = await supabase
+          .from("oficinas")
+          .select("count", { count: "exact", head: true })
+        
+        if (connectionError) {
+          console.error("Erro de conexão com Supabase:", connectionError)
+          setOficinas([])
+          setLoading(false)
+          return
+        }
+        
+        console.log("Conexão com Supabase OK. Registros encontrados:", testConnection)
+        
+        // Agora buscar os dados completos
+        const { data, error } = await supabase
+          .from("oficinas")
+          .select("*")
+        
+        if (error) {
+          console.error("Erro detalhado ao buscar oficinas:", error)
+          console.error("Código do erro:", error.code)
+          console.error("Mensagem do erro:", error.message)
+          console.error("Detalhes do erro:", error.details)
+          setOficinas([])
+        } else {
+          console.log("Dados brutos encontrados:", data)
+          console.log("Número total de registros:", data?.length || 0)
+          
+          // Filtrar apenas oficinas com coordenadas válidas
+          const oficinasComCoordenadas = (data as Oficina[])?.filter(
+            oficina => oficina.latitude != null && oficina.longitude != null
+          ) || []
+          
+          console.log("Oficinas com coordenadas válidas:", oficinasComCoordenadas.length)
+          setOficinas(oficinasComCoordenadas)
+        }
+      } catch (err) {
+        console.error("Erro inesperado ao buscar oficinas:", err)
         setOficinas([])
-      } else {
-        setOficinas((data as Oficina[]) || [])
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     
     fetchOficinas()
@@ -129,156 +164,416 @@ export default function Home() {
       filtered = filtered.filter((oficina) => oficina.category === selectedCategory)
     }
     setFilteredOficinas(filtered)
-  }, [debouncedSearchTerm, selectedCategory, oficinas])
+  }, [debouncedSearchTerm, selectedCategory, oficinas])  // Function to check scroll arrows visibility
+  const checkScrollArrows = useCallback(() => {
+    const container = document.getElementById('categories-container')
+    if (container) {
+      const { scrollLeft, scrollWidth, clientWidth } = container
+      setShowLeftArrow(scrollLeft > 10) // margem maior para melhor UX
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10) // margem maior para melhor UX
+    }
+  }, [])
 
+  useEffect(() => {
+    const container = document.getElementById('categories-container')
+    if (container) {
+      // Adicionar event listener para scroll
+      container.addEventListener('scroll', checkScrollArrows)
+      
+      // Verificar estado inicial após renderização
+      const timeoutId = setTimeout(checkScrollArrows, 100)
+      
+      // Observer para detectar mudanças no tamanho do container
+      const resizeObserver = new ResizeObserver(() => {
+        checkScrollArrows()
+      })
+      resizeObserver.observe(container)
+      
+      return () => {
+        container.removeEventListener('scroll', checkScrollArrows)
+        resizeObserver.disconnect()
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [checkScrollArrows]) // Remover dependência categories para evitar erro
+  
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
   }
+  
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(selectedCategory === categoryId ? null : categoryId)
   }
+  
   const clearFilters = () => {
     setSearchTerm("")
     setSelectedCategory(null)
   }
-
-  if (loading) {
+    if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 gradient-mesh">
+          <div className="text-center space-y-8">
+            {/* Enhanced Loading Screen with Modern Design */}
+            <div className="relative w-40 h-40 mx-auto">
+              {/* Outer glowing ring */}
+              <div className="absolute inset-0 border-4 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 rounded-full loading-rotate opacity-80"></div>
+              <div className="absolute inset-1 bg-white rounded-full"></div>
+              
+              {/* Middle animated ring */}
+              <div className="absolute inset-3 border-4 border-transparent bg-gradient-to-r from-purple-500 to-pink-500 rounded-full loading-rotate opacity-60" style={{ animationDirection: 'reverse', animationDuration: '2s' }}></div>
+              <div className="absolute inset-4 bg-white rounded-full"></div>
+              
+              {/* Inner pulsing ring */}
+              <div className="absolute inset-6 border-4 border-blue-400 rounded-full loading-pulse"></div>
+              
+              {/* Center animated icon */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Wrench className="w-8 h-8 text-blue-600 loading-bounce" />
+              </div>
+            </div>
+            
+            {/* Enhanced loading text with better typography */}
+            <div className="space-y-4">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Encontrando as melhores oficinas
+              </h2>
+              <p className="text-gray-600 text-lg max-w-md mx-auto">
+                Conectando você com oficinas especializadas na sua região
+              </p>
+              
+              {/* Animated dots */}
+              <div className="flex justify-center space-x-2">
+                <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full loading-bounce"></div>
+                <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full loading-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-3 h-3 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full loading-bounce" style={{ animationDelay: '0.4s' }}></div>
+              </div>
+            </div>
+            
+            {/* Progress indicator */}
+            <div className="w-64 mx-auto">
+              <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full shimmer"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     )
-  }
-
-  // Dados das categorias para mapeamento
+  }  // Optimized categories data for mobile performance
   const categories = [
     { id: "troca-oleo", name: "Troca de óleo", icon: "/oleo.png" },
-    { id: "avaliacao", name: "Avaliação do carro", icon: "/avaliacao.png" },
-    { id: "pelicula", name: "Aplicação de película", icon: "/pelicula.png" },
-    { id: "filtros", name: "Troca de filtros", icon: "/filtro.png" },
+    { id: "avaliacao", name: "Avaliação", icon: "/avaliacao.png" },
+    { id: "pelicula", name: "Película", icon: "/pelicula.png" },
+    { id: "filtros", name: "Filtros", icon: "/filtro.png" },
     { id: "alinhamento", name: "Alinhamento", icon: "/balanceamento.png" },
-    { id: "pastilhas", name: "Troca de pastilhas", icon: "/freio.png" },
+    { id: "pastilhas", name: "Pastilhas", icon: "/freio.png" },
     { id: "polimento", name: "Polimento", icon: "/polimento.png" },
-    { id: "acessorios", name: "Instalação de acessórios", icon: "/acessorios.png" },
+    { id: "acessorios", name: "Acessórios", icon: "/acessorios.png" },
     { id: "ar-condicionado", name: "Ar-condicionado", icon: "/ar-condicionado.png" },
     { id: "higienizacao", name: "Higienização", icon: "/higienizacao.png" },
+    { id: "mecanica-geral", name: "Mecânica Geral", icon: "/oleo.png" },
+    { id: "eletrica", name: "Elétrica", icon: "/filtro.png" },
+    { id: "freios", name: "Freios", icon: "/freio.png" },
+    { id: "suspensao", name: "Suspensão", icon: "/balanceamento.png" },
+    { id: "escape", name: "Escape", icon: "/acessorios.png" },
+    { id: "bateria", name: "Bateria", icon: "/ar-condicionado.png" },
+    { id: "pneus", name: "Pneus", icon: "/balanceamento.png" },
+    { id: "injecao", name: "Injeção", icon: "/filtro.png" }
   ]
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-      <div className="border-b sticky top-[72px] bg-white z-40">
+      <Header />      {/* Enhanced Search and Categories Section - Non-sticky, compact design */}
+      <div className="border-b bg-gradient-to-br from-gray-50 to-blue-50/30">
         <div className="container mx-auto px-4">
-          <div className="py-4">
-            <div className="flex justify-center mb-4">
-              <div className="relative w-full max-w-2xl flex items-center bg-white rounded-full shadow-lg px-4 py-2 border border-gray-200">
-                <Search className="text-gray-400 h-5 w-5 mr-2" />
-                <Input
-                  type="text"
-                  placeholder="Buscar oficinas, serviços..."
-                  className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-base"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  style={{ boxShadow: 'none' }}
-                />
+          <div className="py-6">            {/* Enhanced Responsive Search Section */}
+            <div className="flex justify-center mb-6">
+              <div className="relative w-full max-w-3xl">
+                <div className="flex items-center bg-white rounded-2xl shadow-lg px-4 sm:px-6 py-3 border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                  <Search className="text-blue-500 h-5 w-5 mr-2 sm:mr-3 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                  <Input
+                    type="text"
+                    placeholder="Encontre a oficina perfeita..."
+                    className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-sm sm:text-base placeholder:text-gray-400 focus:placeholder:text-gray-300"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    style={{ boxShadow: 'none' }}
+                  />
+                  {searchTerm ? (
+                    <button
+                      className="text-gray-400 hover:text-gray-600 ml-2 sm:ml-3 hover:bg-gray-100 rounded-full p-1.5 transition-all duration-200 flex-shrink-0"
+                      onClick={() => setSearchTerm("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <div className="text-gray-300 ml-2 sm:ml-3 flex-shrink-0">
+                      <Search className="h-4 w-4" />
+                    </div>
+                  )}
+                </div>
+                {/* Search suggestions indicator */}
                 {searchTerm && (
-                  <button
-                    className="text-gray-400 hover:text-gray-600 ml-2"
-                    onClick={() => setSearchTerm("")}
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-3 animate-fade-in-up z-10">
+                    <p className="text-xs sm:text-sm text-gray-500 text-center">
+                      Pesquisando por &ldquo;{searchTerm}&rdquo;...
+                    </p>
+                  </div>
                 )}
               </div>
-            </div>
-            <div className="flex items-center overflow-x-auto py-2 scrollbar-hide gap-4">
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  className={`flex flex-col items-center gap-1 min-w-[56px] cursor-pointer transition-colors ${
-                    selectedCategory === category.id ? "text-primary" : "text-gray-600"
-                  }`}
-                  onClick={() => handleCategorySelect(category.id)}
-                >
-                  <div
-                    className={`p-2 rounded-full ${selectedCategory === category.id ? "bg-primary/10" : "bg-gray-100"}`}
+            </div>            {/* Enhanced Category Carousel Section */}
+            <div className="mb-6 relative">
+              {/* Category Carousel with Navigation Arrows */}
+              <div className="relative">                {/* Left Arrow - Enhanced */}
+                {showLeftArrow && (
+                  <button
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 border border-gray-200 hover:shadow-2xl hover:scale-110 group carousel-arrow arrow-left"                    onClick={() => {
+                      const container = document.getElementById('categories-container');
+                      if (container) {
+                        const scrollAmount = Math.min(300, container.clientWidth * 0.8);
+                        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                        setTimeout(checkScrollArrows, 100);
+                      }
+                    }}
+                    aria-label="Categorias anteriores"
                   >
-                    <Image
-                      src={category.icon || "/placeholder.svg"}
-                      alt={category.name}
-                      width={20}
-                      height={20}
-                      className="h-5 w-5"
-                    />
-                  </div>
-                  <span className="text-xs text-center whitespace-nowrap">{category.name}</span>
+                    <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                )}                {/* Right Arrow - Enhanced */}
+                {showRightArrow && (
+                  <button
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 border border-gray-200 hover:shadow-2xl hover:scale-110 group carousel-arrow arrow-right"                    onClick={() => {
+                      const container = document.getElementById('categories-container');
+                      if (container) {
+                        const scrollAmount = Math.min(300, container.clientWidth * 0.8);
+                        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                        setTimeout(checkScrollArrows, 100);
+                      }
+                    }}
+                    aria-label="Próximas categorias"
+                  >
+                    <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}{/* Categories Container - Enhanced */}
+                <div 
+                  id="categories-container"
+                  className="flex items-center overflow-x-auto py-4 scrollbar-hide gap-2 sm:gap-3 pb-4 mx-12 scroll-smooth categories-container"
+                  style={{ scrollSnapType: 'x mandatory' }}
+                >{categories.map((category, index) => (
+                    <div
+                      key={category.id}
+                      className={`
+                        flex flex-col items-center gap-1 sm:gap-2 min-w-[60px] sm:min-w-[70px] cursor-pointer transition-all duration-300 hover:scale-105 
+                        transform-gpu category-card group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl
+                        touch-optimized performance-optimized mobile-text scroll-snap-center
+                        ${selectedCategory === category.id ? "text-blue-600 scale-105" : "text-gray-600 hover:text-blue-500"}
+                      `}
+                      onClick={() => handleCategorySelect(category.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleCategorySelect(category.id)
+                        }
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-pressed={selectedCategory === category.id}
+                      aria-label={`Filtrar por ${category.name}`}
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >                      <div
+                        className={`
+                          relative p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg backdrop-blur-sm
+                          ${selectedCategory === category.id 
+                            ? "bg-gradient-to-br from-blue-500 to-purple-600 border-2 border-blue-300 shadow-blue-200/50 text-white" 
+                            : "bg-white hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 border-2 border-gray-200 hover:border-blue-300 hover:shadow-blue-100/50"
+                          }
+                          group-hover:rotate-1 transform-gpu overflow-hidden
+                        `}
+                      >
+                        {/* Background pattern */}
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                        </div>
+                        
+                        {/* Icon */}
+                        <div className="relative z-10">
+                          <Image
+                            src={category.icon || "/placeholder.svg"}
+                            alt={category.name}
+                            width={20}
+                            height={20}
+                            className={`h-5 w-5 sm:h-6 sm:w-6 transition-all duration-300 ${
+                              selectedCategory === category.id 
+                                ? "brightness-0 invert" 
+                                : "group-hover:scale-110"
+                            }`}
+                          />
+                        </div>
+                        
+                        {/* Selection indicator */}
+                        {selectedCategory === category.id && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-yellow-400 rounded-full border-2 border-white shadow-lg flex items-center justify-center animate-bounce">
+                            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full"></div>
+                          </div>
+                        )}
+                        
+                        {/* Hover glow effect */}
+                        <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                      </div>                      
+                      <span className={`
+                        text-xs sm:text-sm text-center whitespace-nowrap font-medium transition-all duration-300 relative max-w-[60px] sm:max-w-[70px] overflow-hidden text-ellipsis
+                        ${selectedCategory === category.id ? "font-bold" : "group-hover:font-semibold"}
+                      `}>
+                        {category.name}
+                        {selectedCategory === category.id && (
+                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-1"></div>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>                
+                {/* Scroll indicators for mobile */}
+                <div className="absolute left-8 top-1/2 transform -translate-y-1/2 pointer-events-none sm:hidden">
+                  <div className="w-8 h-full bg-gradient-to-r from-gray-50 to-transparent"></div>
                 </div>
-              ))}
-            </div>
-            {(searchTerm || selectedCategory) && (
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center gap-2">
+                <div className="absolute right-8 top-1/2 transform -translate-y-1/2 pointer-events-none sm:hidden">
+                  <div className="w-8 h-full bg-gradient-to-l from-gray-50 to-transparent"></div>
+                </div>
+              </div>
+
+              {/* Filter indicator below carousel */}
+              {selectedCategory && (
+                <div className="flex items-center justify-center mt-4">
+                  <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-full px-4 py-2">
+                    <span className="text-blue-700 text-sm font-medium">
+                      Filtrando por: {categories.find((c) => c.id === selectedCategory)?.name}
+                    </span>
+                    <button 
+                      onClick={() => setSelectedCategory(null)}
+                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full p-1 transition-colors"
+                      aria-label="Remover filtro"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>{(searchTerm || selectedCategory) && (
+              <div className="flex items-center justify-between mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="flex items-center gap-3">
                   {selectedCategory && (
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge variant="outline" className="flex items-center gap-2 bg-white border-blue-200 text-blue-700 px-2 py-1 text-xs">
                       {categories.find((c) => c.id === selectedCategory)?.name}
                       <button onClick={() => setSelectedCategory(null)} aria-label="Remover filtro de categoria">
-                        <X className="h-3 w-3 ml-1" />
+                        <X className="h-3 w-3 ml-1 hover:text-blue-900" />
                       </button>
                     </Badge>
                   )}
                   {searchTerm && (
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge variant="outline" className="flex items-center gap-2 bg-white border-blue-200 text-blue-700 px-2 py-1 text-xs">
                       Busca: {searchTerm}
                       <button onClick={() => setSearchTerm("")}>
-                        <X className="h-3 w-3 ml-1" />
+                        <X className="h-3 w-3 ml-1 hover:text-blue-900" />
                       </button>
                     </Badge>
                   )}
                 </div>
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-blue-600 hover:text-blue-800 hover:bg-white text-sm">
                   Limpar filtros
                 </Button>
               </div>
             )}
           </div>
-        </div>
-      </div>
-      <main className="flex-1 container mx-auto px-4 py-8">        {!showMap ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-            {filteredOficinas.map((oficina) => (
-              <div key={oficina.id} className="group cursor-pointer">
-                <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
-                  <Image
-                    src={oficina.foto_url || "/placeholder.svg"}
-                    alt={oficina.nome || "Oficina"}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute top-3 right-3 h-8 w-8 bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:scale-110 transition-all duration-200"
-                  >
-                    <Heart className="h-4 w-4 text-white" />
-                  </Button>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-gray-900 leading-tight truncate pr-2">{oficina.nome}</h3>
-                    <div className="flex items-center flex-shrink-0">
-                      <Star className="h-3.5 w-3.5 fill-current text-gray-900" />
-                      <span className="ml-1 text-sm font-medium">Novo</span>
-                    </div>
-                  </div>
-                  <p className="text-gray-500 text-sm truncate">{oficina.endereco}</p>
-                  <p className="text-gray-900 font-medium text-sm">
-                    Serviços a partir de <span className="font-semibold">R$50</span>
-                  </p>
-                </div>
-              </div>
-            ))}
+        </div>      </div>
+
+      {/* Enhanced Floating Map Toggle Button */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <Button
+          onClick={() => setShowMap(!showMap)}
+          className={`
+            w-16 h-16 rounded-full shadow-2xl transition-all duration-500 transform hover:scale-110 active:scale-95
+            ${showMap 
+              ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700' 
+              : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+            }
+            text-white border-4 border-white hover:shadow-3xl backdrop-blur-sm
+            group relative overflow-hidden
+          `}
+        >
+          {/* Ripple effect background */}
+          <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+          
+          {/* Icon with animation */}
+          <div className="relative z-10 transition-transform duration-300 group-hover:rotate-12">
+            {showMap ? (
+              <List className="h-8 w-8" />
+            ) : (
+              <MapPin className="h-8 w-8" />
+            )}
           </div>
-        ) : (
+          
+          {/* Floating indicator dots */}
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse shadow-lg"></div>
+          
+          {/* Tooltip */}
+          <div className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-black/80 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap backdrop-blur-sm">
+            {showMap ? 'Ver lista' : 'Ver mapa'}
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/80"></div>
+          </div>
+        </Button>
+      </div>      {!showMap ? (
+        <>
+          {/* Office Cards Section - Clean design with small margin */}
+          <main className="flex-1 bg-gray-50 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Office Cards Grid */}
+              {filteredOficinas.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredOficinas.map((oficina, index) => (
+                    <div 
+                      key={oficina.id} 
+                      className="animate-fade-in-up"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <OfficeCard oficina={oficina} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* No results state */}
+              {filteredOficinas.length === 0 && (
+                <div className="text-center py-24">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-24 h-24 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
+                      <Search className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">Nenhuma oficina encontrada</h3>
+                    <p className="text-gray-600 mb-6">
+                      Tente ajustar os filtros ou remover alguns termos de busca.
+                    </p>
+                    <Button 
+                      onClick={clearFilters}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg"
+                    >
+                      Limpar filtros
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+            </div>
+          </main>
+        </>
+      ) : (
+        <main className="flex-1 container mx-auto px-4 py-8 bg-gradient-to-br from-gray-50 to-white min-h-screen relative">
           <WorkshopMap
             workshops={filteredOficinas.map((oficina) => ({
               id: String(oficina.id),
@@ -291,26 +586,9 @@ export default function Home() {
             }))}
             height="600px"
           />
-        )}
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10">
-          <Button
-            onClick={() => setShowMap(!showMap)}
-            className="rounded-full bg-gray-900 text-white px-4 py-3 shadow-lg gap-2"
-          >
-            {showMap ? (
-              <>
-                <List className="h-4 w-4" />
-                Mostrar Lista
-              </>
-            ) : (
-              <>
-                <MapPin className="h-4 w-4" />
-                Mostrar Mapa
-              </>
-            )}
-          </Button>
-        </div>
-      </main>
+        </main>
+      )}
+      
       <Footer />
     </div>
   )
