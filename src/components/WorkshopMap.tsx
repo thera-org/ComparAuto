@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { GoogleMap, Marker, InfoWindow, useLoadScript } from "@react-google-maps/api"
+import { GoogleMap, OverlayView, useLoadScript } from "@react-google-maps/api"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
-import { Navigation } from "lucide-react"
+import { Navigation, MapPin, Star, Phone } from "lucide-react"
 import Link from "next/link"
 
 interface Workshop {
@@ -155,39 +155,126 @@ export default function WorkshopMap({
           onLoad={onMapLoad}
           onClick={handleMapClick}
           options={mapOptions}
-        >
-        {selectLocationMode && marker && (
-          <Marker position={marker} />
-        )}
-        
+        >        {/* Custom Airbnb-style markers for workshops */}
         {!selectLocationMode && workshops.map((workshop) => (
-          <Marker
+          <OverlayView
             key={workshop.id}
             position={{ lat: workshop.latitude, lng: workshop.longitude }}
-            onClick={() => handleMarkerClick(workshop)}
-          />
-        ))}
-        
-        {!selectLocationMode && selectedWorkshop && (
-          <InfoWindow
-            position={{ lat: selectedWorkshop.latitude, lng: selectedWorkshop.longitude }}
-            onCloseClick={() => setSelectedWorkshop(null)}
+            mapPaneName="overlayMouseTarget"
           >
-            <div className="p-1 max-w-[250px]">
-              <h3 className="font-medium text-sm">{selectedWorkshop.nome}</h3>
-              <p className="text-xs text-gray-600 mt-1">{selectedWorkshop.endereco}</p>
-              {selectedWorkshop.telefone && (
-                <p className="text-xs mt-1">
-                  <span className="font-medium">Tel:</span> {selectedWorkshop.telefone}
-                </p>
-              )}
-              <div className="mt-2">
-                <Link href={`/oficinas/${selectedWorkshop.id}`} className="text-xs text-blue-600 hover:underline">
-                  Ver detalhes
-                </Link>
+            <div
+              className={`
+                relative cursor-pointer transform transition-all duration-300 hover:scale-110 z-10
+                ${selectedWorkshop?.id === workshop.id ? 'scale-110' : ''}
+              `}
+              onClick={() => handleMarkerClick(workshop)}
+            >
+              {/* Main marker container */}
+              <div className={`
+                relative bg-white rounded-full p-2 shadow-lg border-2 transition-all duration-300
+                ${selectedWorkshop?.id === workshop.id 
+                  ? 'border-blue-500 shadow-blue-200/50 shadow-xl' 
+                  : 'border-gray-200 hover:border-blue-300 hover:shadow-xl'
+                }
+              `}>
+                {/* Price/Rating indicator */}
+                <div className="flex items-center justify-center">
+                  <div className="flex items-center gap-1 text-xs font-semibold text-gray-700">
+                    <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                    <span>4.8</span>
+                  </div>
+                </div>
+                
+                {/* Pointer arrow */}
+                <div className={`
+                  absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 rotate-45 transition-colors duration-300
+                  ${selectedWorkshop?.id === workshop.id 
+                    ? 'bg-blue-500' 
+                    : 'bg-white border-r border-b border-gray-200'
+                  }
+                `}></div>
+              </div>
+              
+              {/* Workshop name tooltip on hover */}
+              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+                <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                  {workshop.nome}
+                </div>
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-4 border-transparent border-t-gray-900"></div>
               </div>
             </div>
-          </InfoWindow>
+          </OverlayView>
+        ))}
+
+        {/* Location marker for selectLocationMode */}
+        {selectLocationMode && marker && (
+          <OverlayView
+            position={marker}
+            mapPaneName="overlayMouseTarget"
+          >
+            <div className="relative">
+              <div className="bg-red-500 rounded-full p-3 shadow-lg border-2 border-white">
+                <MapPin className="w-4 h-4 text-white" />
+              </div>
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-red-500 rotate-45"></div>
+            </div>
+          </OverlayView>
+        )}
+        
+        {/* Enhanced InfoWindow for selected workshop */}
+        {!selectLocationMode && selectedWorkshop && (
+          <OverlayView
+            position={{ lat: selectedWorkshop.latitude + 0.001, lng: selectedWorkshop.longitude }}
+            mapPaneName="floatPane"
+          >
+            <div className="relative bg-white rounded-xl shadow-2xl border border-gray-200 p-4 max-w-[280px] transform -translate-x-1/2 -translate-y-full">
+              {/* Close button */}
+              <button
+                onClick={() => setSelectedWorkshop(null)}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              >
+                <span className="text-gray-500 text-sm">×</span>
+              </button>
+              
+              {/* Workshop info */}
+              <div className="pr-6">
+                <h3 className="font-semibold text-base text-gray-900 mb-2">{selectedWorkshop.nome}</h3>
+                
+                <div className="flex items-center gap-1 mb-2">
+                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                  <span className="text-sm font-medium">4.8</span>
+                  <span className="text-sm text-gray-500">(124 avaliações)</span>
+                </div>
+                
+                <p className="text-sm text-gray-600 mb-3 flex items-start gap-2">
+                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  {selectedWorkshop.endereco}
+                </p>
+                
+                {selectedWorkshop.telefone && (
+                  <p className="text-sm text-gray-600 mb-3 flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    {selectedWorkshop.telefone}
+                  </p>
+                )}
+                
+                <div className="flex gap-2">
+                  <Link 
+                    href={`/oficina/${selectedWorkshop.id}`}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded-lg text-center transition-colors"
+                  >
+                    Ver detalhes
+                  </Link>
+                  <button className="px-3 py-2 border border-gray-300 hover:border-gray-400 rounded-lg transition-colors">
+                    <Phone className="w-4 h-4 text-gray-600" />
+                  </button>
+                </div>
+              </div>
+              
+              {/* Pointer arrow */}
+              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-r border-b border-gray-200 rotate-45"></div>
+            </div>
+          </OverlayView>
         )}
       </GoogleMap>
         {!selectLocationMode && (
