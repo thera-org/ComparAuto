@@ -275,13 +275,13 @@ export default function Home() {
     { id: "ar-condicionado", name: "Ar-condicionado", icon: "/ar-condicionado.png" },
     { id: "higienizacao", name: "Higienização", icon: "/higienizacao.png" },
     { id: "mecanica-geral", name: "Mecânica Geral", icon: "/oleo.png" },
-    { id: "eletrica", name: "Elétrica", icon: "/filtro.png" },
+    { id: "eletrica", name: "Elétrica", icon: "/eletrica.png" },
     { id: "freios", name: "Freios", icon: "/freio.png" },
-    { id: "suspensao", name: "Suspensão", icon: "/balanceamento.png" },
-    { id: "escape", name: "Escape", icon: "/acessorios.png" },
-    { id: "bateria", name: "Bateria", icon: "/ar-condicionado.png" },
+    { id: "suspensao", name: "Suspensão", icon: "/susp.png" },
+    { id: "escape", name: "Escape", icon: "/escape.png" },
+    { id: "bateria", name: "Bateria", icon: "/bateria.png" },
     { id: "pneus", name: "Pneus", icon: "/balanceamento.png" },
-    { id: "injecao", name: "Injeção", icon: "/filtro.png" }
+    { id: "injecao", name: "Injeção", icon: "/injecao.png" }
   ]
 
   return (
