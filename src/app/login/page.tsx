@@ -7,12 +7,15 @@ import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff, AlertCircle, Loader2, LogIn, Facebook, Apple } from "lucide-react";
 import Image from "next/image";
 import styles from './login.module.css';
+import { useNotifications } from '@/contexts/NotificationContext';
+import { useAppNotifications } from '@/hooks/useAppNotifications';
 
 // Regex simples para e-mail
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginPage() {
   const router = useRouter();
+  const { auth } = useAppNotifications();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,19 +96,29 @@ export default function LoginPage() {
       if (error) {
         setLoginAttempts((a) => a + 1);
         if (error.message.includes("Invalid login credentials")) {
-          setError("E-mail ou senha incorretos.");
+          const errorMsg = "E-mail ou senha incorretos.";
+          setError(errorMsg);
+          showError("Falha no Login", errorMsg);
         } else if (error.message.includes("Email not confirmed")) {
-          setError("Por favor, confirme seu e-mail antes de fazer login.");
+          const errorMsg = "Por favor, confirme seu e-mail antes de fazer login.";
+          setError(errorMsg);
+          showError("E-mail não confirmado", errorMsg);
         } else if (error.message.includes("Too many requests")) {
-          setError("Muitas tentativas de login. Tente novamente mais tarde.");
+          const errorMsg = "Muitas tentativas de login. Tente novamente mais tarde.";
+          setError(errorMsg);
+          showError("Muitas tentativas", errorMsg);
         } else {
-          setError("Falha ao fazer login. Verifique suas informações.");
+          const errorMsg = "Falha ao fazer login. Verifique suas informações.";
+          setError(errorMsg);
+          showError("Erro no Login", errorMsg);
         }
         return;
       }      // Login bem-sucedido
       if (data.session) {
         // Reset login attempts on successful login
         setLoginAttempts(0);
+        
+        success("Login realizado com sucesso!", "Bem-vindo de volta!");
         
         // Verifica se há parâmetro de redirect
         const params = new URLSearchParams(window.location.search);

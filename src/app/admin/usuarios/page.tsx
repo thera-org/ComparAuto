@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import AdminLayout from "@/components/admin-layout"
+import AdminAuthGate from "@/components/AdminAuthGate"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -63,13 +63,6 @@ type CreateUserPayload = {
 };
 
 export default function UsersPage() {
-  const router = useRouter()
-  useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("admin") !== "true") {
-      router.push("/admin/login")
-    }
-  }, [router])
-
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -246,7 +239,8 @@ export default function UsersPage() {
   }
 
   return (
-    <AdminLayout searchPlaceholder="Buscar por nome ou email..." onSearch={handleSearch}>
+    <AdminAuthGate>
+      <AdminLayout searchPlaceholder="Buscar por nome ou email..." onSearch={handleSearch}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -342,16 +336,19 @@ export default function UsersPage() {
       </div>
       {/* Modal de criação de usuário */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Novo Usuário</DialogTitle>
-            <DialogDescription>Preencha os dados conforme o tipo de usuário.</DialogDescription>
+        <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto bg-white rounded-lg shadow-xl">
+          <DialogHeader className="space-y-3 pb-4 border-b border-gray-200">
+            <DialogTitle className="text-xl font-semibold text-gray-900">Novo Usuário</DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Preencha os dados conforme o tipo de usuário.
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmitCreate)} className="space-y-4">
-            <div>
-              <Label htmlFor="tipo">Tipo</Label>
+          
+          <form onSubmit={handleSubmit(onSubmitCreate)} className="space-y-6 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="tipo" className="text-sm font-medium text-gray-700">Tipo de Usuário</Label>
               <Select value={createTipo} onValueChange={handleTipoChange}>
-                <SelectTrigger id="tipo">
+                <SelectTrigger id="tipo" className="w-full h-10 border border-gray-300">
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -361,55 +358,166 @@ export default function UsersPage() {
                 </SelectContent>
               </Select>
             </div>
+            
             {createTipo === "cliente" && (
-              <>
-                <div className="flex gap-2">
-                  <div className="w-1/2">
-                    <Label htmlFor="nome">Nome</Label>
-                    <Input id="nome" {...register("nome", { required: true })} />
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome <span className="text-red-500">*</span></Label>
+                    <Input 
+                      id="nome" 
+                      placeholder="Digite o nome"
+                      {...register("nome", { required: true })} 
+                      className="w-full h-10 border border-gray-300 rounded-md px-3"
+                    />
                   </div>
-                  <div className="w-1/2">
-                    <Label htmlFor="sobrenome">Sobrenome</Label>
-                    <Input id="sobrenome" {...register("sobrenome", { required: true })} />
+                  <div className="space-y-2">
+                    <Label htmlFor="sobrenome" className="text-sm font-medium text-gray-700">Sobrenome <span className="text-red-500">*</span></Label>
+                    <Input 
+                      id="sobrenome" 
+                      placeholder="Digite o sobrenome"
+                      {...register("sobrenome", { required: true })} 
+                      className="w-full h-10 border border-gray-300 rounded-md px-3"
+                    />
                   </div>
                 </div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" {...register("email", { required: true })} />
-                <Label htmlFor="telefone">Telefone</Label>
-                <Input id="telefone" {...register("telefone", { required: true })} />
-                <Label htmlFor="endereco">Endereço</Label>
-                <Input id="endereco" {...register("endereco", { required: true })} />
-                <Label htmlFor="cpf">CPF</Label>
-                <Input id="cpf" {...register("cpf", { required: true })} />
-              </>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="Digite o email"
+                    {...register("email", { required: true })} 
+                    className="w-full h-10 border border-gray-300 rounded-md px-3"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="telefone" className="text-sm font-medium text-gray-700">Telefone <span className="text-red-500">*</span></Label>
+                    <Input 
+                      id="telefone" 
+                      placeholder="(11) 99999-9999"
+                      {...register("telefone", { required: true })} 
+                      className="w-full h-10 border border-gray-300 rounded-md px-3"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cpf" className="text-sm font-medium text-gray-700">CPF <span className="text-red-500">*</span></Label>
+                    <Input 
+                      id="cpf" 
+                      placeholder="000.000.000-00"
+                      {...register("cpf", { required: true })} 
+                      className="w-full h-10 border border-gray-300 rounded-md px-3"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endereco" className="text-sm font-medium text-gray-700">Endereço <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="endereco" 
+                    placeholder="Digite o endereço completo"
+                    {...register("endereco", { required: true })} 
+                    className="w-full h-10 border border-gray-300 rounded-md px-3"
+                  />
+                </div>
+              </div>
             )}
+            
             {createTipo === "oficina" && (
-              <>
-                <Label htmlFor="nome">Nome da oficina</Label>
-                <Input id="nome" {...register("nome", { required: true })} />
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" {...register("email", { required: true })} />
-                <Label htmlFor="telefone">Telefone</Label>
-                <Input id="telefone" {...register("telefone", { required: true })} />
-                <Label htmlFor="endereco">Endereço</Label>
-                <Input id="endereco" {...register("endereco", { required: true })} />
-                <Label htmlFor="cnpj">CNPJ (opcional)</Label>
-                <Input id="cnpj" {...register("cnpj")} />
-              </>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome da Oficina <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="nome" 
+                    placeholder="Digite o nome da oficina"
+                    {...register("nome", { required: true })} 
+                    className="w-full h-10 border border-gray-300 rounded-md px-3"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="Digite o email da oficina"
+                    {...register("email", { required: true })} 
+                    className="w-full h-10 border border-gray-300 rounded-md px-3"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="telefone" className="text-sm font-medium text-gray-700">Telefone <span className="text-red-500">*</span></Label>
+                    <Input 
+                      id="telefone" 
+                      placeholder="(11) 99999-9999"
+                      {...register("telefone", { required: true })} 
+                      className="w-full h-10 border border-gray-300 rounded-md px-3"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cnpj" className="text-sm font-medium text-gray-700">
+                      CNPJ <span className="text-xs text-gray-500">(opcional)</span>
+                    </Label>
+                    <Input 
+                      id="cnpj" 
+                      placeholder="00.000.000/0000-00"
+                      {...register("cnpj")} 
+                      className="w-full h-10 border border-gray-300 rounded-md px-3"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endereco" className="text-sm font-medium text-gray-700">Endereço <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="endereco" 
+                    placeholder="Digite o endereço da oficina"
+                    {...register("endereco", { required: true })} 
+                    className="w-full h-10 border border-gray-300 rounded-md px-3"
+                  />
+                </div>
+              </div>
             )}
+            
             {createTipo === "admin" && (
-              <>
-                <Label htmlFor="username">Username</Label>
-                <Input id="username" {...register("username", { required: true })} />
-                <Label htmlFor="senha">Senha</Label>
-                <Input id="senha" type="password" {...register("senha", { required: true })} />
-              </>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-sm font-medium text-gray-700">Username <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="username" 
+                    placeholder="Digite o username"
+                    {...register("username", { required: true })} 
+                    className="w-full h-10 border border-gray-300 rounded-md px-3"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="senha" className="text-sm font-medium text-gray-700">Senha <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="senha" 
+                    type="password" 
+                    placeholder="Digite uma senha segura"
+                    {...register("senha", { required: true })} 
+                    className="w-full h-10 border border-gray-300 rounded-md px-3"
+                  />
+                </div>
+              </div>
             )}
-            <DialogFooter>
+            
+            <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3 pt-6 border-t border-gray-200">
               <DialogClose asChild>
-                <Button type="button" variant="outline">Cancelar</Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full sm:w-auto h-10 px-6 border border-gray-300 hover:bg-gray-50"
+                >
+                  Cancelar
+                </Button>
               </DialogClose>
-              <Button type="submit" className="bg-blue-600 text-white">Cadastrar</Button>
+              <Button 
+                type="submit" 
+                className="w-full sm:w-auto h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium"
+              >
+                Cadastrar Usuário
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -433,5 +541,6 @@ export default function UsersPage() {
         </AlertDialogContent>
       </AlertDialog>
     </AdminLayout>
+    </AdminAuthGate>
   )
 }

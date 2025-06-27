@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import AdminLayout from "@/components/admin-layout"
+import AdminAuthGate from "@/components/AdminAuthGate"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -20,6 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Pencil, Plus, MapPin, Phone, Mail } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -183,7 +185,8 @@ export default function OficinasPage() {
   }
 
   return (
-    <AdminLayout searchPlaceholder="Buscar por nome ou endereço..." onSearch={handleSearch}>
+    <AdminAuthGate>
+      <AdminLayout searchPlaceholder="Buscar por nome ou endereço..." onSearch={handleSearch}>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
@@ -254,24 +257,39 @@ export default function OficinasPage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(oficina.status)}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(oficina)}>
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Editar</span>
-                      </Button>
-                      {oficina.status === "pendente" && (
-                        <>
-                          <Button size="sm" className="ml-2" onClick={async () => {
-                            await supabase.from("oficinas").update({ status: "ativo" }).eq("id", oficina.id);
-                            setOficinas(oficinas.map(o => o.id === oficina.id ? { ...o, status: "ativo" } : o));
-                            setFilteredOficinas(filteredOficinas.map(o => o.id === oficina.id ? { ...o, status: "ativo" } : o));
-                          }}>Aprovar</Button>
-                          <Button size="sm" variant="destructive" className="ml-2" onClick={async () => {
-                            await supabase.from("oficinas").update({ status: "inativo" }).eq("id", oficina.id);
-                            setOficinas(oficinas.map(o => o.id === oficina.id ? { ...o, status: "inativo" } : o));
-                            setFilteredOficinas(filteredOficinas.map(o => o.id === oficina.id ? { ...o, status: "inativo" } : o));
-                          }}>Recusar</Button>
-                        </>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">Editar</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(oficina)}>
+                              Edição Rápida
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.push(`/admin/oficinas/editar/${oficina.id}`)}>
+                              Edição Completa
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        
+                        {oficina.status === "pendente" && (
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={async () => {
+                              await supabase.from("oficinas").update({ status: "ativo" }).eq("id", oficina.id);
+                              setOficinas(oficinas.map(o => o.id === oficina.id ? { ...o, status: "ativo" } : o));
+                              setFilteredOficinas(filteredOficinas.map(o => o.id === oficina.id ? { ...o, status: "ativo" } : o));
+                            }}>Aprovar</Button>
+                            <Button size="sm" variant="destructive" onClick={async () => {
+                              await supabase.from("oficinas").update({ status: "inativo" }).eq("id", oficina.id);
+                              setOficinas(oficinas.map(o => o.id === oficina.id ? { ...o, status: "inativo" } : o));
+                              setFilteredOficinas(filteredOficinas.map(o => o.id === oficina.id ? { ...o, status: "inativo" } : o));
+                            }}>Recusar</Button>
+                          </div>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -288,10 +306,12 @@ export default function OficinasPage() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>{isEditing ? "Editar Oficina" : "Nova Oficina"}</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto bg-white rounded-lg shadow-xl border border-gray-200">
+          <DialogHeader className="pb-4 border-b border-gray-200">
+            <DialogTitle className="text-xl font-semibold text-gray-900">
+              {isEditing ? "Editar Oficina" : "Nova Oficina"}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
               {isEditing
                 ? "Atualize as informações da oficina abaixo."
                 : "Preencha os dados para cadastrar uma nova oficina."}
@@ -299,16 +319,20 @@ export default function OficinasPage() {
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="nome"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nome</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Nome *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nome da oficina" {...field} />
+                        <Input 
+                          placeholder="Nome da oficina" 
+                          {...field} 
+                          className="w-full h-10 border border-gray-300 rounded-md px-3"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -320,10 +344,10 @@ export default function OficinasPage() {
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Status *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full h-10 border border-gray-300">
                             <SelectValue placeholder="Selecione o status" />
                           </SelectTrigger>
                         </FormControl>
@@ -339,15 +363,19 @@ export default function OficinasPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Email *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Email de contato" {...field} />
+                        <Input 
+                          placeholder="Email de contato" 
+                          {...field} 
+                          className="w-full h-10 border border-gray-300 rounded-md px-3"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -359,9 +387,13 @@ export default function OficinasPage() {
                   name="telefone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telefone</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Telefone *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Telefone de contato" {...field} />
+                        <Input 
+                          placeholder="Telefone de contato" 
+                          {...field} 
+                          className="w-full h-10 border border-gray-300 rounded-md px-3"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -374,9 +406,13 @@ export default function OficinasPage() {
                 name="endereco"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Endereço</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">Endereço *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Endereço completo" {...field} />
+                      <Input 
+                        placeholder="Endereço completo" 
+                        {...field} 
+                        className="w-full h-10 border border-gray-300 rounded-md px-3"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -388,9 +424,13 @@ export default function OficinasPage() {
                 name="descricao"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descrição</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">Descrição</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Descrição dos serviços oferecidos" className="resize-none" {...field} />
+                      <Textarea 
+                        placeholder="Descrição dos serviços oferecidos" 
+                        className="resize-none min-h-[80px] w-full border border-gray-300 rounded-md px-3 py-2" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -402,10 +442,10 @@ export default function OficinasPage() {
                 name="user_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Usuário Associado</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">Usuário Associado</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full h-10 border border-gray-300">
                           <SelectValue placeholder="Selecione um usuário (opcional)" />
                         </SelectTrigger>
                       </FormControl>
@@ -417,19 +457,27 @@ export default function OficinasPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>Usuário que terá acesso a esta oficina (opcional)</FormDescription>
+                    <FormDescription className="text-xs text-gray-500">
+                      Usuário que terá acesso a esta oficina (opcional)
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <DialogFooter>
-                <Button type="submit">{isEditing ? "Salvar alterações" : "Cadastrar oficina"}</Button>
+              <DialogFooter className="pt-6 border-t border-gray-200">
+                <Button 
+                  type="submit" 
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white h-10 px-6 rounded-md font-medium"
+                >
+                  {isEditing ? "Salvar alterações" : "Cadastrar oficina"}
+                </Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
     </AdminLayout>
+    </AdminAuthGate>
   )
 }

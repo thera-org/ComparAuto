@@ -4,6 +4,7 @@ import { useEffect, useState, ChangeEvent, FormEvent } from "react"
 import { supabase } from "@/lib/supabase"
 import Image from "next/image"
 import type { UserProfile } from "@/types/user"
+import { useAppNotifications } from "@/hooks/useAppNotifications"
 
 
 export default function ContaPage() {
@@ -18,29 +19,36 @@ export default function ContaPage() {
   })
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
+  const { crud, upload, system } = useAppNotifications()
 
   const fetchUser = async () => {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error || !user) {
-      setUser(null)
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error || !user) {
+        setUser(null)
+        setLoading(false)
+        return
+      }
+      const { data: userDoc } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", user.id)
+        .single()
+      const merged = { ...user, ...userDoc }
+      setUser(merged)
+      setForm({
+        nome: merged.nome || "",
+        email: merged.email || "",
+        telefone: merged.telefone || "",
+        endereco: merged.endereco || "",
+        avatar_url: merged.avatar_url || ""
+      })
+    } catch (err) {
+      console.error("Erro ao carregar perfil:", err)
+      system.networkError()
+    } finally {
       setLoading(false)
-      return
     }
-    const { data: userDoc } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", user.id)
-      .single()
-    const merged = { ...user, ...userDoc }
-    setUser(merged)
-    setForm({
-      nome: merged.nome || "",
-      email: merged.email || "",
-      telefone: merged.telefone || "",
-      endereco: merged.endereco || "",
-      avatar_url: merged.avatar_url || ""
-    })
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -63,38 +71,59 @@ export default function ContaPage() {
     setSaving(true)
     let avatar_url = form.avatar_url
 
-    // Upload avatar se mudou
-    if (avatarFile && user) {
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .upload(`public/${user.id}`, avatarFile, { upsert: true })
-      if (!error && data) {
-        const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(data.path)
-        avatar_url = urlData.publicUrl
+    try {
+      // Upload avatar se mudou
+      if (avatarFile && user) {
+        const { data, error } = await supabase.storage
+          .from("avatars")
+          .upload(`public/${user.id}`, avatarFile, { upsert: true })
+        if (!error && data) {
+          const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(data.path)
+          avatar_url = urlData.publicUrl
+          upload.uploadSuccess("Avatar")
+        } else if (error) {
+          upload.uploadError(error.message)
+          return
+        }
       }
-    }
 
-    // Atualiza tabela users
-    if (user) {
-      await supabase
-        .from("users")
-        .update({
-          nome: form.nome,
-          telefone: form.telefone,
-          endereco: form.endereco,
-          avatar_url
-        })
-        .eq("id", user.id)
+      // Atualiza tabela users
+      if (user) {
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({
+            nome: form.nome,
+            telefone: form.telefone,
+            endereco: form.endereco,
+            avatar_url
+          })
+          .eq("id", user.id)
 
-      // Atualiza email se mudou
-      if (form.email !== user.email) {
-        await supabase.auth.updateUser({ email: form.email })
+        if (updateError) {
+          crud.updateError("perfil", updateError.message)
+          return
+        }
+
+        // Atualiza email se mudou
+        if (form.email !== user.email) {
+          const { error: emailError } = await supabase.auth.updateUser({ email: form.email })
+          if (emailError) {
+            crud.updateError("email", emailError.message)
+            return
+          }
+        }
+
+        crud.updateSuccess("Perfil")
       }
-    }
 
-    setEdit(false)
-    setSaving(false)
-    fetchUser()
+      setEdit(false)
+      fetchUser()
+    } catch (err) {
+      console.error("Erro ao atualizar perfil:", err)
+      system.serverError()
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) {

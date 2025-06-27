@@ -3,6 +3,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { useState, Fragment } from "react"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
+import { useAppNotifications } from "@/hooks/useAppNotifications"
 
 const TOPICOS = [
   {
@@ -32,6 +33,7 @@ export default function AjudaPage() {
   const [selectedFAQ, setSelectedFAQ] = useState<{ q: string; a: string } | null>(null)
   const [form, setForm] = useState({ nome: "", email: "", mensagem: "", file: null as File | null })
   const [enviado, setEnviado] = useState(false)
+  const { success } = useAppNotifications()
 
   const openModal = (faq: { q: string; a: string }) => {
     setSelectedFAQ(faq)
@@ -60,7 +62,7 @@ export default function AjudaPage() {
     setTimeout(() => {
       setForm({ nome: "", email: "", mensagem: "", file: null })
       setEnviado(false)
-      alert("Mensagem enviada com sucesso!")
+      success("Mensagem enviada!", "Sua mensagem foi enviada com sucesso. Retornaremos em breve.")
     }, 1500)
   }
 

@@ -8,7 +8,7 @@ interface Oficina {
   endereco: string
   telefone?: string
   horario_funcionamento?: string
-  imagem?: string
+  foto_url?: string
   servicos?: string[]
   latitude: number
   longitude: number
@@ -25,7 +25,7 @@ export default function OfficeCard({ oficina }: OfficeCardProps) {
         {/* Image Section */}
         <div className="relative h-44 w-full overflow-hidden flex-shrink-0">
           <Image
-            src={oficina.imagem || "/placeholder.svg"}
+            src={oficina.foto_url || "/placeholder.svg"}
             alt={oficina.nome}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"

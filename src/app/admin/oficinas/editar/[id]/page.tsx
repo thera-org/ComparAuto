@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { uploadMultipleImages } from "@/lib/storage";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,8 @@ import {
   ChevronLeft,
   Check,
   Upload,
-  X
+  X,
+  ArrowLeft
 } from "lucide-react";
 
 const Map = dynamic(() => import("@/components/WorkshopMap"), { ssr: false });
@@ -68,6 +69,7 @@ interface FormData {
   // Passo 7: Imagens
   imagens: File[];
   imagensPreview: string[];
+  imagensExistentes: string[];
   
   // Status
   status: string;
@@ -119,11 +121,15 @@ const steps = [
   { title: "Imagens", icon: Upload },
 ];
 
-export default function NovaOficinaPage() {
+export default function EditarOficinaPage() {
   const router = useRouter();
+  const params = useParams();
+  const oficinaId = params.id as string;
   const { success, error: showError } = useNotifications();
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState<FormData>({
     nome: "",
@@ -150,11 +156,104 @@ export default function NovaOficinaPage() {
     pagamento_outros: "",
     imagens: [],
     imagensPreview: [],
+    imagensExistentes: [],
     status: "ativo",
     latitude: null,
     longitude: null,
   });
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+
+  // Carregar dados da oficina
+  useEffect(() => {
+    const loadOficina = async () => {
+      if (!oficinaId) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("oficinas")
+          .select("*")
+          .eq("id", oficinaId)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          // Extrair endereço componente por componente se estiver concatenado
+          const enderecoParts = data.endereco?.split(", ") || [];
+          
+          setFormData({
+            nome: data.nome || "",
+            cnpj_cpf: data.cnpj_cpf || "",
+            razao_social: data.razao_social || "",
+            descricao: data.descricao || "", // Usar 'descricao' que existe no banco
+            email: data.email || "",
+            telefone: data.telefone || data.telefone_fixo || "",
+            whatsapp: data.whatsapp || "", // Campo existe no banco
+            site: data.site || "", // Campo existe no banco
+            
+            // Usar campos separados se existirem, senão tentar extrair do endereço concatenado
+            cep: data.cep || "",
+            rua: data.rua || enderecoParts[0] || "",
+            numero: data.numero || enderecoParts[1] || "",
+            complemento: data.complemento || "",
+            bairro: data.bairro || enderecoParts[2] || "",
+            cidade: data.cidade || enderecoParts[3]?.split(" - ")[0] || "",
+            estado: data.estado || enderecoParts[3]?.split(" - ")[1] || "",
+            
+            latitude: data.latitude,
+            longitude: data.longitude,
+            
+            // Usar nome correto da coluna e lidar com arrays PostgreSQL
+            servicosSelecionados: data.servicos_oferecidos ? 
+              (Array.isArray(data.servicos_oferecidos) ? 
+                data.servicos_oferecidos.map((nome: string) => ({ nome, valor: "", icone: "" })) : 
+                []) : [],
+            servico_outros: "", // Não existe no banco
+            
+            diasSelecionados: Array.isArray(data.dias_funcionamento) ? data.dias_funcionamento : [],
+            horario_abertura: data.horario_abertura || "",
+            horario_fechamento: data.horario_fechamento || "",
+            
+            pagamentosSelecionados: Array.isArray(data.formas_pagamento) ? data.formas_pagamento : [],
+            pagamento_outros: "", // Não existe no banco
+            
+            // Carregar imagens existentes
+            imagensExistentes: (() => {
+              const imagens: string[] = [];
+              if (data.foto_url) imagens.push(data.foto_url);
+              if (data.imagens_urls) {
+                try {
+                  const imagensAdicionais = Array.isArray(data.imagens_urls) ? data.imagens_urls : JSON.parse(data.imagens_urls);
+                  if (Array.isArray(imagensAdicionais)) {
+                    // Evitar duplicatas da foto_url
+                    imagensAdicionais.forEach((img: string) => {
+                      if (!imagens.includes(img)) {
+                        imagens.push(img);
+                      }
+                    });
+                  }
+                } catch (e) {
+                  console.warn('Erro ao parsear imagens_urls:', e);
+                }
+              }
+              return imagens;
+            })(),
+            imagens: [],
+            imagensPreview: [],
+            
+            status: data.status || "ativo",
+          });
+        }
+      } catch (err) {
+        console.error("Erro ao carregar oficina:", err);
+        setError("Erro ao carregar dados da oficina");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadOficina();
+  }, [oficinaId]);
 
   const validateCurrentStep = (): boolean => {
     const errors: Partial<Record<keyof FormData, string>> = {};
@@ -216,7 +315,7 @@ export default function NovaOficinaPage() {
         }
         
         if (formData.latitude === null || formData.longitude === null) {
-          errors.latitude = "Selecione a localização no mapa";
+          errors.rua = "Selecione a localização no mapa";
         }
         break;
 
@@ -227,12 +326,10 @@ export default function NovaOficinaPage() {
           errors.telefone = "Telefone deve ter formato válido (11) 99999-9999";
         }
         
-        // Validar WhatsApp se fornecido
         if (formData.whatsapp.trim() && !/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/.test(formData.whatsapp.trim().replace(/\s/g, ''))) {
           errors.whatsapp = "WhatsApp deve ter formato válido (11) 99999-9999";
         }
         
-        // Validar site se fornecido
         if (formData.site.trim() && !/^https?:\/\/.+\..+/.test(formData.site.trim())) {
           errors.site = "Site deve ser uma URL válida (incluindo http:// ou https://)";
         }
@@ -267,8 +364,7 @@ export default function NovaOficinaPage() {
         }
         break;
 
-      case 6: // Imagens (opcional, sem validação obrigatória)
-        // Nenhuma validação necessária, imagens são opcionais
+      case 6: // Imagens (opcional)
         break;
     }
 
@@ -280,7 +376,15 @@ export default function NovaOficinaPage() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Limpar erro do campo quando usuário começar a digitar
+    if (fieldErrors[name as keyof FormData]) {
+      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
     if (fieldErrors[name as keyof FormData]) {
       setFieldErrors(prev => ({ ...prev, [name]: undefined }));
     }
@@ -345,7 +449,7 @@ export default function NovaOficinaPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    if (files.length + formData.imagens.length > 5) {
+    if (files.length + formData.imagens.length + formData.imagensExistentes.length > 5) {
       setError("Máximo de 5 imagens permitidas");
       return;
     }
@@ -361,7 +465,6 @@ export default function NovaOficinaPage() {
       return;
     }
 
-    // Criar previews
     const newPreviews: string[] = [];
     validFiles.forEach(file => {
       const reader = new FileReader();
@@ -389,6 +492,13 @@ export default function NovaOficinaPage() {
     }));
   };
 
+  const removeExistingImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      imagensExistentes: prev.imagensExistentes.filter((_, i) => i !== index)
+    }));
+  };
+
   const nextStep = () => {
     if (validateCurrentStep()) {
       setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
@@ -410,24 +520,26 @@ export default function NovaOficinaPage() {
     try {
       const enderecoCompleto = `${formData.rua}, ${formData.numero}${formData.complemento ? `, ${formData.complemento}` : ""}, ${formData.bairro}, ${formData.cidade} - ${formData.estado}, ${formData.cep}`;
       
-      // Upload das imagens primeiro (opcional)
-      const imagensUrls: string[] = [];
+      // Upload das novas imagens
+      const novasImagensUrls: string[] = [];
       let uploadedImages = 0;
       
       if (formData.imagens.length > 0) {
         try {
-          console.log(`Tentando fazer upload de ${formData.imagens.length} imagens...`);
+          console.log(`Tentando fazer upload de ${formData.imagens.length} novas imagens...`);
           const urls = await uploadMultipleImages(formData.imagens, 'oficinas');
-          imagensUrls.push(...urls);
+          novasImagensUrls.push(...urls);
           uploadedImages = urls.length;
-          console.log(`${uploadedImages} imagens enviadas com sucesso`);
+          console.log(`${uploadedImages} novas imagens enviadas com sucesso`);
         } catch (uploadError) {
           console.error("Erro no upload das imagens:", uploadError);
-          // Continue sem imagens se houver erro - não impede o cadastro da oficina
         }
       }
 
-      // Inserir dados da oficina (usando nomes corretos das colunas do banco)
+      // Combinar imagens existentes com novas
+      const todasImagens = [...formData.imagensExistentes, ...novasImagensUrls];
+
+      // Atualizar dados da oficina (usando nomes corretos das colunas do banco)
       const oficinaData = {
         nome: formData.nome.trim(),
         email: formData.email.trim(),
@@ -449,8 +561,8 @@ export default function NovaOficinaPage() {
         formas_pagamento: formData.pagamentosSelecionados.length > 0 ? formData.pagamentosSelecionados : null, // Array de strings
         // pagamento_outros: formData.pagamento_outros.trim() || null, // Coluna não existe
         // Usar foto_url para primeira imagem e imagens_urls como array
-        foto_url: imagensUrls.length > 0 ? imagensUrls[0] : null,
-        imagens_urls: imagensUrls.length > 0 ? imagensUrls : null, // Array de strings
+        foto_url: todasImagens.length > 0 ? todasImagens[0] : null,
+        imagens_urls: todasImagens.length > 0 ? todasImagens : null, // Array de strings
         
         // Campos de endereço separados (que existem no banco)
         rua: formData.rua.trim() || null,
@@ -464,27 +576,24 @@ export default function NovaOficinaPage() {
 
       const { error } = await supabase
         .from("oficinas")
-        .insert(oficinaData)
-        .select()
-        .single();
+        .update(oficinaData)
+        .eq("id", oficinaId);
       
       if (error) {
         console.error("Erro detalhado:", error);
         throw error;
       }
       
-      // Se chegou até aqui, deu tudo certo
       setSaving(false);
       
-      // Mostrar mensagem de sucesso
-      const successMessage = `Oficina "${formData.nome}" cadastrada com sucesso!${uploadedImages > 0 ? ` ${uploadedImages} imagen(s) foi(ram) enviada(s).` : formData.imagens.length > 0 ? ' (Algumas imagens podem não ter sido enviadas)' : ''}`;
-      success("Oficina cadastrada!", successMessage);
+      const successMessage = `Oficina "${formData.nome}" atualizada com sucesso!${uploadedImages > 0 ? ` ${uploadedImages} nova(s) imagen(s) foi(ram) adicionada(s).` : ''}`;
+      success("Oficina atualizada!", successMessage);
       
       router.push("/admin/oficinas");
     } catch (err: unknown) {
       console.error("Erro completo:", err);
       
-      let errorMessage = "Erro ao cadastrar oficina";
+      let errorMessage = "Erro ao atualizar oficina";
       
       if (err instanceof Error) {
         errorMessage = err.message;
@@ -500,10 +609,25 @@ export default function NovaOficinaPage() {
       }
       
       setError(errorMessage);
-      showError("Erro ao cadastrar oficina", errorMessage);
+      showError("Erro ao atualizar oficina", errorMessage);
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <AdminAuthGate>
+        <AdminLayout>
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Carregando dados da oficina...</p>
+            </div>
+          </div>
+        </AdminLayout>
+      </AdminAuthGate>
+    );
+  }
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -558,6 +682,20 @@ export default function NovaOficinaPage() {
                 {fieldErrors.email && <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>}
               </div>
               
+              <div>
+                <label className="block text-sm font-medium mb-2">Status *</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleSelectChange}
+                  className="w-full h-10 border border-gray-300 rounded-md px-3"
+                >
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                  <option value="pendente">Pendente</option>
+                </select>
+              </div>
+              
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-2">Descrição</label>
                 <Textarea 
@@ -571,6 +709,9 @@ export default function NovaOficinaPage() {
             </div>
           </div>
         );
+
+      // ... outros cases seguem o mesmo padrão da página de criação
+      // Por brevidade, vou incluir apenas alguns casos principais
 
       case 1: // Endereço
         return (
@@ -872,12 +1013,41 @@ export default function NovaOficinaPage() {
         return (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-4">Imagens da Oficina (opcional)</label>
+              <label className="block text-sm font-medium mb-4">Imagens da Oficina</label>
               <p className="text-sm text-gray-600 mb-4">
                 Adicione até 5 imagens da sua oficina. Formatos aceitos: JPG, PNG. Tamanho máximo: 5MB por imagem.
               </p>
               
-              {/* Upload de imagens */}
+              {/* Imagens existentes */}
+              {formData.imagensExistentes.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium mb-3">Imagens atuais:</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {formData.imagensExistentes.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                          <Image
+                            src={url}
+                            alt={`Imagem existente ${index + 1}`}
+                            width={200}
+                            height={150}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(index)}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Upload de novas imagens */}
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                 <input
                   type="file"
@@ -893,7 +1063,7 @@ export default function NovaOficinaPage() {
                 >
                   <Upload className="w-12 h-12 text-gray-400 mb-4" />
                   <span className="text-lg font-medium text-gray-700 mb-2">
-                    Clique para selecionar imagens
+                    Clique para adicionar novas imagens
                   </span>
                   <span className="text-sm text-gray-500">
                     ou arraste e solte aqui
@@ -901,17 +1071,17 @@ export default function NovaOficinaPage() {
                 </label>
               </div>
 
-              {/* Preview das imagens */}
+              {/* Preview das novas imagens */}
               {formData.imagensPreview.length > 0 && (
                 <div className="mt-6">
-                  <h4 className="text-sm font-medium mb-3">Imagens selecionadas:</h4>
+                  <h4 className="text-sm font-medium mb-3">Novas imagens a serem adicionadas:</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {formData.imagensPreview.map((preview, index) => (
                       <div key={index} className="relative group">
                         <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
                           <Image
                             src={preview}
-                            alt={`Preview ${index + 1}`}
+                            alt={`Nova imagem ${index + 1}`}
                             width={200}
                             height={150}
                             className="w-full h-full object-cover"
@@ -927,11 +1097,12 @@ export default function NovaOficinaPage() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    {formData.imagens.length}/5 imagens selecionadas
-                  </p>
                 </div>
               )}
+              
+              <p className="text-xs text-gray-500 mt-2">
+                Total: {formData.imagensExistentes.length + formData.imagens.length}/5 imagens
+              </p>
             </div>
           </div>
         );
@@ -947,8 +1118,18 @@ export default function NovaOficinaPage() {
       <div className="max-w-4xl mx-auto py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Nova Oficina</h1>
-          <p className="text-muted-foreground">Cadastre uma nova oficina no sistema</p>
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              variant="ghost"
+              onClick={() => router.push("/admin/oficinas")}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Button>
+          </div>
+          <h1 className="text-3xl font-bold mb-2">Editar Oficina</h1>
+          <p className="text-muted-foreground">Atualize os dados da oficina &quot;{formData.nome}&quot;</p>
         </div>
 
         {/* Progress indicator */}
@@ -1030,7 +1211,7 @@ export default function NovaOficinaPage() {
               </Button>
             ) : (
               <Button onClick={handleSubmit} disabled={saving} className="bg-green-600 hover:bg-green-700">
-                {saving ? "Salvando..." : "Cadastrar Oficina"}
+                {saving ? "Salvando..." : "Atualizar Oficina"}
                 <Check className="w-4 h-4 ml-2" />
               </Button>
             )}
