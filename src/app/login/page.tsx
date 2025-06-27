@@ -7,7 +7,6 @@ import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff, AlertCircle, Loader2, LogIn, Facebook, Apple } from "lucide-react";
 import Image from "next/image";
 import styles from './login.module.css';
-import { useNotifications } from '@/contexts/NotificationContext';
 import { useAppNotifications } from '@/hooks/useAppNotifications';
 
 // Regex simples para e-mail
@@ -98,19 +97,19 @@ export default function LoginPage() {
         if (error.message.includes("Invalid login credentials")) {
           const errorMsg = "E-mail ou senha incorretos.";
           setError(errorMsg);
-          showError("Falha no Login", errorMsg);
+          auth.loginError(errorMsg);
         } else if (error.message.includes("Email not confirmed")) {
           const errorMsg = "Por favor, confirme seu e-mail antes de fazer login.";
           setError(errorMsg);
-          showError("E-mail não confirmado", errorMsg);
+          auth.loginError(errorMsg);
         } else if (error.message.includes("Too many requests")) {
           const errorMsg = "Muitas tentativas de login. Tente novamente mais tarde.";
           setError(errorMsg);
-          showError("Muitas tentativas", errorMsg);
+          auth.loginError(errorMsg);
         } else {
           const errorMsg = "Falha ao fazer login. Verifique suas informações.";
           setError(errorMsg);
-          showError("Erro no Login", errorMsg);
+          auth.loginError(errorMsg);
         }
         return;
       }      // Login bem-sucedido
@@ -118,7 +117,7 @@ export default function LoginPage() {
         // Reset login attempts on successful login
         setLoginAttempts(0);
         
-        success("Login realizado com sucesso!", "Bem-vindo de volta!");
+        auth.loginSuccess();
         
         // Verifica se há parâmetro de redirect
         const params = new URLSearchParams(window.location.search);

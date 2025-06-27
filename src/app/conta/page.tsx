@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, ChangeEvent, FormEvent } from "react"
+import { useEffect, useState, ChangeEvent, FormEvent, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import Image from "next/image"
 import type { UserProfile } from "@/types/user"
@@ -21,7 +21,7 @@ export default function ContaPage() {
   const [saving, setSaving] = useState(false)
   const { crud, upload, system } = useAppNotifications()
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const { data: { user }, error } = await supabase.auth.getUser()
       if (error || !user) {
@@ -49,11 +49,11 @@ export default function ContaPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [system])
 
   useEffect(() => {
     fetchUser()
-  }, [])
+  }, [fetchUser])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })

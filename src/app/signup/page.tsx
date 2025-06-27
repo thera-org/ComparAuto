@@ -60,7 +60,7 @@ interface SignupFormData {
 
 export default function SignupPage() {
   const router = useRouter();
-  const { success, error: showError, warning } = useNotifications();
+  const { success, error: showError } = useNotifications();
   const [currentStep, setCurrentStep] = useState(1);  const [formData, setFormData] = useState<SignupFormData>({
     telefone: "",
     tipoContaEmpresa: null,
