@@ -30,18 +30,37 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
 
         // Verificar se o usuário é admin
         const { data: userData, error: userError } = await supabase
-          .from("usuarios")
-          .select("tipo, nome, email")
+          .from("users")
+          .select("role, nome, email")
           .eq("id", session.user.id)
-          .eq("tipo", "admin")
+          .eq("role", "admin")
           .single()
 
         if (userError || !userData) {
-          // Usuário não é admin ou não existe
-          await supabase.auth.signOut()
-          localStorage.removeItem("admin")
-          localStorage.removeItem("adminData")
-          router.push("/admin/login")
+          // Se falhar, tentar na tabela usuarios para compatibilidade
+          const { data: fallbackUserData, error: fallbackError } = await supabase
+            .from("usuarios")
+            .select("tipo, nome, email")
+            .eq("id", session.user.id)
+            .eq("tipo", "admin")
+            .single()
+
+          if (fallbackError || !fallbackUserData) {
+            // Usuário não é admin ou não existe
+            await supabase.auth.signOut()
+            localStorage.removeItem("admin")
+            localStorage.removeItem("adminData")
+            router.push("/admin/login")
+            return
+          }
+          
+          // Usar dados da tabela usuarios como fallback
+          setIsAuthenticated(true)
+          localStorage.setItem("adminData", JSON.stringify({
+            nome: fallbackUserData.nome,
+            email: fallbackUserData.email,
+            sessionId: session.access_token.substring(0, 10)
+          }))
           return
         }
 

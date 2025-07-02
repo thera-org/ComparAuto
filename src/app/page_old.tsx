@@ -12,6 +12,8 @@ import { MapPin, List, Search, X, Wrench, Star, Shield, Clock, Award } from "luc
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 
+
+
 const WorkshopMap = dynamic(() => import("@/components/WorkshopMap"), { 
   ssr: false,
   loading: () => <div>Loading map...</div>
@@ -77,8 +79,7 @@ export default function Home() {
           }
         } catch (error) {
           console.error("Unexpected error fetching user data:", error)
-        }
-      } else {
+        }      } else {
         setUserData(null)
       }
       setLoading(false)
@@ -92,6 +93,7 @@ export default function Home() {
       try {
         console.log("Iniciando busca de oficinas...")
         
+        // Primeiro, vamos verificar se conseguimos conectar com o Supabase
         const { data: testConnection, error: connectionError } = await supabase
           .from("oficinas")
           .select("count", { count: "exact", head: true })
@@ -105,16 +107,22 @@ export default function Home() {
         
         console.log("Conexão com Supabase OK. Registros encontrados:", testConnection)
         
+        // Agora buscar os dados completos
         const { data, error } = await supabase
           .from("oficinas")
           .select("*")
         
         if (error) {
           console.error("Erro detalhado ao buscar oficinas:", error)
+          console.error("Código do erro:", error.code)
+          console.error("Mensagem do erro:", error.message)
+          console.error("Detalhes do erro:", error.details)
           setOficinas([])
         } else {
           console.log("Dados brutos encontrados:", data)
+          console.log("Número total de registros:", data?.length || 0)
           
+          // Filtrar apenas oficinas com coordenadas válidas
           const oficinasComCoordenadas = (data as Oficina[])?.filter(
             oficina => oficina.latitude != null && oficina.longitude != null
           ) || []
@@ -133,10 +141,11 @@ export default function Home() {
     fetchOficinas()
   }, [])
 
+  // Debounce para o searchTerm para melhorar performance
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm)
-    }, 300)
+    }, 300) // 300ms de delay
 
     return () => clearTimeout(timer)
   }, [searchTerm])
@@ -155,24 +164,26 @@ export default function Home() {
       filtered = filtered.filter((oficina) => oficina.category === selectedCategory)
     }
     setFilteredOficinas(filtered)
-  }, [debouncedSearchTerm, selectedCategory, oficinas])
-
+  }, [debouncedSearchTerm, selectedCategory, oficinas])  // Function to check scroll arrows visibility
   const checkScrollArrows = useCallback(() => {
     const container = document.getElementById('categories-container')
     if (container) {
       const { scrollLeft, scrollWidth, clientWidth } = container
-      setShowLeftArrow(scrollLeft > 10)
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10)
+      setShowLeftArrow(scrollLeft > 10) // margem maior para melhor UX
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10) // margem maior para melhor UX
     }
   }, [])
 
   useEffect(() => {
     const container = document.getElementById('categories-container')
     if (container) {
+      // Adicionar event listener para scroll
       container.addEventListener('scroll', checkScrollArrows)
       
+      // Verificar estado inicial após renderização
       const timeoutId = setTimeout(checkScrollArrows, 100)
       
+      // Observer para detectar mudanças no tamanho do container
       const resizeObserver = new ResizeObserver(() => {
         checkScrollArrows()
       })
@@ -184,7 +195,7 @@ export default function Home() {
         clearTimeout(timeoutId)
       }
     }
-  }, [checkScrollArrows])
+  }, [checkScrollArrows]) // Remover dependência categories para evitar erro
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -198,8 +209,7 @@ export default function Home() {
     setSearchTerm("")
     setSelectedCategory(null)
   }
-
-  if (loading) {
+    if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -225,8 +235,7 @@ export default function Home() {
         <Footer />
       </div>
     )
-  }
-
+  }  // Optimized categories data for mobile performance
   const categories = [
     { id: "troca-oleo", name: "Troca de óleo", icon: "/oleo.png" },
     { id: "avaliacao", name: "Avaliação", icon: "/avaliacao.png" },
@@ -254,6 +263,7 @@ export default function Home() {
       
       {/* Hero Section - Inspired by Airbnb */}
       <div className="relative bg-white">
+        {/* Hero Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -273,7 +283,6 @@ export default function Home() {
                     <Input
                       type="text"
                       placeholder="Buscar oficinas por nome ou localização..."
-                      className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-base placeholder:text-gray-500"
                       value={searchTerm}
                       onChange={handleSearch}
                       style={{ boxShadow: 'none' }}
@@ -337,7 +346,6 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Serviços Disponíveis</h2>
           
-          <div className="relative">
             {/* Categories navigation */}
             {showLeftArrow && (
               <button

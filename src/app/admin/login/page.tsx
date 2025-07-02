@@ -20,16 +20,28 @@ export default function AdminLogin() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Verificar se é admin
+        // Verificar se é admin - primeiro tentar tabela users
         const { data: userData } = await supabase
-          .from("usuarios")
-          .select("tipo")
+          .from("users")
+          .select("role")
           .eq("id", session.user.id)
-          .eq("tipo", "admin")
-          .single();
+          .eq("role", "admin")
+          .single()
         
         if (userData) {
-          router.push("/admin");
+          router.push("/admin")
+        } else {
+          // Tentar tabela usuarios como fallback
+          const { data: fallbackData } = await supabase
+            .from("usuarios")
+            .select("tipo")
+            .eq("id", session.user.id)
+            .eq("tipo", "admin")
+            .single()
+          
+          if (fallbackData) {
+            router.push("/admin")
+          }
         }
       }
     };
@@ -64,13 +76,30 @@ export default function AdminLogin() {
       }
 
       if (authData.user) {
-        // Verificar se o usuário é admin na tabela usuarios
-        const { data: userData, error: userError } = await supabase
-          .from("usuarios")
-          .select("tipo, nome, email")
+        // Verificar se o usuário é admin - primeiro tentar tabela users
+        let userData, userError
+        const { data: userDataMain, error: userErrorMain } = await supabase
+          .from("users")
+          .select("role, nome, email")
           .eq("id", authData.user.id)
-          .eq("tipo", "admin")
+          .eq("role", "admin")
           .single();
+
+        if (userErrorMain || !userDataMain) {
+          // Tentar tabela usuarios como fallback
+          const { data: userDataFallback, error: userErrorFallback } = await supabase
+            .from("usuarios")
+            .select("tipo, nome, email")
+            .eq("id", authData.user.id)
+            .eq("tipo", "admin")
+            .single();
+          
+          userData = userDataFallback
+          userError = userErrorFallback
+        } else {
+          userData = userDataMain
+          userError = userErrorMain
+        }
 
         if (userError || !userData) {
           // Se não for admin, fazer logout imediatamente

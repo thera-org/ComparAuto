@@ -1,31 +1,67 @@
-# ComparAuto
+# ComparAuto 🚗
 
-Plataforma para comparar preços de serviços automotivos.
+Uma plataforma moderna para comparar preços de serviços automotivos, conectando clientes a oficinas especializadas.
 
-## Como rodar localmente
+## ✨ Funcionalidades
 
-1. Instale as dependências:
+- 🔍 **Busca Inteligente**: Encontre oficinas por localização e serviços
+- 🗺️ **Visualização em Mapa**: Integração com Google Maps
+- 👨‍💼 **Painel Administrativo**: Gestão completa de oficinas e usuários
+- 🔐 **Autenticação Segura**: Sistema robusto com Supabase Auth
+- 📱 **Responsivo**: Funciona perfeitamente em todos os dispositivos
+- ⚡ **Performance**: Otimizado com Next.js 15 e React 19
 
+## 🚀 Início Rápido
+
+### Pré-requisitos
+
+- Node.js 18+ 
+- npm/yarn/pnpm
+- Conta no Supabase
+
+### Instalação
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/seu-usuario/comparauto.git
+cd comparauto
+```
+
+2. **Instale as dependências**
 ```bash
 npm install
+# ou
+yarn install
+# ou
+pnpm install
 ```
 
-2. Configure as variáveis de ambiente:
-
-Crie um arquivo `.env.local` na raiz com:
-
-```
-SUPABASE_URL=...
-SUPABASE_ANON_KEY=...
+3. **Configure as variáveis de ambiente**
+```bash
+cp .env.example .env.local
 ```
 
-3. Rode o servidor de desenvolvimento:
+4. **Edite o arquivo .env.local** com suas configurações:
+```env
+# Obrigatórias
+NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
 
+# Opcionais
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=sua_chave_google_maps
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_sua_chave_stripe
+```
+
+5. **Execute o projeto**
 ```bash
 npm run dev
+# ou
+yarn dev
+# ou
+pnpm dev
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000).
+6. **Acesse** http://localhost:3000
 
 ## Deploy
 

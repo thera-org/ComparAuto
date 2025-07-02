@@ -1,12 +1,18 @@
-"use client"
-
+import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { metadata } from './metadata' // Importe a metadata
-import { NotificationProvider } from '@/contexts/NotificationContext'
-import { NotificationContainer } from '@/components/NotificationContainer'
+import { ClientProviders } from '../components/ClientProviders'
 
 const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: "ComparAuto",
+  description: "A melhor plataforma para comparar preços de serviços automotivos",
+  keywords: ["comparação", "serviços automotivos", "preços", "oficinas"],
+  authors: [{ name: "ComparAuto" }],
+  creator: "ComparAuto",
+  publisher: "ComparAuto",
+}
 
 export default function RootLayout({
   children,
@@ -15,15 +21,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <head>
-        <title>{metadata.title as string}</title>
-        <meta name="description" content={metadata.description as string} />
-      </head>
       <body className={inter.className}>
-        <NotificationProvider>
+        <ClientProviders>
           {children}
-          <NotificationContainer />
-        </NotificationProvider>
+        </ClientProviders>
       </body>
     </html>
   )
