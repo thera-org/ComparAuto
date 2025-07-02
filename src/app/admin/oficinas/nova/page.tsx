@@ -1,78 +1,275 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { uploadMultipleImages } from "@/lib/storage";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AdminLayout from "@/components/admin-layout";
+import AdminAuthGate from "@/components/AdminAuthGate";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import { useNotifications } from '@/contexts/NotificationContext';
+import { 
+  MapPin, 
+  Phone, 
+  Clock, 
+  CreditCard, 
+  Building,
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Upload,
+  X
+} from "lucide-react";
 
 const Map = dynamic(() => import("@/components/WorkshopMap"), { ssr: false });
 
 interface FormData {
+  // Passo 1: Dados básicos
   nome: string;
-  email: string;
-  telefone: string;
-  endereco: string;
+  cnpj_cpf: string;
+  razao_social: string;
+  descricao: string;
+  
+  // Passo 2: Endereço
+  cep: string;
+  rua: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
   latitude: number | null;
   longitude: number | null;
-  descricao: string;
+  
+  // Passo 3: Contato
+  telefone: string;
+  whatsapp: string;
+  email: string;
+  site: string;
+  
+  // Passo 4: Serviços
+  servicosSelecionados: { nome: string; valor: string; icone: string }[];
+  servico_outros: string;
+  
+  // Passo 5: Horário
+  diasSelecionados: string[];
+  horario_abertura: string;
+  horario_fechamento: string;
+  
+  // Passo 6: Pagamento
+  pagamentosSelecionados: string[];
+  pagamento_outros: string;
+  
+  // Passo 7: Imagens
+  imagens: File[];
+  imagensPreview: string[];
+  
+  // Status
   status: string;
 }
 
+const servicosList = [
+  { nome: "Troca de óleo", icone: "/oleo.png" },
+  { nome: "Alinhamento e balanceamento", icone: "/balanceamento.png" },
+  { nome: "Elétrica", icone: "/eletrica.png" },
+  { nome: "Mecânica geral", icone: "/freio.png" },
+  { nome: "Ar-condicionado", icone: "/ar-condicionado.png" },
+  { nome: "Suspensão", icone: "/susp.png" },
+  { nome: "Sistema de escape", icone: "/escape.png" },
+  { nome: "Injeção eletrônica", icone: "/injecao.png" },
+  { nome: "Filtros", icone: "/filtro.png" },
+  { nome: "Bateria", icone: "/bateria.png" },
+  { nome: "Higienização", icone: "/higienizacao.png" },
+  { nome: "Polimento", icone: "/polimento.png" },
+  { nome: "Película", icone: "/pelicula.png" },
+  { nome: "Acessórios", icone: "/acessorios.png" },
+];
+
+const diasSemana = [
+  "Segunda-feira",
+  "Terça-feira", 
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado",
+  "Domingo"
+];
+
+const formasPagamento = [
+  "Dinheiro",
+  "Cartão de débito",
+  "Cartão de crédito",
+  "PIX",
+  "Transferência bancária",
+  "Boleto bancário"
+];
+
+const steps = [
+  { title: "Dados Básicos", icon: Building },
+  { title: "Endereço", icon: MapPin },
+  { title: "Contato", icon: Phone },
+  { title: "Serviços", icon: Check },
+  { title: "Horário", icon: Clock },
+  { title: "Pagamento", icon: CreditCard },
+  { title: "Imagens", icon: Upload },
+];
+
 export default function NovaOficinaPage() {
   const router = useRouter();
+  const { success, error: showError } = useNotifications();
+  const [currentStep, setCurrentStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState<FormData>({
     nome: "",
-    email: "",
-    telefone: "",
-    endereco: "",
+    cnpj_cpf: "",
+    razao_social: "",
     descricao: "",
+    cep: "",
+    rua: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    telefone: "",
+    whatsapp: "",
+    email: "",
+    site: "",
+    servicosSelecionados: [],
+    servico_outros: "",
+    diasSelecionados: [],
+    horario_abertura: "",
+    horario_fechamento: "",
+    pagamentosSelecionados: [],
+    pagamento_outros: "",
+    imagens: [],
+    imagensPreview: [],
     status: "ativo",
     latitude: null,
     longitude: null,
   });
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
-  const validateForm = (): boolean => {
+  const validateCurrentStep = (): boolean => {
     const errors: Partial<Record<keyof FormData, string>> = {};
 
-    // Validação de nome
-    if (!formData.nome.trim()) {
-      errors.nome = "Nome é obrigatório";
-    } else if (formData.nome.trim().length < 2) {
-      errors.nome = "Nome deve ter pelo menos 2 caracteres";
-    }
+    switch (currentStep) {
+      case 0: // Dados básicos
+        if (!formData.nome.trim()) {
+          errors.nome = "Nome é obrigatório";
+        } else if (formData.nome.trim().length < 2) {
+          errors.nome = "Nome deve ter pelo menos 2 caracteres";
+        }
 
-    // Validação de email
-    if (!formData.email.trim()) {
-      errors.email = "Email é obrigatório";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Email deve ser válido";
-    }
+        if (!formData.email.trim()) {
+          errors.email = "Email é obrigatório";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+          errors.email = "Email deve ser válido";
+        }
 
-    // Validação de telefone
-    if (!formData.telefone.trim()) {
-      errors.telefone = "Telefone é obrigatório";
-    } else if (formData.telefone.trim().length < 10) {
-      errors.telefone = "Telefone deve ter pelo menos 10 dígitos";
-    }
+        if (!formData.cnpj_cpf.trim()) {
+          errors.cnpj_cpf = "CNPJ/CPF é obrigatório";
+        } else if (formData.cnpj_cpf.trim().length < 11) {
+          errors.cnpj_cpf = "CNPJ/CPF deve ter pelo menos 11 caracteres";
+        }
+        break;
 
-    // Validação de endereço
-    if (!formData.endereco.trim()) {
-      errors.endereco = "Endereço é obrigatório";
-    } else if (formData.endereco.trim().length < 10) {
-      errors.endereco = "Endereço deve ter pelo menos 10 caracteres";
-    }
+      case 1: // Endereço
+        if (!formData.cep.trim()) {
+          errors.cep = "CEP é obrigatório";
+        } else if (!/^\d{5}-?\d{3}$/.test(formData.cep.trim())) {
+          errors.cep = "CEP deve ter formato válido (00000-000)";
+        }
+        
+        if (!formData.rua.trim()) {
+          errors.rua = "Rua é obrigatória";
+        } else if (formData.rua.trim().length < 3) {
+          errors.rua = "Rua deve ter pelo menos 3 caracteres";
+        }
+        
+        if (!formData.numero.trim()) {
+          errors.numero = "Número é obrigatório";
+        }
+        
+        if (!formData.bairro.trim()) {
+          errors.bairro = "Bairro é obrigatório";
+        } else if (formData.bairro.trim().length < 2) {
+          errors.bairro = "Bairro deve ter pelo menos 2 caracteres";
+        }
+        
+        if (!formData.cidade.trim()) {
+          errors.cidade = "Cidade é obrigatória";
+        } else if (formData.cidade.trim().length < 2) {
+          errors.cidade = "Cidade deve ter pelo menos 2 caracteres";
+        }
+        
+        if (!formData.estado.trim()) {
+          errors.estado = "Estado é obrigatório";
+        } else if (formData.estado.trim().length !== 2) {
+          errors.estado = "Estado deve ter 2 caracteres (ex: SP)";
+        }
+        
+        if (formData.latitude === null || formData.longitude === null) {
+          errors.latitude = "Selecione a localização no mapa";
+        }
+        break;
 
-    // Validação de coordenadas
-    if (formData.latitude === null || formData.longitude === null) {
-      errors.latitude = "Selecione a localização no mapa";
-      errors.longitude = "Selecione a localização no mapa";
+      case 2: // Contato
+        if (!formData.telefone.trim()) {
+          errors.telefone = "Telefone é obrigatório";
+        } else if (!/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/.test(formData.telefone.trim().replace(/\s/g, ''))) {
+          errors.telefone = "Telefone deve ter formato válido (11) 99999-9999";
+        }
+        
+        // Validar WhatsApp se fornecido
+        if (formData.whatsapp.trim() && !/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/.test(formData.whatsapp.trim().replace(/\s/g, ''))) {
+          errors.whatsapp = "WhatsApp deve ter formato válido (11) 99999-9999";
+        }
+        
+        // Validar site se fornecido
+        if (formData.site.trim() && !/^https?:\/\/.+\..+/.test(formData.site.trim())) {
+          errors.site = "Site deve ser uma URL válida (incluindo http:// ou https://)";
+        }
+        break;
+
+      case 3: // Serviços
+        if (formData.servicosSelecionados.length === 0) {
+          errors.nome = "Selecione pelo menos um serviço";
+        }
+        break;
+
+      case 4: // Horário
+        if (formData.diasSelecionados.length === 0) {
+          errors.horario_abertura = "Selecione pelo menos um dia de funcionamento";
+        }
+        if (!formData.horario_abertura) {
+          errors.horario_abertura = "Horário de abertura é obrigatório";
+        }
+        if (!formData.horario_fechamento) {
+          errors.horario_fechamento = "Horário de fechamento é obrigatório";
+        }
+        if (formData.horario_abertura && formData.horario_fechamento) {
+          if (formData.horario_abertura >= formData.horario_fechamento) {
+            errors.horario_fechamento = "Horário de fechamento deve ser posterior ao de abertura";
+          }
+        }
+        break;
+
+      case 5: // Pagamento
+        if (formData.pagamentosSelecionados.length === 0) {
+          errors.nome = "Selecione pelo menos uma forma de pagamento";
+        }
+        break;
+
+      case 6: // Imagens (opcional, sem validação obrigatória)
+        // Nenhuma validação necessária, imagens são opcionais
+        break;
     }
 
     setFieldErrors(errors);
@@ -91,14 +288,119 @@ export default function NovaOficinaPage() {
 
   const handleMapClick = (lat: number, lng: number) => {
     setFormData(prev => ({ ...prev, latitude: lat, longitude: lng }));
-    // Limpar erros de coordenadas
     setFieldErrors(prev => ({ ...prev, latitude: undefined, longitude: undefined }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const toggleServico = (servico: string, icone: string) => {
+    setFormData(prev => {
+      const exists = prev.servicosSelecionados.find(s => s.nome === servico);
+      if (exists) {
+        return {
+          ...prev,
+          servicosSelecionados: prev.servicosSelecionados.filter(s => s.nome !== servico)
+        };
+      } else {
+        return {
+          ...prev,
+          servicosSelecionados: [...prev.servicosSelecionados, { nome: servico, valor: "", icone }]
+        };
+      }
+    });
+  };
+
+  const toggleDia = (dia: string) => {
+    setFormData(prev => {
+      const exists = prev.diasSelecionados.includes(dia);
+      if (exists) {
+        return {
+          ...prev,
+          diasSelecionados: prev.diasSelecionados.filter(d => d !== dia)
+        };
+      } else {
+        return {
+          ...prev,
+          diasSelecionados: [...prev.diasSelecionados, dia]
+        };
+      }
+    });
+  };
+
+  const togglePagamento = (pagamento: string) => {
+    setFormData(prev => {
+      const exists = prev.pagamentosSelecionados.includes(pagamento);
+      if (exists) {
+        return {
+          ...prev,
+          pagamentosSelecionados: prev.pagamentosSelecionados.filter(p => p !== pagamento)
+        };
+      } else {
+        return {
+          ...prev,
+          pagamentosSelecionados: [...prev.pagamentosSelecionados, pagamento]
+        };
+      }
+    });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
     
-    if (!validateForm()) {
+    if (files.length + formData.imagens.length > 5) {
+      setError("Máximo de 5 imagens permitidas");
+      return;
+    }
+
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('image/');
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+      return isValidType && isValidSize;
+    });
+
+    if (validFiles.length !== files.length) {
+      setError("Apenas imagens até 5MB são permitidas");
+      return;
+    }
+
+    // Criar previews
+    const newPreviews: string[] = [];
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        newPreviews.push(e.target?.result as string);
+        if (newPreviews.length === validFiles.length) {
+          setFormData(prev => ({
+            ...prev,
+            imagens: [...prev.imagens, ...validFiles],
+            imagensPreview: [...prev.imagensPreview, ...newPreviews]
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    setError("");
+  };
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      imagens: prev.imagens.filter((_, i) => i !== index),
+      imagensPreview: prev.imagensPreview.filter((_, i) => i !== index)
+    }));
+  };
+
+  const nextStep = () => {
+    if (validateCurrentStep()) {
+      setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 0));
+  };
+
+  const handleSubmit = async () => {
+    if (!validateCurrentStep()) {
       return;
     }
 
@@ -106,135 +408,636 @@ export default function NovaOficinaPage() {
     setError("");
     
     try {
-      const { error } = await supabase.from("oficinas").insert({
+      const enderecoCompleto = `${formData.rua}, ${formData.numero}${formData.complemento ? `, ${formData.complemento}` : ""}, ${formData.bairro}, ${formData.cidade} - ${formData.estado}, ${formData.cep}`;
+      
+      // Upload das imagens primeiro (opcional)
+      const imagensUrls: string[] = [];
+      let uploadedImages = 0;
+      
+      if (formData.imagens.length > 0) {
+        try {
+          console.log(`Tentando fazer upload de ${formData.imagens.length} imagens...`);
+          const urls = await uploadMultipleImages(formData.imagens, 'oficinas');
+          imagensUrls.push(...urls);
+          uploadedImages = urls.length;
+          console.log(`${uploadedImages} imagens enviadas com sucesso`);
+        } catch (uploadError) {
+          console.error("Erro no upload das imagens:", uploadError);
+          // Continue sem imagens se houver erro - não impede o cadastro da oficina
+        }
+      }
+
+      // Inserir dados da oficina (usando nomes corretos das colunas do banco)
+      const oficinaData = {
         nome: formData.nome.trim(),
         email: formData.email.trim(),
         telefone: formData.telefone.trim(),
-        endereco: formData.endereco.trim(),
-        descricao: formData.descricao.trim(),
+        telefone_fixo: formData.telefone.trim(), // Coluna adicional no banco
+        endereco: enderecoCompleto,
+        descricao: formData.descricao.trim() || null, // Voltar para 'descricao' que existe
         status: formData.status,
         latitude: formData.latitude,
         longitude: formData.longitude,
-      });
+        cnpj_cpf: formData.cnpj_cpf.trim() || null,
+        razao_social: formData.razao_social.trim() || null,
+        whatsapp: formData.whatsapp.trim() || null, // Coluna existe no banco
+        site: formData.site.trim() || null, // Coluna existe no banco
+        servicos_oferecidos: formData.servicosSelecionados.length > 0 ? formData.servicosSelecionados.map(s => s.nome) : null, // Array de strings
+        dias_funcionamento: formData.diasSelecionados.length > 0 ? formData.diasSelecionados : null, // Array de strings
+        horario_abertura: formData.horario_abertura || null,
+        horario_fechamento: formData.horario_fechamento || null,
+        formas_pagamento: formData.pagamentosSelecionados.length > 0 ? formData.pagamentosSelecionados : null, // Array de strings
+        // pagamento_outros: formData.pagamento_outros.trim() || null, // Coluna não existe
+        // Usar foto_url para primeira imagem e imagens_urls como array
+        foto_url: imagensUrls.length > 0 ? imagensUrls[0] : null,
+        imagens_urls: imagensUrls.length > 0 ? imagensUrls : null, // Array de strings
+        
+        // Campos de endereço separados (que existem no banco)
+        rua: formData.rua.trim() || null,
+        numero: formData.numero.trim() || null,
+        complemento: formData.complemento.trim() || null,
+        bairro: formData.bairro.trim() || null,
+        cidade: formData.cidade.trim() || null,
+        estado: formData.estado.trim() || null,
+        cep: formData.cep.trim() || null,
+      };
+
+      const { error } = await supabase
+        .from("oficinas")
+        .insert(oficinaData)
+        .select()
+        .single();
       
       if (error) {
+        console.error("Erro detalhado:", error);
         throw error;
       }
       
+      // Se chegou até aqui, deu tudo certo
+      setSaving(false);
+      
+      // Mostrar mensagem de sucesso
+      const successMessage = `Oficina "${formData.nome}" cadastrada com sucesso!${uploadedImages > 0 ? ` ${uploadedImages} imagen(s) foi(ram) enviada(s).` : formData.imagens.length > 0 ? ' (Algumas imagens podem não ter sido enviadas)' : ''}`;
+      success("Oficina cadastrada!", successMessage);
+      
       router.push("/admin/oficinas");
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Erro ao cadastrar oficina";
+      console.error("Erro completo:", err);
+      
+      let errorMessage = "Erro ao cadastrar oficina";
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        const errorObj = err as Record<string, unknown>;
+        if (typeof errorObj.message === 'string') {
+          errorMessage = errorObj.message;
+        } else if (typeof errorObj.details === 'string') {
+          errorMessage = errorObj.details;
+        } else if (typeof errorObj.hint === 'string') {
+          errorMessage = errorObj.hint;
+        }
+      }
+      
       setError(errorMessage);
+      showError("Erro ao cadastrar oficina", errorMessage);
       setSaving(false);
     }
   };
-  return (
-    <AdminLayout>
-      <div className="max-w-2xl mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-4">Nova Oficina</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input 
-              name="nome"
-              value={formData.nome}
-              onChange={handleInputChange}
-              placeholder="Nome da oficina" 
-              className={fieldErrors.nome ? "border-red-500" : ""}
-            />
-            {fieldErrors.nome && <p className="text-red-500 text-sm mt-1">{fieldErrors.nome}</p>}
-          </div>
-          
-          <div>
-            <Input 
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Email da oficina" 
-              type="email"
-              className={fieldErrors.email ? "border-red-500" : ""}
-            />
-            {fieldErrors.email && <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>}
-          </div>
-          
-          <div>
-            <Input 
-              name="telefone"
-              value={formData.telefone}
-              onChange={handleInputChange}
-              placeholder="Telefone (XX) XXXXX-XXXX" 
-              className={fieldErrors.telefone ? "border-red-500" : ""}
-            />
-            {fieldErrors.telefone && <p className="text-red-500 text-sm mt-1">{fieldErrors.telefone}</p>}
-          </div>
-          
-          <div>
-            <Input 
-              name="endereco"
-              value={formData.endereco}
-              onChange={handleInputChange}
-              placeholder="Endereço completo" 
-              className={fieldErrors.endereco ? "border-red-500" : ""}
-            />
-            {fieldErrors.endereco && <p className="text-red-500 text-sm mt-1">{fieldErrors.endereco}</p>}
-          </div>
-          
-          <div>
-            <Textarea 
-              name="descricao"
-              value={formData.descricao}
-              onChange={handleInputChange}
-              placeholder="Descrição da oficina (opcional)" 
-              rows={3}
-            />
-          </div>
-          
-          <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Localização no mapa <span className="text-red-500">*</span>
-            </label>
-            <div className="h-64 w-full rounded border overflow-hidden">
-              <Map
-                selectLocationMode={true}
-                onLocationSelect={handleMapClick}
-                marker={formData.latitude !== null && formData.longitude !== null ? { lat: formData.latitude, lng: formData.longitude } : null}
-                height="256px"
-              />
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0: // Dados básicos
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">Nome da Oficina *</label>
+                <Input 
+                  name="nome"
+                  value={formData.nome}
+                  onChange={handleInputChange}
+                  placeholder="Digite o nome da oficina" 
+                  className={fieldErrors.nome ? "border-red-500" : ""}
+                />
+                {fieldErrors.nome && <p className="text-red-500 text-sm mt-1">{fieldErrors.nome}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">CNPJ/CPF *</label>
+                <Input 
+                  name="cnpj_cpf"
+                  value={formData.cnpj_cpf}
+                  onChange={handleInputChange}
+                  placeholder="00.000.000/0000-00" 
+                  className={fieldErrors.cnpj_cpf ? "border-red-500" : ""}
+                />
+                {fieldErrors.cnpj_cpf && <p className="text-red-500 text-sm mt-1">{fieldErrors.cnpj_cpf}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Razão Social</label>
+                <Input 
+                  name="razao_social"
+                  value={formData.razao_social}
+                  onChange={handleInputChange}
+                  placeholder="Razão social da empresa" 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Email *</label>
+                <Input 
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="contato@oficina.com" 
+                  type="email"
+                  className={fieldErrors.email ? "border-red-500" : ""}
+                />
+                {fieldErrors.email && <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>}
+              </div>
+              
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">Descrição</label>
+                <Textarea 
+                  name="descricao"
+                  value={formData.descricao}
+                  onChange={handleInputChange}
+                  placeholder="Descreva a oficina, especialidades e diferenciais..." 
+                  rows={3}
+                />
+              </div>
             </div>
-            <div className="mt-2">
-              {formData.latitude !== null && formData.longitude !== null ? (
-                <div className="text-xs text-green-600">
-                  ✓ Localização selecionada: {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
-                </div>
-              ) : (
-                <div className="text-xs text-gray-500">Clique no mapa para selecionar a localização</div>
+          </div>
+        );
+
+      case 1: // Endereço
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">CEP *</label>
+                <Input 
+                  name="cep"
+                  value={formData.cep}
+                  onChange={handleInputChange}
+                  placeholder="00000-000" 
+                  className={fieldErrors.cep ? "border-red-500" : ""}
+                />
+                {fieldErrors.cep && <p className="text-red-500 text-sm mt-1">{fieldErrors.cep}</p>}
+              </div>
+              
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">Rua *</label>
+                <Input 
+                  name="rua"
+                  value={formData.rua}
+                  onChange={handleInputChange}
+                  placeholder="Nome da rua" 
+                  className={fieldErrors.rua ? "border-red-500" : ""}
+                />
+                {fieldErrors.rua && <p className="text-red-500 text-sm mt-1">{fieldErrors.rua}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Número *</label>
+                <Input 
+                  name="numero"
+                  value={formData.numero}
+                  onChange={handleInputChange}
+                  placeholder="123" 
+                  className={fieldErrors.numero ? "border-red-500" : ""}
+                />
+                {fieldErrors.numero && <p className="text-red-500 text-sm mt-1">{fieldErrors.numero}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Complemento</label>
+                <Input 
+                  name="complemento"
+                  value={formData.complemento}
+                  onChange={handleInputChange}
+                  placeholder="Apto, Sala, etc." 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Bairro *</label>
+                <Input 
+                  name="bairro"
+                  value={formData.bairro}
+                  onChange={handleInputChange}
+                  placeholder="Nome do bairro" 
+                  className={fieldErrors.bairro ? "border-red-500" : ""}
+                />
+                {fieldErrors.bairro && <p className="text-red-500 text-sm mt-1">{fieldErrors.bairro}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Cidade *</label>
+                <Input 
+                  name="cidade"
+                  value={formData.cidade}
+                  onChange={handleInputChange}
+                  placeholder="Nome da cidade" 
+                  className={fieldErrors.cidade ? "border-red-500" : ""}
+                />
+                {fieldErrors.cidade && <p className="text-red-500 text-sm mt-1">{fieldErrors.cidade}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Estado *</label>
+                <Input 
+                  name="estado"
+                  value={formData.estado}
+                  onChange={handleInputChange}
+                  placeholder="SP" 
+                  className={fieldErrors.estado ? "border-red-500" : ""}
+                />
+                {fieldErrors.estado && <p className="text-red-500 text-sm mt-1">{fieldErrors.estado}</p>}
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Localização no mapa *</label>
+              <div className="h-64 w-full rounded border overflow-hidden">
+                <Map
+                  selectLocationMode={true}
+                  onLocationSelect={handleMapClick}
+                  marker={formData.latitude !== null && formData.longitude !== null ? 
+                    { lat: formData.latitude, lng: formData.longitude } : undefined}
+                  height="256px"
+                />
+              </div>
+              <div className="mt-2">
+                {formData.latitude !== null && formData.longitude !== null ? (
+                  <div className="text-xs text-green-600">
+                    ✓ Localização selecionada: {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500">Clique no mapa para selecionar a localização</div>
+                )}
+              </div>
+              {fieldErrors.latitude && (
+                <p className="text-red-500 text-sm mt-1">Selecione a localização no mapa</p>
               )}
             </div>
-            {(fieldErrors.latitude || fieldErrors.longitude) && (
-              <p className="text-red-500 text-sm mt-1">Selecione a localização no mapa</p>
+          </div>
+        );
+
+      case 2: // Contato  
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Telefone Fixo *</label>
+                <Input 
+                  name="telefone"
+                  value={formData.telefone}
+                  onChange={handleInputChange}
+                  placeholder="(11) 3333-4444" 
+                  className={fieldErrors.telefone ? "border-red-500" : ""}
+                />
+                {fieldErrors.telefone && <p className="text-red-500 text-sm mt-1">{fieldErrors.telefone}</p>}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">WhatsApp</label>
+                <Input 
+                  name="whatsapp"
+                  value={formData.whatsapp}
+                  onChange={handleInputChange}
+                  placeholder="(11) 99999-9999" 
+                  className={fieldErrors.whatsapp ? "border-red-500" : ""}
+                />
+                {fieldErrors.whatsapp && <p className="text-red-500 text-sm mt-1">{fieldErrors.whatsapp}</p>}
+              </div>
+              
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">Site</label>
+                <Input 
+                  name="site"
+                  value={formData.site}
+                  onChange={handleInputChange}
+                  placeholder="https://www.oficina.com.br" 
+                  className={fieldErrors.site ? "border-red-500" : ""}
+                />
+                {fieldErrors.site && <p className="text-red-500 text-sm mt-1">{fieldErrors.site}</p>}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 3: // Serviços
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-4">Selecione os serviços oferecidos *</label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {servicosList.map((servico) => (
+                  <div
+                    key={servico.nome}
+                    onClick={() => toggleServico(servico.nome, servico.icone)}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                      formData.servicosSelecionados.find(s => s.nome === servico.nome)
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <Image
+                        src={servico.icone}
+                        alt={servico.nome}
+                        width={32}
+                        height={32}
+                        className="mb-2"
+                      />
+                      <span className="text-sm font-medium">{servico.nome}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {fieldErrors.nome && currentStep === 3 && (
+                <p className="text-red-500 text-sm mt-2">{fieldErrors.nome}</p>
+              )}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Outros serviços (opcional)</label>
+              <Textarea 
+                name="servico_outros"
+                value={formData.servico_outros}
+                onChange={handleInputChange}
+                placeholder="Descreva outros serviços não listados acima..." 
+                rows={3}
+              />
+            </div>
+          </div>
+        );
+
+      case 4: // Horário
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-4">Dias de funcionamento *</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {diasSemana.map((dia) => (
+                  <div
+                    key={dia}
+                    onClick={() => toggleDia(dia)}
+                    className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                      formData.diasSelecionados.includes(dia)
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="font-medium">{dia}</span>
+                  </div>
+                ))}
+              </div>
+              {fieldErrors.horario_abertura && (
+                <p className="text-red-500 text-sm mt-2">{fieldErrors.horario_abertura}</p>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Horário de Abertura *</label>
+                <Input 
+                  name="horario_abertura"
+                  type="time"
+                  value={formData.horario_abertura}
+                  onChange={handleInputChange}
+                  className={fieldErrors.horario_abertura ? "border-red-500" : ""}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Horário de Fechamento *</label>
+                <Input 
+                  name="horario_fechamento"
+                  type="time"
+                  value={formData.horario_fechamento}
+                  onChange={handleInputChange}
+                  className={fieldErrors.horario_fechamento ? "border-red-500" : ""}
+                />
+                {fieldErrors.horario_fechamento && (
+                  <p className="text-red-500 text-sm mt-1">{fieldErrors.horario_fechamento}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 5: // Pagamento
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-4">Formas de pagamento aceitas *</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {formasPagamento.map((pagamento) => (
+                  <div
+                    key={pagamento}
+                    onClick={() => togglePagamento(pagamento)}
+                    className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                      formData.pagamentosSelecionados.includes(pagamento)
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="font-medium">{pagamento}</span>
+                  </div>
+                ))}
+              </div>
+              {fieldErrors.nome && currentStep === 5 && (
+                <p className="text-red-500 text-sm mt-2">{fieldErrors.nome}</p>
+              )}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Outras formas de pagamento (opcional)</label>
+              <Textarea 
+                name="pagamento_outros"
+                value={formData.pagamento_outros}
+                onChange={handleInputChange}
+                placeholder="Descreva outras formas de pagamento..." 
+                rows={3}
+              />
+            </div>
+          </div>
+        );
+
+      case 6: // Imagens
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-4">Imagens da Oficina (opcional)</label>
+              <p className="text-sm text-gray-600 mb-4">
+                Adicione até 5 imagens da sua oficina. Formatos aceitos: JPG, PNG. Tamanho máximo: 5MB por imagem.
+              </p>
+              
+              {/* Upload de imagens */}
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                <input
+                  type="file"
+                  id="imagens"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="imagens"
+                  className="cursor-pointer flex flex-col items-center"
+                >
+                  <Upload className="w-12 h-12 text-gray-400 mb-4" />
+                  <span className="text-lg font-medium text-gray-700 mb-2">
+                    Clique para selecionar imagens
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    ou arraste e solte aqui
+                  </span>
+                </label>
+              </div>
+
+              {/* Preview das imagens */}
+              {formData.imagensPreview.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="text-sm font-medium mb-3">Imagens selecionadas:</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {formData.imagensPreview.map((preview, index) => (
+                      <div key={index} className="relative group">
+                        <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                          <Image
+                            src={preview}
+                            alt={`Preview ${index + 1}`}
+                            width={200}
+                            height={150}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {formData.imagens.length}/5 imagens selecionadas
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <AdminAuthGate>
+      <AdminLayout>
+      <div className="max-w-4xl mx-auto py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Nova Oficina</h1>
+          <p className="text-muted-foreground">Cadastre uma nova oficina no sistema</p>
+        </div>
+
+        {/* Progress indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              const isActive = index === currentStep;
+              const isCompleted = index < currentStep;
+              
+              return (
+                <div key={index} className="flex items-center">
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                    isCompleted 
+                      ? "bg-green-500 border-green-500 text-white" 
+                      : isActive 
+                        ? "bg-blue-500 border-blue-500 text-white" 
+                        : "border-gray-300 text-gray-400"
+                  }`}>
+                    {isCompleted ? (
+                      <Check className="w-5 h-5" />
+                    ) : (
+                      <Icon className="w-5 h-5" />
+                    )}
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-12 h-0.5 mx-2 ${
+                      isCompleted ? "bg-green-500" : "bg-gray-300"
+                    }`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-center">
+            <h2 className="text-xl font-semibold">{steps[currentStep].title}</h2>
+            <p className="text-sm text-muted-foreground">
+              Passo {currentStep + 1} de {steps.length}
+            </p>
+          </div>
+        </div>
+
+        {/* Form content */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {React.createElement(steps[currentStep].icon, { className: "w-5 h-5" })}
+              {steps[currentStep].title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {renderStepContent()}
+            
+            {error && (
+              <div className="mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Navigation buttons */}
+        <div className="flex justify-between mt-8">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={currentStep === 0 ? () => router.push("/admin/oficinas") : prevStep}
+            disabled={saving}
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            {currentStep === 0 ? "Cancelar" : "Anterior"}
+          </Button>
+          
+          <div className="flex gap-2">
+            {currentStep < steps.length - 1 ? (
+              <Button onClick={nextStep} disabled={saving}>
+                Próximo
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={saving} className="bg-green-600 hover:bg-green-700">
+                {saving ? "Salvando..." : "Cadastrar Oficina"}
+                <Check className="w-4 h-4 ml-2" />
+              </Button>
             )}
           </div>
-          
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          
-          <div className="flex gap-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => router.push("/admin/oficinas")}
-              disabled={saving}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={saving} className="flex-1">
-              {saving ? "Salvando..." : "Cadastrar oficina"}
-            </Button>
-          </div>
-        </form>
+        </div>
       </div>
     </AdminLayout>
+    </AdminAuthGate>
   );
 }

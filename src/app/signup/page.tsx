@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff, Loader2, Facebook, Apple, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import styles from './signup.module.css';
+import { useNotifications } from '@/contexts/NotificationContext';
 
 type AccountType = 'pessoal' | 'empresa' | null;
 type UserType = 'cliente' | 'oficina' | null;
@@ -58,7 +59,9 @@ interface SignupFormData {
 }
 
 export default function SignupPage() {
-  const router = useRouter();  const [currentStep, setCurrentStep] = useState(1);  const [formData, setFormData] = useState<SignupFormData>({
+  const router = useRouter();
+  const { success, error: showError } = useNotifications();
+  const [currentStep, setCurrentStep] = useState(1);  const [formData, setFormData] = useState<SignupFormData>({
     telefone: "",
     tipoContaEmpresa: null,
     tipoUsuario: null,
@@ -299,7 +302,9 @@ export default function SignupPage() {
     
     const finalStep = getTotalSteps();
     if (!validateStep(finalStep)) {
-      setError("Preencha todos os campos obrigatórios.");
+      const errorMsg = "Preencha todos os campos obrigatórios.";
+      setError(errorMsg);
+      showError("Campos obrigatórios", errorMsg);
       return;
     }
 
@@ -379,8 +384,10 @@ export default function SignupPage() {
       
       // Verifica se há sessão ativa (usuário confirmou email automaticamente)
       if (data.session) {
+        success("Conta criada com sucesso!", "Bem-vindo ao ComparAuto!");
         router.push("/"); // Redireciona para a home se já autenticado
       } else {
+        success("Conta criada!", "Verifique seu email para confirmar sua conta.");
         // Redireciona para a tela de confirmação de e-mail
         router.push(`/signup/confirm-email?email=${encodeURIComponent(formData.email)}`);
       }
@@ -390,11 +397,17 @@ export default function SignupPage() {
       const errorMessage = error instanceof Error ? error.message : String(error);
       
       if (errorMessage.includes('duplicate key') || errorMessage.includes('already registered')) {
-        setError("Este email já está cadastrado. Tente fazer login.");
+        const errorMsg = "Este email já está cadastrado. Tente fazer login.";
+        setError(errorMsg);
+        showError("Email já cadastrado", errorMsg);
       } else if (errorMessage.includes('violates check constraint')) {
-        setError("Dados inválidos. Verifique os campos obrigatórios.");
+        const errorMsg = "Dados inválidos. Verifique os campos obrigatórios.";
+        setError(errorMsg);
+        showError("Dados inválidos", errorMsg);
       } else if (errorMessage.includes('column') && errorMessage.includes('does not exist')) {
-        setError("Erro na estrutura dos dados. Contacte o suporte.");
+        const errorMsg = "Erro na estrutura dos dados. Contacte o suporte.";
+        setError(errorMsg);
+        showError("Erro do sistema", errorMsg);
       } else if (errorMessage.includes('Invalid login credentials')) {
         setError("Credenciais inválidas. Verifique email e senha.");
       } else if (error instanceof Error) {

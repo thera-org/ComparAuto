@@ -26,6 +26,7 @@ import {
   MessageCircle
 } from "lucide-react"
 import dynamic from "next/dynamic"
+import { useAppNotifications } from "@/hooks/useAppNotifications"
 
 // Dinamically import map component
 const MapComponent = dynamic(() => import("@/components/OfficeDetailMap").then(mod => ({ default: mod.default })), { 
@@ -57,6 +58,7 @@ export default function OfficeDetailPage() {
   const [oficina, setOficina] = useState<Oficina | null>(null)
   const [loading, setLoading] = useState(true)
   const [isFavorite, setIsFavorite] = useState(false)
+  const { error: showError } = useAppNotifications()
 
   useEffect(() => {
     const fetchOficina = async () => {
@@ -71,18 +73,20 @@ export default function OfficeDetailPage() {
 
         if (error) {
           console.error("Erro ao buscar oficina:", error)
+          showError("Erro ao carregar oficina", "Não foi possível carregar os detalhes da oficina")
         } else {
           setOficina(data as Oficina)
         }
       } catch (err) {
         console.error("Erro inesperado:", err)
+        showError("Erro inesperado", "Erro inesperado ao carregar a oficina")
       } finally {
         setLoading(false)
       }
     }
 
     fetchOficina()
-  }, [params.id])
+  }, [params.id, showError])
 
   const handleRouteClick = () => {
     if (oficina) {

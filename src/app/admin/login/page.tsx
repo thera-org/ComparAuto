@@ -1,27 +1,73 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useNotifications } from '@/contexts/NotificationContext';
 import styles from './admin-login.module.css';
 
 export default function AdminLogin() {
-  const [form, setForm] = useState({ username: "", senha: "" });
+  const { success, error: showError } = useNotifications();
+  const [form, setForm] = useState({ email: "", senha: "" });
   const [loading, setLoading] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
   const router = useRouter();
+
+  // Verificar se já está logado
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // Verificar se é admin - primeiro tentar tabela users
+        const { data: userData } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", session.user.id)
+          .eq("role", "admin")
+          .single()
+        
+        if (userData) {
+          router.push("/admin")
+        } else {
+          // Tentar tabela usuarios como fallback
+          const { data: fallbackData } = await supabase
+            .from("usuarios")
+            .select("tipo")
+            .eq("id", session.user.id)
+            .eq("tipo", "admin")
+            .single()
+          
+          if (fallbackData) {
+            router.push("/admin")
+          }
+        }
+      }
+    };
+    
+    checkSession();
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Verificar tentativas de login
+    if (attempts >= 3) {
+      setIsBlocked(true);
+      showError("Bloqueado", "Muitas tentativas de login. Tente novamente em 5 minutos.");
+      return;
+    }
+    
     setLoading(true);
     
     try {
-      // Usar autenticação do Supabase em vez de comparação direta
+      // Fazer login com Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: form.username + '@admin.comparauto.com', // Converter username para email
+        email: form.email,
         password: form.senha
       });
 
@@ -30,25 +76,70 @@ export default function AdminLogin() {
       }
 
       if (authData.user) {
-        // Verificar se o usuário é admin na tabela usuarios
-        const { data: userData } = await supabase
-          .from("usuarios")
-          .select("tipo")
+        // Verificar se o usuário é admin - primeiro tentar tabela users
+        let userData, userError
+        const { data: userDataMain, error: userErrorMain } = await supabase
+          .from("users")
+          .select("role, nome, email")
           .eq("id", authData.user.id)
-          .eq("tipo", "admin")
+          .eq("role", "admin")
           .single();
 
-        if (userData) {
-          localStorage.setItem("admin", "true");
-          router.push("/admin/usuarios");
+        if (userErrorMain || !userDataMain) {
+          // Tentar tabela usuarios como fallback
+          const { data: userDataFallback, error: userErrorFallback } = await supabase
+            .from("usuarios")
+            .select("tipo, nome, email")
+            .eq("id", authData.user.id)
+            .eq("tipo", "admin")
+            .single();
+          
+          userData = userDataFallback
+          userError = userErrorFallback
         } else {
+          userData = userDataMain
+          userError = userErrorMain
+        }
+
+        if (userError || !userData) {
+          // Se não for admin, fazer logout imediatamente
           await supabase.auth.signOut();
-          alert("Acesso não autorizado");
+          setAttempts(prev => prev + 1);
+          showError("Acesso não autorizado", "Apenas administradores podem acessar.");
+          return;
+        }
+
+        // Sucesso - limpar tentativas e redirecionar
+        setAttempts(0);
+        setIsBlocked(false);
+        
+        success("Login realizado!", `Bem-vindo, ${userData.nome || userData.email}!`);
+        
+        // Log da sessão para auditoria
+        console.log(`Admin login: ${userData.email} at ${new Date().toISOString()}`);
+        
+        router.push("/admin");
+      }
+    } catch (error: unknown) {
+      console.error("Erro no login:", error);
+      
+      setAttempts(prev => prev + 1);
+      
+      // Mensagens de erro mais específicas
+      let errorMessage = "Erro ao fazer login. Tente novamente.";
+      
+      if (error instanceof Error) {
+        if (error.message?.includes("Invalid login credentials")) {
+          errorMessage = "Email ou senha inválidos.";
+        } else if (error.message?.includes("Email not confirmed")) {
+          errorMessage = "Email não confirmado. Verifique sua caixa de entrada.";
+        } else if (error.message?.includes("Too many requests")) {
+          errorMessage = "Muitas tentativas. Aguarde alguns minutos.";
+          setIsBlocked(true);
         }
       }
-    } catch (error) {
-      console.error("Erro no login:", error);
-      alert("Usuário ou senha inválidos");
+      
+      showError("Erro no login", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -76,8 +167,9 @@ export default function AdminLogin() {
         </div>
         <div className={styles.inputGroup}>
           <input
-            name="username"
-            placeholder="Username"
+            name="email"
+            type="email"
+            placeholder="Email"
             onChange={handleChange}
             required
             className={styles.input}
@@ -90,11 +182,16 @@ export default function AdminLogin() {
             required
             className={styles.input}
           />
+          {attempts > 0 && (
+            <div className="text-red-500 text-sm mt-2">
+              Tentativas restantes: {3 - attempts}
+            </div>
+          )}
         </div>
         <button
           type="submit"
           className={styles.submitButton}
-          disabled={loading}        >
+          disabled={loading || isBlocked}        >
           {loading ? (
             <span className={styles.loadingContainer}>
               <svg
@@ -119,6 +216,8 @@ export default function AdminLogin() {
               </svg>
               Entrando...
             </span>
+          ) : isBlocked ? (
+            "Bloqueado"
           ) : (
             "Entrar"
           )}
