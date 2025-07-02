@@ -196,9 +196,8 @@ export default function Home() {
   
   const clearFilters = () => {
     setSearchTerm("")
-    setSelectedCategory(null)
-  }
-
+    setSelectedCategory(null)  }
+  
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -222,11 +221,11 @@ export default function Home() {
             </div>
           </div>
         </main>
-        <Footer />
-      </div>
+        <Footer />      </div>
     )
   }
 
+  // Optimized categories data for mobile performance
   const categories = [
     { id: "troca-oleo", name: "Troca de óleo", icon: "/oleo.png" },
     { id: "avaliacao", name: "Avaliação", icon: "/avaliacao.png" },
@@ -244,204 +243,248 @@ export default function Home() {
     { id: "suspensao", name: "Suspensão", icon: "/susp.png" },
     { id: "escape", name: "Escape", icon: "/escape.png" },
     { id: "bateria", name: "Bateria", icon: "/bateria.png" },
-    { id: "pneus", name: "Pneus", icon: "/balanceamento.png" },
-    { id: "injecao", name: "Injeção", icon: "/injecao.png" }
+    { id: "pneus", name: "Pneus", icon: "/balanceamento.png" },    { id: "injecao", name: "Injeção", icon: "/injecao.png" }
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col">
       <Header />
       
-      {/* Hero Section - Inspired by Airbnb */}
-      <div className="relative bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Encontre a oficina
-              <span className="block text-blue-600">perfeita para seu carro</span>
+      {/* Hero Section with Search */}
+      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
+        
+        <div className="container mx-auto px-4 py-16 relative z-10">
+          {/* Hero Content */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              Encontre a sua
+              <span className="block bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Oficina perfeita...
+              </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-              Conectamos você com oficinas especializadas e confiáveis. Compare preços, avaliações e escolha a melhor opção.
+            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              Compare preços, avaliações e encontre especialistas próximos a você
             </p>
-            
-            {/* Search Bar - Clean Design */}
-            <div className="max-w-2xl mx-auto mb-12">
-              <div className="relative">
-                <div className="flex items-center bg-white rounded-full shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
-                  <div className="flex-1 flex items-center px-6 py-4">
-                    <Search className="text-gray-400 h-5 w-5 mr-3 flex-shrink-0" />
-                    <Input
-                      type="text"
-                      placeholder="Buscar oficinas por nome ou localização..."
-                      className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-base placeholder:text-gray-500"
-                      value={searchTerm}
-                      onChange={handleSearch}
-                      style={{ boxShadow: 'none' }}
-                    />
-                    {searchTerm && (
-                      <button
-                        className="text-gray-400 hover:text-gray-600 ml-3 hover:bg-gray-100 rounded-full p-1.5 transition-all duration-200"
-                        onClick={() => setSearchTerm("")}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  <Button className="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full">
-                    Buscar
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats Section */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4 mx-auto">
-                  <Award className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">500+</div>
-                <div className="text-gray-600">Oficinas Parceiras</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4 mx-auto">
-                  <Star className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">4.8★</div>
-                <div className="text-gray-600">Avaliação Média</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4 mx-auto">
-                  <Clock className="h-6 w-6 text-purple-600" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">24h</div>
-                <div className="text-gray-600">Atendimento</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-full mb-4 mx-auto">
-                  <Shield className="h-6 w-6 text-yellow-600" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">100%</div>
-                <div className="text-gray-600">Garantia</div>
-              </div>
-            </div>
           </div>
-        </div>
+
+          {/* Enhanced Search Bar */}
+          <div className="flex justify-center mb-8">
+            <div className="relative w-full max-w-2xl">
+              <div className="flex items-center bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl px-6 py-4 border border-white/20 hover:shadow-3xl transition-all duration-300 group">
+                <Search className="text-blue-500 h-6 w-6 mr-4 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                <Input
+                  type="text"
+                  placeholder="Digite o nome da oficina ou localização..."
+                  className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-lg placeholder:text-gray-400 focus:placeholder:text-gray-300 text-gray-700"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  style={{ boxShadow: 'none' }}
+                />
+                {searchTerm ? (
+                  <button
+                    className="text-gray-400 hover:text-gray-600 ml-3 hover:bg-gray-100 rounded-full p-2 transition-all duration-200 flex-shrink-0"
+                    onClick={() => setSearchTerm("")}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <div className="text-gray-300 ml-3 flex-shrink-0">
+                    <Search className="h-5 w-5" />
+                  </div>
+                )}
+              </div>
+              {/* Search suggestions indicator */}
+              {searchTerm && (
+                <div className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-4 animate-fade-in-up z-10">                  <p className="text-sm text-gray-600 text-center">
+                    Pesquisando por &ldquo;<span className="font-semibold text-blue-600">{searchTerm}</span>&rdquo;...
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>        </div>
       </div>
 
       {/* Categories Section */}
-      <div className="bg-gray-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Serviços Disponíveis</h2>
-          
-          <div className="relative">
-            {/* Categories navigation */}
-            {showLeftArrow && (
-              <button
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-all duration-300"
-                onClick={() => {
-                  const container = document.getElementById('categories-container');
-                  if (container) {
-                    container.scrollBy({ left: -200, behavior: 'smooth' });
-                  }
-                }}
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-            )}
-
-            {showRightArrow && (
-              <button
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-all duration-300"
-                onClick={() => {
-                  const container = document.getElementById('categories-container');
-                  if (container) {
-                    container.scrollBy({ left: 200, behavior: 'smooth' });
-                  }
-                }}
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            )}
-
-            {/* Categories container */}
-            <div 
-              id="categories-container"
-              className="flex items-center overflow-x-auto scrollbar-hide gap-4 py-4 mx-8"
-              onScroll={checkScrollArrows}
-            >
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  className={`
-                    flex flex-col items-center gap-2 min-w-[80px] cursor-pointer transition-all duration-300
-                    ${selectedCategory === category.id ? "text-blue-600" : "text-gray-600 hover:text-blue-500"}
-                  `}
-                  onClick={() => handleCategorySelect(category.id)}
-                >
-                  <div
-                    className={`
-                      relative p-3 rounded-xl transition-all duration-300 border-2
-                      ${selectedCategory === category.id 
-                        ? "bg-blue-600 border-blue-600 text-white shadow-lg" 
-                        : "bg-white border-gray-200 hover:border-blue-300 hover:shadow-md"
+      <div className="bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="py-8">
+            {/* Enhanced Category Carousel Section */}
+            <div className="mb-6 relative">              {/* Category Carousel with Navigation Arrows */}
+              <div className="relative">
+                
+                {/* Left Arrow - Enhanced */}
+                {showLeftArrow && (
+                  <button
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 border border-gray-200 hover:shadow-2xl hover:scale-110 group carousel-arrow arrow-left"                    onClick={() => {
+                      const container = document.getElementById('categories-container');
+                      if (container) {
+                        const scrollAmount = Math.min(300, container.clientWidth * 0.8);
+                        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                        setTimeout(checkScrollArrows, 100);
                       }
-                    `}
+                    }}
+                    aria-label="Categorias anteriores"
                   >
-                    <Image
-                      src={category.icon || "/placeholder.svg"}
-                      alt={category.name}
-                      width={24}
-                      height={24}
-                      className={`h-6 w-6 transition-all duration-300 ${
-                        selectedCategory === category.id 
-                          ? "brightness-0 invert" 
-                          : ""
-                      }`}
-                    />
-                    {selectedCategory === category.id && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></div>
-                    )}
-                  </div>
-                  <span className="text-sm text-center font-medium">
-                    {category.name}
-                  </span>
+                    <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>                  </button>
+                )}
+
+                {/* Right Arrow - Enhanced */}
+                {showRightArrow && (                  <button
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 border border-gray-200 hover:shadow-2xl hover:scale-110 group carousel-arrow arrow-right"
+                    onClick={() => {
+                      const container = document.getElementById('categories-container');
+                      if (container) {
+                        const scrollAmount = Math.min(300, container.clientWidth * 0.8);
+                        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                        setTimeout(checkScrollArrows, 100);
+                      }
+                    }}
+                    aria-label="Próximas categorias"
+                  >
+                    <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>                  </button>
+                )}
+
+                {/* Categories Container - Enhanced */}
+                <div
+                  id="categories-container"
+                  className="flex items-center overflow-x-auto py-4 scrollbar-hide gap-2 sm:gap-3 pb-4 mx-12 scroll-smooth categories-container"                  style={{ scrollSnapType: 'x mandatory' }}
+                >
+                  {categories.map((category, index) => (
+                    <div
+                      key={category.id}
+                      className={`
+                        flex flex-col items-center gap-1 sm:gap-2 min-w-[60px] sm:min-w-[70px] cursor-pointer transition-all duration-300 hover:scale-105 
+                        transform-gpu category-card group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl
+                        touch-optimized performance-optimized mobile-text scroll-snap-center
+                        ${selectedCategory === category.id ? "text-blue-600 scale-105" : "text-gray-600 hover:text-blue-500"}
+                      `}
+                      onClick={() => handleCategorySelect(category.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleCategorySelect(category.id)
+                        }
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-pressed={selectedCategory === category.id}
+                      aria-label={`Filtrar por ${category.name}`}                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      
+                      <div
+                        className={`
+                          relative p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg backdrop-blur-sm
+                          ${selectedCategory === category.id 
+                            ? "bg-gradient-to-br from-blue-500 to-purple-600 border-2 border-blue-300 shadow-blue-200/50 text-white" 
+                            : "bg-white hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 border-2 border-gray-200 hover:border-blue-300 hover:shadow-blue-100/50"
+                          }
+                          group-hover:rotate-1 transform-gpu overflow-hidden
+                        `}
+                      >
+                        {/* Background pattern */}
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                        </div>
+                        
+                        {/* Icon */}
+                        <div className="relative z-10">
+                          <Image
+                            src={category.icon || "/placeholder.svg"}
+                            alt={category.name}
+                            width={20}
+                            height={20}
+                            className={`h-5 w-5 sm:h-6 sm:w-6 transition-all duration-300 ${
+                              selectedCategory === category.id 
+                                ? "brightness-0 invert" 
+                                : "group-hover:scale-110"
+                            }`}
+                          />
+                        </div>
+                        
+                        {/* Selection indicator */}
+                        {selectedCategory === category.id && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-yellow-400 rounded-full border-2 border-white shadow-lg flex items-center justify-center animate-bounce">
+                            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full"></div>
+                          </div>
+                        )}
+                        
+                        {/* Hover glow effect */}
+                        <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>                      </div>
+                      
+                      <span className={`
+                        text-xs sm:text-sm text-center whitespace-nowrap font-medium transition-all duration-300 relative max-w-[60px] sm:max-w-[70px] overflow-hidden text-ellipsis
+                        ${selectedCategory === category.id ? "font-bold" : "group-hover:font-semibold"}
+                      `}>
+                        {category.name}
+                        {selectedCategory === category.id && (
+                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-1"></div>
+                        )}
+                      </span>                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+                
+                {/* Scroll indicators for mobile */}
+                <div className="absolute left-8 top-1/2 transform -translate-y-1/2 pointer-events-none sm:hidden">
+                  <div className="w-8 h-full bg-gradient-to-r from-gray-50 to-transparent"></div>
+                </div>
+                <div className="absolute right-8 top-1/2 transform -translate-y-1/2 pointer-events-none sm:hidden">
+                  <div className="w-8 h-full bg-gradient-to-l from-gray-50 to-transparent"></div>
+                </div>
+              </div>
 
           {/* Active filters */}
           {(searchTerm || selectedCategory) && (
             <div className="mt-8 flex items-center justify-center gap-4">
               {selectedCategory && (
-                <Badge variant="outline" className="flex items-center gap-2 bg-blue-50 border-blue-200 text-blue-700 px-3 py-1">
-                  {categories.find((c) => c.id === selectedCategory)?.name}
-                  <button onClick={() => setSelectedCategory(null)}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
+                <div className="flex items-center justify-center mt-4">
+                  <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-full px-4 py-2">
+                    <span className="text-blue-700 text-sm font-medium">
+                      Filtrando por: {categories.find((c) => c.id === selectedCategory)?.name}
+                    </span>
+                    <button 
+                      onClick={() => setSelectedCategory(null)}
+                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full p-1 transition-colors"
+                      aria-label="Remover filtro"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               )}
-              {searchTerm && (
-                <Badge variant="outline" className="flex items-center gap-2 bg-blue-50 border-blue-200 text-blue-700 px-3 py-1">
-                  Busca: {searchTerm}
-                  <button onClick={() => setSearchTerm("")}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-blue-600 hover:text-blue-800">
-                Limpar filtros
-              </Button>
             </div>
-          )}
+
+            {(searchTerm || selectedCategory) && (
+              <div className="flex items-center justify-between mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="flex items-center gap-3">
+                  {selectedCategory && (
+                    <Badge variant="outline" className="flex items-center gap-2 bg-white border-blue-200 text-blue-700 px-2 py-1 text-xs">
+                      {categories.find((c) => c.id === selectedCategory)?.name}
+                      <button onClick={() => setSelectedCategory(null)} aria-label="Remover filtro de categoria">
+                        <X className="h-3 w-3 ml-1 hover:text-blue-900" />
+                      </button>
+                    </Badge>
+                  )}
+                  {searchTerm && (
+                    <Badge variant="outline" className="flex items-center gap-2 bg-white border-blue-200 text-blue-700 px-2 py-1 text-xs">
+                      Busca: {searchTerm}
+                      <button onClick={() => setSearchTerm("")}>
+                        <X className="h-3 w-3 ml-1 hover:text-blue-900" />
+                      </button>
+                    </Badge>
+                  )}
+                </div>
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-blue-600 hover:text-blue-800 hover:bg-white text-sm">
+                  Limpar filtros
+                </Button>
+              </div>            )}
+          </div>
         </div>
       </div>
 
@@ -458,67 +501,86 @@ export default function Home() {
             text-white border-2 border-white
           `}
         >
-          {showMap ? (
-            <List className="h-6 w-6" />
-          ) : (
-            <MapPin className="h-6 w-6" />
-          )}
-        </Button>
-      </div>
-
-      {/* Main Content */}
-      {!showMap ? (
-        <main className="flex-1 bg-white py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Results header */}
-            {filteredOficinas.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {filteredOficinas.length} oficinas encontradas
-                </h2>
-                <p className="text-gray-600">
-                  {selectedCategory ? `Filtrando por ${categories.find(c => c.id === selectedCategory)?.name}` : 'Todas as oficinas disponíveis'}
-                </p>
-              </div>
-            )}
-
-            {/* Office Cards Grid */}
-            {filteredOficinas.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredOficinas.map((oficina, index) => (
-                  <div 
-                    key={oficina.id} 
-                    className="animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    <OfficeCard oficina={oficina} />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* No results state */}
-            {filteredOficinas.length === 0 && (
-              <div className="text-center py-24">
-                <div className="max-w-md mx-auto">
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Search className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Nenhuma oficina encontrada</h3>
-                  <p className="text-gray-600 mb-6">
-                    Tente ajustar os filtros ou buscar por outros termos.
-                  </p>
-                  <Button 
-                    onClick={clearFilters}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
-                  >
-                    Limpar filtros
-                  </Button>
-                </div>
-              </div>
+          {/* Ripple effect background */}
+          <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+          
+          {/* Icon with animation */}
+          <div className="relative z-10 transition-transform duration-300 group-hover:rotate-12">
+            {showMap ? (
+              <List className="h-8 w-8" />
+            ) : (
+              <MapPin className="h-8 w-8" />
             )}
           </div>
-        </main>
+          
+          {/* Floating indicator dots */}
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse shadow-lg"></div>
+          
+          {/* Tooltip */}
+          <div className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-black/80 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap backdrop-blur-sm">
+            {showMap ? 'Ver lista' : 'Ver mapa'}
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/80"></div>          </div>
+        </Button>
+      </div>
+      
+      {!showMap ? (
+        <>
+          {/* Office Cards Section - Melhorado */}
+          <main className="flex-1 bg-gradient-to-br from-gray-50 to-white py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Results Header */}
+              {filteredOficinas.length > 0 && (
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {filteredOficinas.length} oficinas encontradas
+                  </h3>
+                  <p className="text-gray-600">
+                    {searchTerm || selectedCategory 
+                      ? "Resultados filtrados conforme sua pesquisa" 
+                      : "Todas as oficinas disponíveis na sua região"
+                    }
+                  </p>
+                </div>
+              )}
+
+              {/* Office Cards Grid */}
+              {filteredOficinas.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {filteredOficinas.map((oficina, index) => (
+                    <div 
+                      key={oficina.id} 
+                      className="animate-fade-in-up"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <OfficeCard oficina={oficina} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* No results state */}
+              {filteredOficinas.length === 0 && (
+                <div className="text-center py-24">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                      <Search className="w-12 h-12 text-gray-400" />
+                    </div>
+                    <h3 className="text-3xl font-bold text-gray-900 mb-4">Nenhuma oficina encontrada</h3>
+                    <p className="text-gray-600 mb-8 text-lg">
+                      Tente ajustar os filtros ou remover alguns termos de busca para encontrar mais resultados.
+                    </p>
+                    <Button 
+                      onClick={clearFilters}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      Limpar filtros
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </main>
+        </>
       ) : (
         <main className="flex-1 bg-white">
           <div className="h-[600px]">

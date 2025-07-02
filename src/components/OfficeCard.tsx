@@ -62,132 +62,89 @@ const OfficeCard = memo(function OfficeCard({
   }
 
   return (
-    <Link href={`/oficina/${oficina.id}`} className="block group">
-      <article className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1">
-        {/* Header Image */}
-        <div className="relative h-48 bg-gradient-to-br from-blue-50 to-gray-100">
-          {oficina.foto_url ? (
-            <Image
-              src={oficina.foto_url}
-              alt={`Foto da ${oficina.nome}`}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={false}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-gray-400 text-center">
-                <div className="w-16 h-16 mx-auto mb-2 bg-gray-200 rounded-full flex items-center justify-center">
-                  <MapPin className="w-8 h-8" />
-                </div>
-                <p className="text-sm">Sem foto</p>
-              </div>
-            </div>
-          )}
+    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 h-96 flex flex-col hover:scale-105 transform-gpu">
+      <Link href={`/oficina/${oficina.id}`} className="h-full flex flex-col">
+        {/* Image Section */}
+        <div className="relative h-48 w-full overflow-hidden flex-shrink-0">
+          <Image
+            src={oficina.foto_url || "/placeholder.svg"}
+            alt={oficina.nome}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
           
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex gap-2">
-            {oficina.isVerified && (
-              <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                <Verified className="w-3 h-3" />
-                Verificado
-              </div>
-            )}
-            <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(oficina.status)}`}>
-              {oficina.status === 'ativo' ? 'Aberto' : oficina.status || 'Fechado'}
-            </div>
-          </div>
-
-          {/* Favorite Button */}
-          <button
-            onClick={handleFavoriteClick}
-            className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
-            aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-          >
-            <Heart 
-              className={`w-5 h-5 ${
-                isFavorite ? 'text-red-500 fill-current' : 'text-gray-600'
-              }`} 
-            />
+          {/* Gradient overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          {/* Heart/Favorite Button */}
+          <button className="absolute top-4 right-4 w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 border border-white/50">
+            <Heart className="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors" />
           </button>
 
-          {/* Distance */}
-          {showDistance && distance && (
-            <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs">
-              {distance.toFixed(1)} km
+          {/* Status Badge */}
+          <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              Online
             </div>
-          )}
+          </div>
         </div>
-
-        {/* Content */}
-        <div className="p-4">
-          {/* Title and Rating */}
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 flex-1">
-              {oficina.nome}
-            </h3>
+        
+        {/* Content Section */}
+        <div className="p-5 flex flex-col flex-1 bg-white">
+          {/* Title */}
+          <h3 className="font-bold text-gray-900 text-lg mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight">
+            {oficina.nome}
+          </h3>
+          
+          {/* Location */}
+          <div className="flex items-start gap-2 mb-4">
+            <MapPin className="w-4 h-4 text-blue-500 mt-1 flex-shrink-0" />
+            <span className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{oficina.endereco}</span>
           </div>
 
           {/* Rating */}
-          {oficina.avaliacao && (
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex items-center">
-                {renderStars(oficina.avaliacao)}
-              </div>
-              <span className="text-sm font-medium text-gray-900">
-                {oficina.avaliacao.toFixed(1)}
-              </span>
-              {oficina.totalAvaliacoes && (
-                <span className="text-sm text-gray-500">
-                  ({oficina.totalAvaliacoes} avaliações)
-                </span>
-              )}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
             </div>
-          )}
-
-          {/* Address */}
-          <div className="flex items-start gap-2 mb-3 text-gray-600">
-            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <p className="text-sm line-clamp-2">{oficina.endereco}</p>
+            <span className="text-sm font-semibold text-gray-900">4.8</span>
+            <span className="text-sm text-gray-500">(127 avaliações)</span>
           </div>
 
-          {/* Services */}
-          {oficina.servicos && oficina.servicos.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-3">
-              {oficina.servicos.slice(0, 3).map((servico, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md font-medium"
-                >
-                  {servico}
-                </span>
-              ))}
-              {oficina.servicos.length > 3 && (
-                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
-                  +{oficina.servicos.length - 3} mais
-                </span>
-              )}
+          {/* Services Tags */}
+          <div className="flex flex-wrap gap-2 mb-4 flex-1">
+            {(oficina.servicos || ['Mecânica Geral', 'Elétrica', 'Ar-condicionado']).slice(0, 3).map((servico, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full font-medium border border-blue-100"
+              >
+                {servico}
+              </span>
+            ))}
+            {(oficina.servicos?.length || 3) > 3 && (
+              <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">
+                +{(oficina.servicos?.length || 3) - 3} mais
+              </span>
+            )}
+          </div>
+          
+          {/* Price/Contact Info */}
+          <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-gray-600 font-medium">Disponível</span>
             </div>
-          )}
-
-          {/* Footer */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-            {/* Contact */}
-            {oficina.telefone && (
-              <div className="flex items-center gap-1 text-gray-600">
-                <Phone className="w-4 h-4" />
-                <span className="text-sm">{oficina.telefone}</span>
-              </div>
-            )}
-
-            {/* Working Hours */}
-            {oficina.horarioFuncionamento && (
-              <div className="flex items-center gap-1 text-gray-600">
-                <Clock className="w-4 h-4" />
-                <span className="text-sm">{oficina.horarioFuncionamento}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:text-blue-700 transition-colors">
+              <span className="text-sm">Ver detalhes</span>
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </div>
         </div>
       </article>
