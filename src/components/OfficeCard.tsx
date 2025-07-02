@@ -77,15 +77,18 @@ const OfficeCard = memo(function OfficeCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           
           {/* Heart/Favorite Button */}
-          <button className="absolute top-4 right-4 w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 border border-white/50">
-            <Heart className="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors" />
+          <button 
+            onClick={handleFavoriteClick}
+            className="absolute top-4 right-4 w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 border border-white/50"
+          >
+            <Heart className={`w-5 h-5 transition-colors ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-600 hover:text-red-500'}`} />
           </button>
 
           {/* Status Badge */}
           <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              Online
+              {oficina.status || 'Online'}
             </div>
           </div>
         </div>
@@ -106,14 +109,10 @@ const OfficeCard = memo(function OfficeCard({
           {/* Rating */}
           <div className="flex items-center gap-2 mb-4">
             <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              {renderStars(oficina.avaliacao || 5)}
             </div>
-            <span className="text-sm font-semibold text-gray-900">4.8</span>
-            <span className="text-sm text-gray-500">(127 avaliações)</span>
+            <span className="text-sm font-semibold text-gray-900">{oficina.avaliacao || '4.8'}</span>
+            <span className="text-sm text-gray-500">({oficina.totalAvaliacoes || '127'} avaliações)</span>
           </div>
 
           {/* Services Tags */}
@@ -147,8 +146,8 @@ const OfficeCard = memo(function OfficeCard({
             </div>
           </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+    </div>
   )
 })
 
