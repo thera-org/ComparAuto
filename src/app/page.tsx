@@ -207,9 +207,9 @@ export default function Home() {
   
   const clearFilters = () => {
     setSearchTerm("")
-    setSelectedCategory(null)
-  }
-    if (loading) {
+    setSelectedCategory(null)  }
+  
+  if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -259,10 +259,11 @@ export default function Home() {
             </div>
           </div>
         </main>
-        <Footer />
-      </div>
+        <Footer />      </div>
     )
-  }  // Optimized categories data for mobile performance
+  }
+
+  // Optimized categories data for mobile performance
   const categories = [
     { id: "troca-oleo", name: "Troca de óleo", icon: "/oleo.png" },
     { id: "avaliacao", name: "Avaliação", icon: "/avaliacao.png" },
@@ -280,54 +281,79 @@ export default function Home() {
     { id: "suspensao", name: "Suspensão", icon: "/susp.png" },
     { id: "escape", name: "Escape", icon: "/escape.png" },
     { id: "bateria", name: "Bateria", icon: "/bateria.png" },
-    { id: "pneus", name: "Pneus", icon: "/balanceamento.png" },
-    { id: "injecao", name: "Injeção", icon: "/injecao.png" }
+    { id: "pneus", name: "Pneus", icon: "/balanceamento.png" },    { id: "injecao", name: "Injeção", icon: "/injecao.png" }
   ]
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />      {/* Enhanced Search and Categories Section - Non-sticky, compact design */}
-      <div className="border-b bg-gradient-to-br from-gray-50 to-blue-50/30">
-        <div className="container mx-auto px-4">
-          <div className="py-6">            {/* Enhanced Responsive Search Section */}
-            <div className="flex justify-center mb-6">
-              <div className="relative w-full max-w-3xl">
-                <div className="flex items-center bg-white rounded-2xl shadow-lg px-4 sm:px-6 py-3 border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-                  <Search className="text-blue-500 h-5 w-5 mr-2 sm:mr-3 group-hover:text-blue-600 transition-colors flex-shrink-0" />
-                  <Input
-                    type="text"
-                    placeholder="Encontre a oficina perfeita..."
-                    className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-sm sm:text-base placeholder:text-gray-400 focus:placeholder:text-gray-300"
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    style={{ boxShadow: 'none' }}
-                  />
-                  {searchTerm ? (
-                    <button
-                      className="text-gray-400 hover:text-gray-600 ml-2 sm:ml-3 hover:bg-gray-100 rounded-full p-1.5 transition-all duration-200 flex-shrink-0"
-                      onClick={() => setSearchTerm("")}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  ) : (
-                    <div className="text-gray-300 ml-2 sm:ml-3 flex-shrink-0">
-                      <Search className="h-4 w-4" />
-                    </div>
-                  )}
-                </div>
-                {/* Search suggestions indicator */}
-                {searchTerm && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-3 animate-fade-in-up z-10">
-                    <p className="text-xs sm:text-sm text-gray-500 text-center">
-                      Pesquisando por &ldquo;{searchTerm}&rdquo;...
-                    </p>
+      <Header />
+      
+      {/* Hero Section with Search */}
+      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
+        
+        <div className="container mx-auto px-4 py-16 relative z-10">
+          {/* Hero Content */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              Encontre a sua
+              <span className="block bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Oficina perfeita...
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              Compare preços, avaliações e encontre especialistas próximos a você
+            </p>
+          </div>
+
+          {/* Enhanced Search Bar */}
+          <div className="flex justify-center mb-8">
+            <div className="relative w-full max-w-2xl">
+              <div className="flex items-center bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl px-6 py-4 border border-white/20 hover:shadow-3xl transition-all duration-300 group">
+                <Search className="text-blue-500 h-6 w-6 mr-4 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                <Input
+                  type="text"
+                  placeholder="Digite o nome da oficina ou localização..."
+                  className="flex-1 border-none outline-none shadow-none bg-transparent p-0 text-lg placeholder:text-gray-400 focus:placeholder:text-gray-300 text-gray-700"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  style={{ boxShadow: 'none' }}
+                />
+                {searchTerm ? (
+                  <button
+                    className="text-gray-400 hover:text-gray-600 ml-3 hover:bg-gray-100 rounded-full p-2 transition-all duration-200 flex-shrink-0"
+                    onClick={() => setSearchTerm("")}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <div className="text-gray-300 ml-3 flex-shrink-0">
+                    <Search className="h-5 w-5" />
                   </div>
                 )}
               </div>
-            </div>            {/* Enhanced Category Carousel Section */}
-            <div className="mb-6 relative">
-              {/* Category Carousel with Navigation Arrows */}
-              <div className="relative">                {/* Left Arrow - Enhanced */}
+              {/* Search suggestions indicator */}
+              {searchTerm && (
+                <div className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-4 animate-fade-in-up z-10">                  <p className="text-sm text-gray-600 text-center">
+                    Pesquisando por &ldquo;<span className="font-semibold text-blue-600">{searchTerm}</span>&rdquo;...
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>        </div>
+      </div>
+
+      {/* Categories Section */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="py-8">
+            {/* Enhanced Category Carousel Section */}
+            <div className="mb-6 relative">              {/* Category Carousel with Navigation Arrows */}
+              <div className="relative">
+                
+                {/* Left Arrow - Enhanced */}
                 {showLeftArrow && (
                   <button
                     className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 border border-gray-200 hover:shadow-2xl hover:scale-110 group carousel-arrow arrow-left"                    onClick={() => {
@@ -342,12 +368,13 @@ export default function Home() {
                   >
                     <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                )}                {/* Right Arrow - Enhanced */}
-                {showRightArrow && (
-                  <button
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 border border-gray-200 hover:shadow-2xl hover:scale-110 group carousel-arrow arrow-right"                    onClick={() => {
+                    </svg>                  </button>
+                )}
+
+                {/* Right Arrow - Enhanced */}
+                {showRightArrow && (                  <button
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 border border-gray-200 hover:shadow-2xl hover:scale-110 group carousel-arrow arrow-right"
+                    onClick={() => {
                       const container = document.getElementById('categories-container');
                       if (container) {
                         const scrollAmount = Math.min(300, container.clientWidth * 0.8);
@@ -359,14 +386,15 @@ export default function Home() {
                   >
                     <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                )}{/* Categories Container - Enhanced */}
-                <div 
+                    </svg>                  </button>
+                )}
+
+                {/* Categories Container - Enhanced */}
+                <div
                   id="categories-container"
-                  className="flex items-center overflow-x-auto py-4 scrollbar-hide gap-2 sm:gap-3 pb-4 mx-12 scroll-smooth categories-container"
-                  style={{ scrollSnapType: 'x mandatory' }}
-                >{categories.map((category, index) => (
+                  className="flex items-center overflow-x-auto py-4 scrollbar-hide gap-2 sm:gap-3 pb-4 mx-12 scroll-smooth categories-container"                  style={{ scrollSnapType: 'x mandatory' }}
+                >
+                  {categories.map((category, index) => (
                     <div
                       key={category.id}
                       className={`
@@ -385,9 +413,10 @@ export default function Home() {
                       tabIndex={0}
                       role="button"
                       aria-pressed={selectedCategory === category.id}
-                      aria-label={`Filtrar por ${category.name}`}
-                      style={{ animationDelay: `${index * 0.05}s` }}
-                    >                      <div
+                      aria-label={`Filtrar por ${category.name}`}                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      
+                      <div
                         className={`
                           relative p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg backdrop-blur-sm
                           ${selectedCategory === category.id 
@@ -425,8 +454,8 @@ export default function Home() {
                         )}
                         
                         {/* Hover glow effect */}
-                        <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                      </div>                      
+                        <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>                      </div>
+                      
                       <span className={`
                         text-xs sm:text-sm text-center whitespace-nowrap font-medium transition-all duration-300 relative max-w-[60px] sm:max-w-[70px] overflow-hidden text-ellipsis
                         ${selectedCategory === category.id ? "font-bold" : "group-hover:font-semibold"}
@@ -435,10 +464,10 @@ export default function Home() {
                         {selectedCategory === category.id && (
                           <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-1"></div>
                         )}
-                      </span>
-                    </div>
+                      </span>                    </div>
                   ))}
-                </div>                
+                </div>
+                
                 {/* Scroll indicators for mobile */}
                 <div className="absolute left-8 top-1/2 transform -translate-y-1/2 pointer-events-none sm:hidden">
                   <div className="w-8 h-full bg-gradient-to-r from-gray-50 to-transparent"></div>
@@ -465,7 +494,9 @@ export default function Home() {
                   </div>
                 </div>
               )}
-            </div>{(searchTerm || selectedCategory) && (
+            </div>
+
+            {(searchTerm || selectedCategory) && (
               <div className="flex items-center justify-between mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <div className="flex items-center gap-3">
                   {selectedCategory && (
@@ -488,10 +519,10 @@ export default function Home() {
                 <Button variant="ghost" size="sm" onClick={clearFilters} className="text-blue-600 hover:text-blue-800 hover:bg-white text-sm">
                   Limpar filtros
                 </Button>
-              </div>
-            )}
+              </div>            )}
           </div>
-        </div>      </div>
+        </div>
+      </div>
 
       {/* Enhanced Floating Map Toggle Button */}
       <div className="fixed bottom-8 right-8 z-50">
@@ -525,17 +556,33 @@ export default function Home() {
           {/* Tooltip */}
           <div className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-black/80 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap backdrop-blur-sm">
             {showMap ? 'Ver lista' : 'Ver mapa'}
-            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/80"></div>
-          </div>
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/80"></div>          </div>
         </Button>
-      </div>      {!showMap ? (
+      </div>
+      
+      {!showMap ? (
         <>
-          {/* Office Cards Section - Clean design with small margin */}
-          <main className="flex-1 bg-gray-50 py-8">
+          {/* Office Cards Section - Melhorado */}
+          <main className="flex-1 bg-gradient-to-br from-gray-50 to-white py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Office Cards Grid */}
+              {/* Results Header */}
               {filteredOficinas.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {filteredOficinas.length} oficinas encontradas
+                  </h3>
+                  <p className="text-gray-600">
+                    {searchTerm || selectedCategory 
+                      ? "Resultados filtrados conforme sua pesquisa" 
+                      : "Todas as oficinas disponíveis na sua região"
+                    }
+                  </p>
+                </div>
+              )}
+
+              {/* Office Cards Grid */}
+              {filteredOficinas.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                   {filteredOficinas.map((oficina, index) => (
                     <div 
                       key={oficina.id} 
@@ -552,23 +599,22 @@ export default function Home() {
               {filteredOficinas.length === 0 && (
                 <div className="text-center py-24">
                   <div className="max-w-md mx-auto">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
-                      <Search className="w-10 h-10 text-gray-400" />
+                    <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                      <Search className="w-12 h-12 text-gray-400" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">Nenhuma oficina encontrada</h3>
-                    <p className="text-gray-600 mb-6">
-                      Tente ajustar os filtros ou remover alguns termos de busca.
+                    <h3 className="text-3xl font-bold text-gray-900 mb-4">Nenhuma oficina encontrada</h3>
+                    <p className="text-gray-600 mb-8 text-lg">
+                      Tente ajustar os filtros ou remover alguns termos de busca para encontrar mais resultados.
                     </p>
                     <Button 
                       onClick={clearFilters}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       Limpar filtros
                     </Button>
                   </div>
                 </div>
               )}
-              
             </div>
           </main>
         </>
