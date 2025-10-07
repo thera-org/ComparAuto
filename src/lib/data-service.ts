@@ -119,15 +119,13 @@ export class OficinaDataService {
   }): Promise<Oficina[]> {
     const cacheKey = `${this.listCacheKey}:${JSON.stringify(filters || {})}`
     const cached = dataCache.get<Oficina[]>(cacheKey)
-    
+
     if (cached) {
       return cached
     }
 
     try {
-      let query = supabase
-        .from('oficinas')
-        .select('*')
+      let query = supabase.from('oficinas').select('*')
 
       if (filters?.status) {
         query = query.eq('status', filters.status)
@@ -142,7 +140,7 @@ export class OficinaDataService {
       }
 
       if (filters?.offset) {
-        query = query.range(filters.offset, (filters.offset + (filters.limit || 10)) - 1)
+        query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
       }
 
       const { data, error } = await query.order('created_at', { ascending: false })
@@ -151,7 +149,7 @@ export class OficinaDataService {
 
       // Cache for 5 minutes
       dataCache.set(cacheKey, data || [], 5 * 60 * 1000)
-      
+
       return data || []
     } catch (error) {
       console.error('Error fetching oficinas:', error)
@@ -162,7 +160,7 @@ export class OficinaDataService {
   async getOficinaById(id: string): Promise<OficinaDetails | null> {
     const cacheKey = `${this.cachePrefix}${id}`
     const cached = dataCache.get<OficinaDetails>(cacheKey)
-    
+
     if (cached) {
       return cached
     }
@@ -200,7 +198,7 @@ export class OficinaDataService {
 
       // Cache for 10 minutes
       dataCache.set(cacheKey, oficinaDetails, 10 * 60 * 1000)
-      
+
       return oficinaDetails
     } catch (error) {
       console.error('Error fetching oficina details:', error)
@@ -208,23 +206,23 @@ export class OficinaDataService {
     }
   }
 
-  async searchOficinas(query: string, filters?: {
-    cidade?: string
-    servico?: string
-    limit?: number
-  }): Promise<Oficina[]> {
+  async searchOficinas(
+    query: string,
+    filters?: {
+      cidade?: string
+      servico?: string
+      limit?: number
+    }
+  ): Promise<Oficina[]> {
     const cacheKey = `search:${query}:${JSON.stringify(filters || {})}`
     const cached = dataCache.get<Oficina[]>(cacheKey)
-    
+
     if (cached) {
       return cached
     }
 
     try {
-      let supabaseQuery = supabase
-        .from('oficinas')
-        .select('*')
-        .eq('status', 'ativo')
+      let supabaseQuery = supabase.from('oficinas').select('*').eq('status', 'ativo')
 
       // Search in name and address
       if (query.trim()) {
@@ -245,7 +243,7 @@ export class OficinaDataService {
 
       // Cache for 3 minutes (shorter for search results)
       dataCache.set(cacheKey, data || [], 3 * 60 * 1000)
-      
+
       return data || []
     } catch (error) {
       console.error('Error searching oficinas:', error)
@@ -256,7 +254,7 @@ export class OficinaDataService {
   async getOficinasByServico(servico: string): Promise<Oficina[]> {
     const cacheKey = `servico:${servico}`
     const cached = dataCache.get<Oficina[]>(cacheKey)
-    
+
     if (cached) {
       return cached
     }
@@ -287,7 +285,7 @@ export class OficinaDataService {
 
       // Cache for 10 minutes
       dataCache.set(cacheKey, oficinas || [], 10 * 60 * 1000)
-      
+
       return oficinas || []
     } catch (error) {
       console.error('Error fetching oficinas by servico:', error)
@@ -329,7 +327,7 @@ export class UserDataService {
   async getUserById(id: string): Promise<User | null> {
     const cacheKey = `${this.cachePrefix}${id}`
     const cached = dataCache.get<User>(cacheKey)
-    
+
     if (cached) {
       return cached
     }
@@ -351,7 +349,7 @@ export class UserDataService {
         // Cache for 15 minutes
         dataCache.set(cacheKey, userData, 15 * 60 * 1000)
       }
-      
+
       return userData
     } catch (error) {
       console.error('Error fetching user:', error)

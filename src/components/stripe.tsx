@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { Elements } from "@stripe/react-stripe-js"
-import { loadStripe } from "@stripe/stripe-js"
-import type React from "react"
-import { useEffect, useState } from "react"
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import type React from 'react'
+import { useEffect, useState } from 'react'
 
 interface StripeProps {
   children: React.ReactNode
   options: {
-    mode: "payment" | "subscription"
+    mode: 'payment' | 'subscription'
     amount: number
     currency: string
   }
@@ -21,7 +21,7 @@ export function Stripe({ children, options, className }: StripeProps) {
   useEffect(() => {
     // This would normally use your actual Stripe publishable key
     // For demo purposes, we're using a placeholder
-    setStripePromise(loadStripe("pk_test_placeholder"))
+    setStripePromise(loadStripe('pk_test_placeholder'))
   }, [])
 
   return (
@@ -34,7 +34,7 @@ export function Stripe({ children, options, className }: StripeProps) {
             amount: options.amount,
             currency: options.currency,
             appearance: {
-              theme: "stripe",
+              theme: 'stripe',
             },
           }}
         >
@@ -44,4 +44,3 @@ export function Stripe({ children, options, className }: StripeProps) {
     </div>
   )
 }
-

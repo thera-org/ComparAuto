@@ -14,14 +14,11 @@ export function useEnvironmentCheck(): EnvironmentCheck {
     isMapsConfigured: false,
     isStripeConfigured: false,
     hasRequiredEnvVars: false,
-    missingVars: []
+    missingVars: [],
   })
 
   useEffect(() => {
-    const requiredVars = [
-      'NEXT_PUBLIC_SUPABASE_URL',
-      'NEXT_PUBLIC_SUPABASE_ANON_KEY'
-    ]
+    const requiredVars = ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY']
 
     // Aguardar o Next.js carregar as variáveis completamente
     const checkEnvironment = () => {
@@ -31,24 +28,24 @@ export function useEnvironmentCheck(): EnvironmentCheck {
       })
 
       const isSupabaseConfigured = Boolean(
-        process.env.NEXT_PUBLIC_SUPABASE_URL && 
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-        process.env.NEXT_PUBLIC_SUPABASE_URL !== '' &&
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY !== '' &&
-        process.env.NEXT_PUBLIC_SUPABASE_URL !== 'undefined' &&
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY !== 'undefined'
+        process.env.NEXT_PUBLIC_SUPABASE_URL &&
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+          process.env.NEXT_PUBLIC_SUPABASE_URL !== '' &&
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY !== '' &&
+          process.env.NEXT_PUBLIC_SUPABASE_URL !== 'undefined' &&
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY !== 'undefined'
       )
 
       const isMapsConfigured = Boolean(
         process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY &&
-        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY !== '' &&
-        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY !== 'undefined'
+          process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY !== '' &&
+          process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY !== 'undefined'
       )
 
       const isStripeConfigured = Boolean(
         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY &&
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY !== '' &&
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY !== 'undefined'
+          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY !== '' &&
+          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY !== 'undefined'
       )
 
       setCheck({
@@ -56,7 +53,7 @@ export function useEnvironmentCheck(): EnvironmentCheck {
         isMapsConfigured,
         isStripeConfigured,
         hasRequiredEnvVars: missingRequired.length === 0,
-        missingVars: missingRequired
+        missingVars: missingRequired,
       })
 
       // Log warnings for missing optional variables (apenas no desenvolvimento)
@@ -64,7 +61,7 @@ export function useEnvironmentCheck(): EnvironmentCheck {
         if (!isMapsConfigured) {
           console.warn('Google Maps API key not configured. Maps may not work.')
         }
-        
+
         if (!isStripeConfigured) {
           console.warn('Stripe not configured. Payment features will be disabled.')
         }
@@ -74,7 +71,9 @@ export function useEnvironmentCheck(): EnvironmentCheck {
           console.error('Missing required environment variables:', missingRequired)
           console.log('Current environment variables:', {
             NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'MISSING',
-            NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'SET' : 'MISSING',
+            NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+              ? 'SET'
+              : 'MISSING',
           })
         }
       }
@@ -82,7 +81,7 @@ export function useEnvironmentCheck(): EnvironmentCheck {
 
     // Aguardar um pouco para garantir que as variáveis estão carregadas
     const timer = setTimeout(checkEnvironment, 100)
-    
+
     return () => clearTimeout(timer)
   }, [])
 

@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
 export default function MessagesPage() {
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6">Mensagens</h1>
-      <div className="bg-white p-6 rounded-lg shadow">
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">Mensagens</h1>
+      <div className="rounded-lg bg-white p-6 shadow">
         <p className="text-gray-600">Suas mensagens aparecerão aqui</p>
       </div>
     </div>

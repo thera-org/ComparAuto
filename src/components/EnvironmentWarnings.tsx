@@ -1,12 +1,13 @@
-"use client"
+'use client'
 
-import { AlertTriangle, Info, X } from "lucide-react"
-import { useState } from "react"
+import { AlertTriangle, Info, X } from 'lucide-react'
+import { useState } from 'react'
 
-import { useEnvironmentCheck } from "@/hooks/useEnvironmentCheck"
+import { useEnvironmentCheck } from '@/hooks/useEnvironmentCheck'
 
 export function EnvironmentWarnings() {
-  const { hasRequiredEnvVars, missingVars, isMapsConfigured, isStripeConfigured } = useEnvironmentCheck()
+  const { hasRequiredEnvVars, missingVars, isMapsConfigured, isStripeConfigured } =
+    useEnvironmentCheck()
   const [dismissed, setDismissed] = useState<string[]>([])
 
   const warnings = []
@@ -28,7 +29,7 @@ export function EnvironmentWarnings() {
         type: 'error' as const,
         title: 'Configuração Obrigatória Ausente',
         message: `Variáveis de ambiente obrigatórias não configuradas: ${actuallyMissing.join(', ')}`,
-        dismissible: true // Tornar dismissível para desenvolvimento
+        dismissible: true, // Tornar dismissível para desenvolvimento
       })
     }
   }
@@ -40,7 +41,7 @@ export function EnvironmentWarnings() {
       type: 'warning' as const,
       title: 'Google Maps Não Configurado',
       message: 'As funcionalidades de mapa podem não funcionar corretamente.',
-      dismissible: true
+      dismissible: true,
     })
   }
 
@@ -48,9 +49,9 @@ export function EnvironmentWarnings() {
     warnings.push({
       id: 'stripe',
       type: 'info' as const,
-      title: 'Stripe Não Configurado', 
+      title: 'Stripe Não Configurado',
       message: 'As funcionalidades de pagamento estão desabilitadas.',
-      dismissible: true
+      dismissible: true,
     })
   }
 
@@ -61,35 +62,36 @@ export function EnvironmentWarnings() {
   if (warnings.length === 0) return null
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-md">
-      {warnings.map((warning) => (
+    <div className="fixed right-4 top-4 z-50 max-w-md space-y-2">
+      {warnings.map(warning => (
         <div
           key={warning.id}
           className={`
-            p-4 rounded-lg shadow-lg border-l-4 backdrop-blur-sm
-            ${warning.type === 'error' 
-              ? 'bg-red-50/95 border-red-500 text-red-700' 
-              : warning.type === 'warning'
-              ? 'bg-yellow-50/95 border-yellow-500 text-yellow-700'
-              : 'bg-blue-50/95 border-blue-500 text-blue-700'
+            rounded-lg border-l-4 p-4 shadow-lg backdrop-blur-sm
+            ${
+              warning.type === 'error'
+                ? 'border-red-500 bg-red-50/95 text-red-700'
+                : warning.type === 'warning'
+                  ? 'border-yellow-500 bg-yellow-50/95 text-yellow-700'
+                  : 'border-blue-500 bg-blue-50/95 text-blue-700'
             }
           `}
         >
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 mt-0.5">
-              {warning.type === 'error' && <AlertTriangle className="w-5 h-5" />}
-              {warning.type === 'warning' && <AlertTriangle className="w-5 h-5" />}
-              {warning.type === 'info' && <Info className="w-5 h-5" />}
+            <div className="mt-0.5 flex-shrink-0">
+              {warning.type === 'error' && <AlertTriangle className="h-5 w-5" />}
+              {warning.type === 'warning' && <AlertTriangle className="h-5 w-5" />}
+              {warning.type === 'info' && <Info className="h-5 w-5" />}
             </div>
-            
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-sm">{warning.title}</h4>
-              <p className="text-sm mt-1 opacity-90">{warning.message}</p>
-              
+
+            <div className="min-w-0 flex-1">
+              <h4 className="text-sm font-semibold">{warning.title}</h4>
+              <p className="mt-1 text-sm opacity-90">{warning.message}</p>
+
               {warning.type === 'error' && (
-                <div className="mt-2 text-xs bg-white/50 rounded p-2">
+                <div className="mt-2 rounded bg-white/50 p-2 text-xs">
                   <p className="font-medium">Para corrigir:</p>
-                  <ol className="list-decimal list-inside mt-1 space-y-1">
+                  <ol className="mt-1 list-inside list-decimal space-y-1">
                     <li>Copie o arquivo .env.example para .env.local</li>
                     <li>Configure as variáveis necessárias</li>
                     <li>Reinicie o servidor de desenvolvimento</li>
@@ -97,13 +99,13 @@ export function EnvironmentWarnings() {
                 </div>
               )}
             </div>
-            
+
             {warning.dismissible && (
               <button
                 onClick={() => handleDismiss(warning.id)}
-                className="flex-shrink-0 p-1 hover:bg-white/20 rounded transition-colors"
+                className="flex-shrink-0 rounded p-1 transition-colors hover:bg-white/20"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             )}
           </div>

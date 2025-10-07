@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { EnvironmentWarnings } from '@/components/EnvironmentWarnings'
 import { NotificationContainer } from '@/components/NotificationContainer'
