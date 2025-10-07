@@ -4,6 +4,7 @@
 
 import { render, RenderOptions } from '@testing-library/react'
 import { ReactElement } from 'react'
+
 import { NotificationProvider } from '@/contexts/NotificationContext'
 
 // Mock Next.js router
@@ -54,17 +55,11 @@ jest.mock('@/lib/supabase', () => ({
 
 // Custom render function with providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <NotificationProvider>
-      {children}
-    </NotificationProvider>
-  )
+  return <NotificationProvider>{children}</NotificationProvider>
 }
 
-const customRender = (
-  ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllTheProviders, ...options })
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
+  render(ui, { wrapper: AllTheProviders, ...options })
 
 // Re-export everything
 export * from '@testing-library/react'

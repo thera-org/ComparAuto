@@ -1,72 +1,73 @@
-"use client";
+'use client'
 
-import { supabase } from "@/lib/supabase";
-import { ChevronDown, MessageSquare, Heart, User, HelpCircle, LogOut } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
+import { ChevronDown, MessageSquare, Heart, User, HelpCircle, LogOut } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+
+import { supabase } from '@/lib/supabase'
 
 interface User {
-  id: string;
-  email: string;
-  photoURL?: string;
-  displayName?: string;
+  id: string
+  email: string
+  photoURL?: string
+  displayName?: string
 }
 
 export function UserDropdown() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchUser = async () => {
       const {
         data: { user },
         error,
-      } = await supabase.auth.getUser();
+      } = await supabase.auth.getUser()
 
       if (error) {
-        console.error("Error fetching user:", error);
-        return;
+        console.error('Error fetching user:', error)
+        return
       }
 
       if (user) {
         setUser({
           id: user.id,
-          email: user.email || "",
-          photoURL: user.user_metadata?.avatar_url || "",
-          displayName: user.user_metadata?.full_name || "",
-        });
+          email: user.email || '',
+          photoURL: user.user_metadata?.avatar_url || '',
+          displayName: user.user_metadata?.full_name || '',
+        })
       } else {
-        setUser(null);
+        setUser(null)
       }
-    };
+    }
 
-    fetchUser();
-  }, []);
+    fetchUser()
+  }, [])
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut()
       if (error) {
-        console.error("Erro ao sair:", error);
-        return;
+        console.error('Erro ao sair:', error)
+        return
       }
-      router.push("/login");
+      router.push('/login')
     } catch (error) {
-      console.error("Erro ao sair:", error);
+      console.error('Erro ao sair:', error)
     }
-  };
+  }
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 border rounded-full p-1 shadow-sm cursor-pointer hover:shadow-md transition-all"
+        className="flex cursor-pointer items-center gap-1 rounded-full border p-1 shadow-sm transition-all hover:shadow-md"
       >
         {/* Avatar do usuário */}
-        <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gray-200">
           {user?.photoURL ? (
             <Image
               src={user.photoURL}
@@ -77,19 +78,19 @@ export function UserDropdown() {
               unoptimized // Remove se configurou domínios no next.config.js
             />
           ) : (
-            <span className="font-medium text-gray-600 text-sm">
-              {user?.email?.charAt(0).toUpperCase() || "?"}
+            <span className="text-sm font-medium text-gray-600">
+              {user?.email?.charAt(0).toUpperCase() || '?'}
             </span>
           )}
         </div>
-        <ChevronDown size={16} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50 border">
-          <div className="p-4 border-b">
-            <p className="font-medium truncate">{user?.displayName || "Usuário"}</p>
-            <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+        <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border bg-white shadow-lg">
+          <div className="border-b p-4">
+            <p className="truncate font-medium">{user?.displayName || 'Usuário'}</p>
+            <p className="truncate text-sm text-gray-500">{user?.email}</p>
           </div>
 
           <div className="py-1">
@@ -107,10 +108,10 @@ export function UserDropdown() {
             </DropdownItem>
           </div>
 
-          <div className="py-1 border-t">
+          <div className="border-t py-1">
             <button
               onClick={handleSignOut}
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               <LogOut size={16} className="mr-2" />
               Sair
@@ -119,7 +120,7 @@ export function UserDropdown() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 function DropdownItem({
@@ -127,18 +128,18 @@ function DropdownItem({
   icon,
   children,
 }: {
-  href: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
+  href: string
+  icon: React.ReactNode
+  children: React.ReactNode
 }) {
   return (
     <Link
       href={href}
       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       <span className="mr-2">{icon}</span>
       {children}
     </Link>
-  );
+  )
 }

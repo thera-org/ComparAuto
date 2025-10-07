@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { supabase } from "@/lib/supabase"
-import Image from "next/image"
-import { useEffect, useState } from "react"
-import { Skeleton } from "@/components/ui/skeleton"
+import { LogOut, LucideUser } from 'lucide-react'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +11,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { LogOut, LucideUser } from "lucide-react"
+} from '@/components/ui/dropdown-menu'
+import { Skeleton } from '@/components/ui/skeleton'
+import { supabase } from '@/lib/supabase'
 
 interface UserProps {
   email: string
@@ -26,11 +27,11 @@ export default function UserAvatar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
       if (sessionError || !sessionData.session) {
-        setUser(null);
-        setLoading(false);
-        return;
+        setUser(null)
+        setLoading(false)
+        return
       }
       const {
         data: { user },
@@ -38,16 +39,16 @@ export default function UserAvatar() {
       } = await supabase.auth.getUser()
 
       if (error) {
-        console.error("Error fetching user:", error)
+        console.error('Error fetching user:', error)
         setLoading(false)
         return
       }
 
       if (user) {
         setUser({
-          email: user.email || "",
-          photoURL: user.user_metadata?.avatar_url || "",
-          displayName: user.user_metadata?.full_name || "",
+          email: user.email || '',
+          photoURL: user.user_metadata?.avatar_url || '',
+          displayName: user.user_metadata?.full_name || '',
         })
       } else {
         setUser(null)
@@ -61,14 +62,14 @@ export default function UserAvatar() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    window.location.href = "/login"
+    window.location.href = '/login'
   }
 
   if (loading) {
     return (
       <div className="flex items-center gap-2">
         <Skeleton className="h-10 w-10 rounded-full" />
-        <Skeleton className="h-4 w-24 hidden md:block" />
+        <Skeleton className="hidden h-4 w-24 md:block" />
       </div>
     )
   }
@@ -78,23 +79,27 @@ export default function UserAvatar() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="focus:outline-none">
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="relative h-10 w-10 rounded-full overflow-hidden bg-muted">
+        <div className="flex cursor-pointer items-center gap-2">
+          <div className="relative h-10 w-10 overflow-hidden rounded-full bg-muted">
             {user.photoURL ? (
               <Image
-                src={user.photoURL || "/placeholder.svg"}
+                src={user.photoURL || '/placeholder.svg'}
                 alt="User avatar"
                 fill
                 className="object-cover"
                 unoptimized={true}
               />
             ) : (
-              <div className="flex items-center justify-center h-full w-full">
-                <span className="font-medium text-muted-foreground">{user.email?.charAt(0).toUpperCase()}</span>
+              <div className="flex h-full w-full items-center justify-center">
+                <span className="font-medium text-muted-foreground">
+                  {user.email?.charAt(0).toUpperCase()}
+                </span>
               </div>
             )}
           </div>
-          <span className="hidden md:inline text-sm font-medium">{user.displayName || user.email?.split("@")[0]}</span>
+          <span className="hidden text-sm font-medium md:inline">
+            {user.displayName || user.email?.split('@')[0]}
+          </span>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

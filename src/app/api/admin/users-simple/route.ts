@@ -1,5 +1,6 @@
-import { supabase } from '@/lib/supabase'
 import { NextResponse } from 'next/server'
+
+import { supabase } from '@/lib/supabase'
 
 export async function GET() {
   try {
@@ -17,15 +18,16 @@ export async function GET() {
     // Como não temos acesso direto aos auth users sem service role key,
     // vamos trabalhar apenas com os dados da tabela usuarios
     // Certifique-se de que o email está sendo salvo na tabela usuarios durante o cadastro
-    const formattedUsers = usuarios?.map((user) => {
-      return {
-        id: user.id,
-        nome: user.nome || 'Sem nome',
-        email: user.email || 'Email não disponível',
-        tipo: user.tipo || 'user',
-        criado_em: user.criado_em,
-      }
-    }) || []
+    const formattedUsers =
+      usuarios?.map(user => {
+        return {
+          id: user.id,
+          nome: user.nome || 'Sem nome',
+          email: user.email || 'Email não disponível',
+          tipo: user.tipo || 'user',
+          criado_em: user.criado_em,
+        }
+      }) || []
 
     return NextResponse.json({ users: formattedUsers })
   } catch (error) {

@@ -66,9 +66,8 @@ jobs:
       
     - name: Build application
       run: npm run build
-      env:
-        NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      # Variáveis de ambiente serão definidas no ambiente de produção (Vercel/etc)
+      # Durante CI, o código usa valores placeholder definidos em src/lib/supabase.ts
         
     - name: Export static files (if applicable)
       run: npm run export

@@ -3,42 +3,43 @@ import { NextResponse } from 'next/server'
 
 // Criar cliente Supabase com service role key para operações admin
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role-key',
   {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   }
 )
 
 export async function GET(request: Request) {
   try {
     // Verificar autorização com método mais robusto
-    const authHeader = request.headers.get('Authorization');
-    
+    const authHeader = request.headers.get('Authorization')
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 })
     }
-    
+
     // Extrair token do cabeçalho Bearer
-    const providedToken = authHeader.slice(7); // Remove "Bearer "
-    const expectedToken = process.env.ADMIN_API_KEY;
-    
+    const providedToken = authHeader.slice(7) // Remove "Bearer "
+    const expectedToken = process.env.ADMIN_API_KEY
+
     if (!expectedToken) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });    }
-    
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 })
+    }
+
     // Usar comparação segura contra timing attacks
-    let isValid = true;
+    let isValid = true
     for (let i = 0; i < providedToken.length; i++) {
       if (providedToken[i] !== expectedToken[i]) {
-        isValid = false;
+        isValid = false
       }
     }
-    
+
     if (!isValid) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 });
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 })
     }
     // Buscar todos os usuários da tabela usuarios
     const { data: usuarios, error: usuariosError } = await supabaseAdmin
@@ -52,7 +53,10 @@ export async function GET(request: Request) {
     }
 
     // Buscar informações de auth dos usuários
-    const { data: { users: authUsers }, error: authError } = await supabaseAdmin.auth.admin.listUsers()
+    const {
+      data: { users: authUsers },
+      error: authError,
+    } = await supabaseAdmin.auth.admin.listUsers()
 
     if (authError) {
       console.error('Erro ao buscar auth users:', authError)
@@ -60,19 +64,20 @@ export async function GET(request: Request) {
     }
 
     // Criar um mapa de lookup para authUsers
-    const authUserMap = new Map(authUsers?.map((au) => [au.id, au]))
+    const authUserMap = new Map(authUsers?.map(au => [au.id, au]))
 
     // Combinar dados
-    const formattedUsers = usuarios?.map((user) => {
-      const authUser = authUserMap.get(user.id)
-      return {
-        id: user.id,
-        nome: user.nome || 'Sem nome',
-        email: authUser?.email || user.email || 'Email não disponível',
-        tipo: user.tipo || 'user',
-        criado_em: user.criado_em,
-      }
-    }) || []
+    const formattedUsers =
+      usuarios?.map(user => {
+        const authUser = authUserMap.get(user.id)
+        return {
+          id: user.id,
+          nome: user.nome || 'Sem nome',
+          email: authUser?.email || user.email || 'Email não disponível',
+          tipo: user.tipo || 'user',
+          criado_em: user.criado_em,
+        }
+      }) || []
 
     return NextResponse.json({ users: formattedUsers })
   } catch (error) {

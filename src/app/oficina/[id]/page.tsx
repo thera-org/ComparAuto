@@ -1,21 +1,12 @@
-"use client"
+'use client'
 
-import { useParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { 
-  MapPin, 
-  Phone, 
-  Clock, 
-  Star, 
-  Heart, 
-  Navigation, 
+import {
+  MapPin,
+  Phone,
+  Clock,
+  Star,
+  Heart,
+  Navigation,
   ArrowLeft,
   Calendar,
   Wrench,
@@ -23,16 +14,31 @@ import {
   Shield,
   Award,
   Users,
-  MessageCircle
-} from "lucide-react"
-import dynamic from "next/dynamic"
-import { useAppNotifications } from "@/hooks/useAppNotifications"
+  MessageCircle,
+} from 'lucide-react'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAppNotifications } from '@/hooks/useAppNotifications'
+import { supabase } from '@/lib/supabase'
 
 // Dinamically import map component
-const MapComponent = dynamic(() => import("@/components/OfficeDetailMap").then(mod => ({ default: mod.default })), { 
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-100 rounded-lg animate-pulse">Carregando mapa...</div>
-})
+const MapComponent = dynamic(
+  () => import('@/components/OfficeDetailMap').then(mod => ({ default: mod.default })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 animate-pulse rounded-lg bg-gray-100">Carregando mapa...</div>
+    ),
+  }
+)
 
 interface Oficina {
   id: string
@@ -66,20 +72,20 @@ export default function OfficeDetailPage() {
 
       try {
         const { data, error } = await supabase
-          .from("oficinas")
-          .select("*")
-          .eq("id", params.id)
+          .from('oficinas')
+          .select('*')
+          .eq('id', params.id)
           .single()
 
         if (error) {
-          console.error("Erro ao buscar oficina:", error)
-          showError("Erro ao carregar oficina", "Não foi possível carregar os detalhes da oficina")
+          console.error('Erro ao buscar oficina:', error)
+          showError('Erro ao carregar oficina', 'Não foi possível carregar os detalhes da oficina')
         } else {
           setOficina(data as Oficina)
         }
       } catch (err) {
-        console.error("Erro inesperado:", err)
-        showError("Erro inesperado", "Erro inesperado ao carregar a oficina")
+        console.error('Erro inesperado:', err)
+        showError('Erro inesperado', 'Erro inesperado ao carregar a oficina')
       } finally {
         setLoading(false)
       }
@@ -107,18 +113,18 @@ export default function OfficeDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
-          <div className="text-center space-y-8">
-            <div className="relative w-32 h-32 mx-auto">
-              <div className="absolute inset-0 border-4 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 rounded-full loading-rotate opacity-80"></div>
-              <div className="absolute inset-1 bg-white rounded-full"></div>
+        <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+          <div className="space-y-8 text-center">
+            <div className="relative mx-auto h-32 w-32">
+              <div className="loading-rotate absolute inset-0 rounded-full border-4 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 opacity-80"></div>
+              <div className="absolute inset-1 rounded-full bg-white"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <Wrench className="w-8 h-8 text-blue-600 loading-bounce" />
+                <Wrench className="loading-bounce h-8 w-8 text-blue-600" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent">
               Carregando detalhes da oficina...
             </h2>
           </div>
@@ -130,15 +136,17 @@ export default function OfficeDetailPage() {
 
   if (!oficina) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
-          <div className="text-center space-y-6">
+        <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+          <div className="space-y-6 text-center">
             <div className="text-6xl">🚗</div>
             <h2 className="text-3xl font-bold text-gray-800">Oficina não encontrada</h2>
-            <p className="text-gray-600">A oficina que você está procurando não existe ou foi removida.</p>
+            <p className="text-gray-600">
+              A oficina que você está procurando não existe ou foi removida.
+            </p>
             <Button onClick={() => router.back()} className="bg-blue-600 hover:bg-blue-700">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
           </div>
@@ -149,72 +157,74 @@ export default function OfficeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <Header />
-      
+
       <main className="flex-1 bg-gradient-to-br from-gray-50 to-white">
         {/* Hero Section */}
         <div className="relative h-96 overflow-hidden">
           <Image
-            src={oficina.foto_url || "/placeholder.svg"}
+            src={oficina.foto_url || '/placeholder.svg'}
             alt={oficina.nome}
             fill
             className="object-cover"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-          
+
           {/* Navigation and Actions */}
-          <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
+          <div className="absolute left-6 right-6 top-6 flex items-center justify-between">
             <Button
               variant="ghost"
               onClick={() => router.back()}
-              className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 border border-white/20"
+              className="border border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
-            
+
             <Button
               variant="ghost"
               onClick={toggleFavorite}
-              className={`bg-white/10 backdrop-blur-sm border border-white/20 ${
+              className={`border border-white/20 bg-white/10 backdrop-blur-sm ${
                 isFavorite ? 'text-red-500' : 'text-white hover:text-red-500'
               }`}
             >
-              <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
             </Button>
           </div>
 
           {/* Office Info Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-6">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-start justify-between mb-4">
+            <div className="mx-auto max-w-4xl">
+              <div className="mb-4 flex items-start justify-between">
                 <div>
-                  <h1 className="text-4xl font-bold text-white mb-2">{oficina.nome}</h1>
-                  <p className="text-white/90 flex items-center text-lg">
-                    <MapPin className="w-5 h-5 mr-2" />
+                  <h1 className="mb-2 text-4xl font-bold text-white">{oficina.nome}</h1>
+                  <p className="flex items-center text-lg text-white/90">
+                    <MapPin className="mr-2 h-5 w-5" />
                     {oficina.endereco}
                   </p>
                 </div>
-                
-                <div className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2">
+
+                <div className="rounded-xl bg-white/95 px-4 py-2 backdrop-blur-sm">
                   <div className="flex items-center">
-                    <Star className="w-5 h-5 fill-current text-yellow-500 mr-2" />
+                    <Star className="mr-2 h-5 w-5 fill-current text-yellow-500" />
                     <span className="font-bold text-gray-800">{oficina.avaliacao || 4.8}</span>
-                    <span className="text-gray-600 ml-1">({oficina.total_avaliacoes || 127} avaliações)</span>
+                    <span className="ml-1 text-gray-600">
+                      ({oficina.total_avaliacoes || 127} avaliações)
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* Status and Category */}
               <div className="flex gap-3">
-                <Badge className="bg-green-500 hover:bg-green-500 text-white px-3 py-1.5">
-                  <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+                <Badge className="bg-green-500 px-3 py-1.5 text-white hover:bg-green-500">
+                  <div className="mr-2 h-2 w-2 animate-pulse rounded-full bg-white"></div>
                   Online
                 </Badge>
                 {oficina.category && (
-                  <Badge variant="outline" className="bg-white/90 text-gray-800 border-white/50">
+                  <Badge variant="outline" className="border-white/50 bg-white/90 text-gray-800">
                     {oficina.category}
                   </Badge>
                 )}
@@ -224,29 +234,27 @@ export default function OfficeDetailPage() {
         </div>
 
         {/* Content Section */}
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              
+            <div className="space-y-8 lg:col-span-2">
               {/* Quick Actions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Button 
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Button
                   onClick={handleRouteClick}
-                  className="bg-blue-600 hover:bg-blue-700 text-white h-14 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="h-14 rounded-xl bg-blue-600 text-lg text-white shadow-lg transition-all duration-300 hover:bg-blue-700 hover:shadow-xl"
                 >
-                  <Navigation className="w-5 h-5 mr-2" />
+                  <Navigation className="mr-2 h-5 w-5" />
                   Como chegar
                 </Button>
-                
-                <Button 
+
+                <Button
                   onClick={handleCallClick}
                   variant="outline"
-                  className="border-blue-200 text-blue-600 hover:bg-blue-50 h-14 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="h-14 rounded-xl border-blue-200 text-lg text-blue-600 shadow-lg transition-all duration-300 hover:bg-blue-50 hover:shadow-xl"
                 >
-                  <Phone className="w-5 h-5 mr-2" />
-                  {oficina.telefone || "Ligar"}
+                  <Phone className="mr-2 h-5 w-5" />
+                  {oficina.telefone || 'Ligar'}
                 </Button>
               </div>
 
@@ -254,18 +262,17 @@ export default function OfficeDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Wrench className="w-5 h-5 mr-2 text-blue-600" />
+                    <Wrench className="mr-2 h-5 w-5 text-blue-600" />
                     Sobre a oficina
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700 leading-relaxed">
-                    {oficina.descricao || 
+                  <p className="leading-relaxed text-gray-700">
+                    {oficina.descricao ||
                       `${oficina.nome} é uma oficina especializada em serviços automotivos de qualidade. 
                       Com anos de experiência no mercado, oferecemos uma ampla gama de serviços para 
                       manter seu veículo sempre em perfeitas condições. Nossa equipe técnica é altamente 
-                      qualificada e utiliza equipamentos de última geração para garantir o melhor resultado.`
-                    }
+                      qualificada e utiliza equipamentos de última geração para garantir o melhor resultado.`}
                   </p>
                 </CardContent>
               </Card>
@@ -274,25 +281,27 @@ export default function OfficeDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Car className="w-5 h-5 mr-2 text-blue-600" />
+                    <Car className="mr-2 h-5 w-5 text-blue-600" />
                     Serviços disponíveis
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {(oficina.especialidades || [
-                      'Troca de óleo',
-                      'Revisão geral',
-                      'Alinhamento',
-                      'Balanceamento',
-                      'Freios',
-                      'Suspensão',
-                      'Ar-condicionado',
-                      'Elétrica',
-                      'Mecânica geral'
-                    ]).map((servico, index) => (
-                      <div key={index} className="flex items-center p-3 bg-blue-50 rounded-lg">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {(
+                      oficina.especialidades || [
+                        'Troca de óleo',
+                        'Revisão geral',
+                        'Alinhamento',
+                        'Balanceamento',
+                        'Freios',
+                        'Suspensão',
+                        'Ar-condicionado',
+                        'Elétrica',
+                        'Mecânica geral',
+                      ]
+                    ).map((servico, index) => (
+                      <div key={index} className="flex items-center rounded-lg bg-blue-50 p-3">
+                        <div className="mr-3 h-2 w-2 rounded-full bg-blue-500"></div>
                         <span className="text-sm font-medium text-gray-700">{servico}</span>
                       </div>
                     ))}
@@ -304,21 +313,21 @@ export default function OfficeDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <MapPin className="w-5 h-5 mr-2 text-blue-600" />
+                    <MapPin className="mr-2 h-5 w-5 text-blue-600" />
                     Localização
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="rounded-lg overflow-hidden">
-                    <MapComponent 
+                  <div className="overflow-hidden rounded-lg">
+                    <MapComponent
                       latitude={oficina.latitude}
                       longitude={oficina.longitude}
                       nome={oficina.nome}
                       endereco={oficina.endereco}
                     />
                   </div>
-                  <p className="text-sm text-gray-600 mt-3 flex items-center">
-                    <MapPin className="w-4 h-4 mr-2" />
+                  <p className="mt-3 flex items-center text-sm text-gray-600">
+                    <MapPin className="mr-2 h-4 w-4" />
                     {oficina.endereco}
                   </p>
                 </CardContent>
@@ -327,7 +336,6 @@ export default function OfficeDetailPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              
               {/* Contact Info */}
               <Card>
                 <CardHeader>
@@ -336,21 +344,21 @@ export default function OfficeDetailPage() {
                 <CardContent className="space-y-4">
                   {oficina.telefone && (
                     <div className="flex items-center">
-                      <Phone className="w-4 h-4 mr-3 text-gray-500" />
+                      <Phone className="mr-3 h-4 w-4 text-gray-500" />
                       <span className="text-gray-700">{oficina.telefone}</span>
                     </div>
                   )}
-                  
+
                   <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-3 text-gray-500" />
+                    <Clock className="mr-3 h-4 w-4 text-gray-500" />
                     <span className="text-gray-700">
-                      {oficina.horario_funcionamento || "Seg-Sex: 8h-18h, Sáb: 8h-12h"}
+                      {oficina.horario_funcionamento || 'Seg-Sex: 8h-18h, Sáb: 8h-12h'}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-3 text-gray-500" />
-                    <span className="text-gray-700 text-sm">{oficina.endereco}</span>
+                    <MapPin className="mr-3 h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-700">{oficina.endereco}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -363,31 +371,31 @@ export default function OfficeDetailPage() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Star className="w-4 h-4 mr-2 text-yellow-500" />
+                      <Star className="mr-2 h-4 w-4 text-yellow-500" />
                       <span className="text-gray-700">Avaliação</span>
                     </div>
                     <span className="font-bold">{oficina.avaliacao || 4.8}/5</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Users className="w-4 h-4 mr-2 text-blue-500" />
+                      <Users className="mr-2 h-4 w-4 text-blue-500" />
                       <span className="text-gray-700">Clientes</span>
                     </div>
                     <span className="font-bold">{oficina.total_avaliacoes || 127}+</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Award className="w-4 h-4 mr-2 text-purple-500" />
+                      <Award className="mr-2 h-4 w-4 text-purple-500" />
                       <span className="text-gray-700">Experiência</span>
                     </div>
                     <span className="font-bold">15+ anos</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Shield className="w-4 h-4 mr-2 text-green-500" />
+                      <Shield className="mr-2 h-4 w-4 text-green-500" />
                       <span className="text-gray-700">Garantia</span>
                     </div>
                     <span className="font-bold">6 meses</span>
@@ -401,22 +409,25 @@ export default function OfficeDetailPage() {
                   <CardTitle className="text-lg">Ações rápidas</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                    <Calendar className="w-4 h-4 mr-2" />
+                  <Button className="w-full bg-green-600 text-white hover:bg-green-700">
+                    <Calendar className="mr-2 h-4 w-4" />
                     Agendar serviço
                   </Button>
-                  
-                  <Button variant="outline" className="w-full border-blue-200 text-blue-600 hover:bg-blue-50">
-                    <MessageCircle className="w-4 h-4 mr-2" />
+
+                  <Button
+                    variant="outline"
+                    className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
                     Enviar mensagem
                   </Button>
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     onClick={handleRouteClick}
                     className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
                   >
-                    <Navigation className="w-4 h-4 mr-2" />
+                    <Navigation className="mr-2 h-4 w-4" />
                     Ver rota
                   </Button>
                 </CardContent>
@@ -428,12 +439,12 @@ export default function OfficeDetailPage() {
                   <CardTitle className="text-lg">Preços</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-gray-600 text-sm">Serviços a partir de</p>
+                  <div className="rounded-lg bg-blue-50 p-4 text-center">
+                    <p className="text-sm text-gray-600">Serviços a partir de</p>
                     <p className="text-3xl font-bold text-blue-600">
                       R$ {oficina.preco_medio || 50}
                     </p>
-                    <p className="text-gray-500 text-xs mt-1">*Consulte condições</p>
+                    <p className="mt-1 text-xs text-gray-500">*Consulte condições</p>
                   </div>
                 </CardContent>
               </Card>
@@ -441,7 +452,7 @@ export default function OfficeDetailPage() {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   )

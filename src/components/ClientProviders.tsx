@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { NotificationProvider } from '@/contexts/NotificationContext'
-import { NotificationContainer } from '@/components/NotificationContainer'
 import { EnvironmentWarnings } from '@/components/EnvironmentWarnings'
+import { NotificationContainer } from '@/components/NotificationContainer'
+import { NotificationProvider } from '@/contexts/NotificationContext'
 
 interface ClientProvidersProps {
   children: React.ReactNode

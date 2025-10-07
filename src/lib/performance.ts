@@ -56,7 +56,10 @@ class PerformanceMonitor {
 
     if (navigation) {
       this.recordMetric('page_load_time', navigation.loadEventEnd - navigation.loadEventStart)
-      this.recordMetric('dom_content_loaded', navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart)
+      this.recordMetric(
+        'dom_content_loaded',
+        navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart
+      )
       this.recordMetric('first_paint', navigation.loadEventEnd - navigation.fetchStart)
       this.recordMetric('ttfb', navigation.responseStart - navigation.requestStart)
     }
@@ -64,7 +67,7 @@ class PerformanceMonitor {
 
   private observeNavigationTiming() {
     // Observe navigation entries
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (entry.entryType === 'navigation') {
           const nav = entry as PerformanceNavigationTiming
@@ -76,7 +79,7 @@ class PerformanceMonitor {
 
   private observeCoreWebVitals() {
     // First Contentful Paint (FCP)
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (entry.name === 'first-contentful-paint') {
           this.recordMetric('fcp', entry.startTime)
@@ -85,14 +88,14 @@ class PerformanceMonitor {
     }).observe({ entryTypes: ['paint'] })
 
     // Largest Contentful Paint (LCP)
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       const entries = list.getEntries()
       const lastEntry = entries[entries.length - 1]
       this.recordMetric('lcp', lastEntry.startTime)
     }).observe({ entryTypes: ['largest-contentful-paint'] })
 
     // First Input Delay (FID)
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         const fidEntry = entry as any // Type assertion for browser compatibility
         if (fidEntry.processingStart) {
@@ -103,7 +106,7 @@ class PerformanceMonitor {
 
     // Cumulative Layout Shift (CLS)
     let clsValue = 0
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         const clsEntry = entry as any // Type assertion for browser compatibility
         if (!clsEntry.hadRecentInput && clsEntry.value) {
@@ -116,7 +119,7 @@ class PerformanceMonitor {
 
   private observeErrors() {
     // JavaScript errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.recordError({
         message: event.message,
         stack: event.error?.stack,
@@ -126,7 +129,7 @@ class PerformanceMonitor {
     })
 
     // Promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.recordError({
         message: `Unhandled Promise Rejection: ${event.reason}`,
         url: window.location.href,
@@ -191,7 +194,7 @@ class PerformanceMonitor {
     try {
       // Send to error reporting service (Sentry, etc.)
       console.error('Application Error:', error)
-      
+
       // You can send to your own API
       // await fetch('/api/analytics/errors', {
       //   method: 'POST',
@@ -214,7 +217,7 @@ class PerformanceMonitor {
   // Measure custom performance
   startMeasure(name: string): () => void {
     const startTime = performance.now()
-    
+
     return () => {
       const endTime = performance.now()
       this.recordMetric(name, endTime - startTime)
@@ -251,7 +254,8 @@ export function usePerformanceMonitor() {
     recordMetric: (name: string, value: number) => performanceMonitor.recordMetric(name, value),
     recordError: (error: Omit<ErrorReport, 'timestamp'>) => performanceMonitor.recordError(error),
     startMeasure: (name: string) => performanceMonitor.startMeasure(name),
-    measureAsync: <T>(name: string, fn: () => Promise<T>) => performanceMonitor.measureAsync(name, fn),
+    measureAsync: <T>(name: string, fn: () => Promise<T>) =>
+      performanceMonitor.measureAsync(name, fn),
     getMetrics: () => performanceMonitor.getMetrics(),
     getErrors: () => performanceMonitor.getErrors(),
   }
@@ -260,7 +264,7 @@ export function usePerformanceMonitor() {
 // Utility to measure page transitions
 export function measurePageTransition(to: string) {
   const startTime = performance.now()
-  
+
   return () => {
     const endTime = performance.now()
     performanceMonitor.recordMetric(`page_transition_to_${to}`, endTime - startTime)

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom'
 import { LoadingSpinner } from '../LoadingSpinner'
 
@@ -12,7 +13,7 @@ describe('LoadingSpinner', () => {
   it('renders with custom text', () => {
     const customText = 'Carregando dados...'
     render(<LoadingSpinner text={customText} />)
-    
+
     expect(screen.getByText(customText)).toBeInTheDocument()
   })
 
@@ -26,7 +27,7 @@ describe('LoadingSpinner', () => {
   it('applies custom className', () => {
     const customClass = 'my-custom-class'
     render(<LoadingSpinner className={customClass} />)
-    
+
     const container = screen.getByRole('status')
     expect(container).toHaveClass(customClass)
   })

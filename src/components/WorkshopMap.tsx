@@ -1,11 +1,12 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { GoogleMap, OverlayView, useLoadScript } from "@react-google-maps/api"
-import { supabase } from "@/lib/supabase"
-import { Button } from "@/components/ui/button"
-import { Navigation, MapPin, Star, Phone } from "lucide-react"
-import Link from "next/link"
+import { GoogleMap, OverlayView, useLoadScript } from '@react-google-maps/api'
+import { Navigation, MapPin, Star, Phone } from 'lucide-react'
+import Link from 'next/link'
+import { useState, useEffect, useCallback, useRef } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { supabase } from '@/lib/supabase'
 
 interface Workshop {
   id: string
@@ -30,14 +31,14 @@ interface WorkshopMapProps {
 const saoLuisCenter = { lat: -2.5307, lng: -44.3068 }
 
 const getMapContainerStyle = (height: string) => ({
-  width: "calc(100% - 32px)",
+  width: 'calc(100% - 32px)',
   height: `calc(${height} - 32px)`,
-  position: "relative" as const,
+  position: 'relative' as const,
   zIndex: 1,
-  margin: "16px",
-  borderRadius: "8px",
-  overflow: "hidden",
-  border: "1px solid #e5e7eb"
+  margin: '16px',
+  borderRadius: '8px',
+  overflow: 'hidden',
+  border: '1px solid #e5e7eb',
 })
 
 const mapOptions = {
@@ -51,7 +52,7 @@ const mapOptions = {
 export default function WorkshopMap({
   initialCenter,
   workshops: initialWorkshops,
-  height = "500px",
+  height = '500px',
   onWorkshopSelect,
   selectLocationMode = false,
   onLocationSelect,
@@ -64,7 +65,7 @@ export default function WorkshopMap({
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
-    libraries: ["places"],
+    libraries: ['places'],
   })
 
   const fetchWorkshops = useCallback(async () => {
@@ -72,15 +73,15 @@ export default function WorkshopMap({
 
     try {
       const { data, error } = await supabase
-        .from("oficinas")
-        .select("id, nome, endereco, latitude, longitude, foto_url, telefone")
-        .not("latitude", "is", null)
-        .not("longitude", "is", null)
+        .from('oficinas')
+        .select('id, nome, endereco, latitude, longitude, foto_url, telefone')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null)
 
       if (error) throw error
       setWorkshops(data || [])
     } catch (error) {
-      console.error("Error fetching workshops:", error)
+      console.error('Error fetching workshops:', error)
     }
   }, [initialWorkshops])
 
@@ -95,7 +96,7 @@ export default function WorkshopMap({
   const getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        position => {
           const location = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
@@ -107,8 +108,8 @@ export default function WorkshopMap({
             mapRef.current.setZoom(14)
           }
         },
-        (error) => {
-          console.error("Error getting user location:", error)
+        error => {
+          console.error('Error getting user location:', error)
         }
       )
     }
@@ -124,28 +125,28 @@ export default function WorkshopMap({
       onWorkshopSelect(workshop)
     }
   }
-  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
-    if (selectLocationMode && onLocationSelect && e.latLng) {
-      onLocationSelect(e.latLng.lat(), e.latLng.lng())
-    }
-  }, [selectLocationMode, onLocationSelect])
+  const handleMapClick = useCallback(
+    (e: google.maps.MapMouseEvent) => {
+      if (selectLocationMode && onLocationSelect && e.latLng) {
+        onLocationSelect(e.latLng.lat(), e.latLng.lng())
+      }
+    },
+    [selectLocationMode, onLocationSelect]
+  )
 
   if (loadError) {
-    return (
-      <div className="map-error-container">
-        Erro ao carregar o mapa: {loadError.message}
-      </div>
-    )
+    return <div className="map-error-container">Erro ao carregar o mapa: {loadError.message}</div>
   }
 
   if (!isLoaded) {
     return (
       <div className="map-loading-container">
         <div className="map-loading-spinner"></div>
-        <p style={{ color: "#4b5563", fontFamily: "inherit" }}>Carregando mapa...</p>
+        <p style={{ color: '#4b5563', fontFamily: 'inherit' }}>Carregando mapa...</p>
       </div>
     )
-  }return (
+  }
+  return (
     <div className="map-isolation">
       <div className="map-container-isolated">
         <GoogleMap
@@ -155,138 +156,144 @@ export default function WorkshopMap({
           onLoad={onMapLoad}
           onClick={handleMapClick}
           options={mapOptions}
-        >        {/* Custom Airbnb-style markers for workshops */}
-        {!selectLocationMode && workshops.map((workshop) => (
-          <OverlayView
-            key={workshop.id}
-            position={{ lat: workshop.latitude, lng: workshop.longitude }}
-            mapPaneName="overlayMouseTarget"
-          >
-            <div
-              className={`
-                relative cursor-pointer transform transition-all duration-300 hover:scale-110 z-10
+        >
+          {' '}
+          {/* Custom Airbnb-style markers for workshops */}
+          {!selectLocationMode &&
+            workshops.map(workshop => (
+              <OverlayView
+                key={workshop.id}
+                position={{ lat: workshop.latitude, lng: workshop.longitude }}
+                mapPaneName="overlayMouseTarget"
+              >
+                <div
+                  className={`
+                relative z-10 transform cursor-pointer transition-all duration-300 hover:scale-110
                 ${selectedWorkshop?.id === workshop.id ? 'scale-110' : ''}
               `}
-              onClick={() => handleMarkerClick(workshop)}
-            >
-              {/* Main marker container */}
-              <div className={`
-                relative bg-white rounded-full p-2 shadow-lg border-2 transition-all duration-300
-                ${selectedWorkshop?.id === workshop.id 
-                  ? 'border-blue-500 shadow-blue-200/50 shadow-xl' 
-                  : 'border-gray-200 hover:border-blue-300 hover:shadow-xl'
+                  onClick={() => handleMarkerClick(workshop)}
+                >
+                  {/* Main marker container */}
+                  <div
+                    className={`
+                relative rounded-full border-2 bg-white p-2 shadow-lg transition-all duration-300
+                ${
+                  selectedWorkshop?.id === workshop.id
+                    ? 'border-blue-500 shadow-xl shadow-blue-200/50'
+                    : 'border-gray-200 hover:border-blue-300 hover:shadow-xl'
                 }
-              `}>
-                {/* Price/Rating indicator */}
-                <div className="flex items-center justify-center">
-                  <div className="flex items-center gap-1 text-xs font-semibold text-gray-700">
-                    <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                    <span>4.8</span>
+              `}
+                  >
+                    {/* Price/Rating indicator */}
+                    <div className="flex items-center justify-center">
+                      <div className="flex items-center gap-1 text-xs font-semibold text-gray-700">
+                        <Star className="h-3 w-3 fill-current text-yellow-500" />
+                        <span>4.8</span>
+                      </div>
+                    </div>
+
+                    {/* Pointer arrow */}
+                    <div
+                      className={`
+                  absolute -bottom-1 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 transform transition-colors duration-300
+                  ${
+                    selectedWorkshop?.id === workshop.id
+                      ? 'bg-blue-500'
+                      : 'border-b border-r border-gray-200 bg-white'
+                  }
+                `}
+                    ></div>
+                  </div>
+
+                  {/* Workshop name tooltip on hover */}
+                  <div className="pointer-events-none absolute -top-12 left-1/2 z-20 -translate-x-1/2 transform opacity-0 transition-opacity duration-300 hover:opacity-100">
+                    <div className="whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white">
+                      {workshop.nome}
+                    </div>
+                    <div className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 transform border-l-2 border-r-2 border-t-4 border-transparent border-t-gray-900"></div>
                   </div>
                 </div>
-                
-                {/* Pointer arrow */}
-                <div className={`
-                  absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 rotate-45 transition-colors duration-300
-                  ${selectedWorkshop?.id === workshop.id 
-                    ? 'bg-blue-500' 
-                    : 'bg-white border-r border-b border-gray-200'
-                  }
-                `}></div>
-              </div>
-              
-              {/* Workshop name tooltip on hover */}
-              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
-                <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                  {workshop.nome}
+              </OverlayView>
+            ))}
+          {/* Location marker for selectLocationMode */}
+          {selectLocationMode && marker && (
+            <OverlayView position={marker} mapPaneName="overlayMouseTarget">
+              <div className="relative">
+                <div className="rounded-full border-2 border-white bg-red-500 p-3 shadow-lg">
+                  <MapPin className="h-4 w-4 text-white" />
                 </div>
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-4 border-transparent border-t-gray-900"></div>
+                <div className="absolute -bottom-1 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 transform bg-red-500"></div>
               </div>
-            </div>
-          </OverlayView>
-        ))}
+            </OverlayView>
+          )}
+          {/* Enhanced InfoWindow for selected workshop */}
+          {!selectLocationMode && selectedWorkshop && (
+            <OverlayView
+              position={{ lat: selectedWorkshop.latitude + 0.001, lng: selectedWorkshop.longitude }}
+              mapPaneName="floatPane"
+            >
+              <div className="relative max-w-[280px] -translate-x-1/2 -translate-y-full transform rounded-xl border border-gray-200 bg-white p-4 shadow-2xl">
+                {/* Close button */}
+                <button
+                  onClick={() => setSelectedWorkshop(null)}
+                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
+                >
+                  <span className="text-sm text-gray-500">×</span>
+                </button>
 
-        {/* Location marker for selectLocationMode */}
-        {selectLocationMode && marker && (
-          <OverlayView
-            position={marker}
-            mapPaneName="overlayMouseTarget"
-          >
-            <div className="relative">
-              <div className="bg-red-500 rounded-full p-3 shadow-lg border-2 border-white">
-                <MapPin className="w-4 h-4 text-white" />
-              </div>
-              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-red-500 rotate-45"></div>
-            </div>
-          </OverlayView>
-        )}
-        
-        {/* Enhanced InfoWindow for selected workshop */}
-        {!selectLocationMode && selectedWorkshop && (
-          <OverlayView
-            position={{ lat: selectedWorkshop.latitude + 0.001, lng: selectedWorkshop.longitude }}
-            mapPaneName="floatPane"
-          >
-            <div className="relative bg-white rounded-xl shadow-2xl border border-gray-200 p-4 max-w-[280px] transform -translate-x-1/2 -translate-y-full">
-              {/* Close button */}
-              <button
-                onClick={() => setSelectedWorkshop(null)}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-              >
-                <span className="text-gray-500 text-sm">×</span>
-              </button>
-              
-              {/* Workshop info */}
-              <div className="pr-6">
-                <h3 className="font-semibold text-base text-gray-900 mb-2">{selectedWorkshop.nome}</h3>
-                
-                <div className="flex items-center gap-1 mb-2">
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                  <span className="text-sm font-medium">4.8</span>
-                  <span className="text-sm text-gray-500">(124 avaliações)</span>
-                </div>
-                
-                <p className="text-sm text-gray-600 mb-3 flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  {selectedWorkshop.endereco}
-                </p>
-                
-                {selectedWorkshop.telefone && (
-                  <p className="text-sm text-gray-600 mb-3 flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-400" />
-                    {selectedWorkshop.telefone}
+                {/* Workshop info */}
+                <div className="pr-6">
+                  <h3 className="mb-2 text-base font-semibold text-gray-900">
+                    {selectedWorkshop.nome}
+                  </h3>
+
+                  <div className="mb-2 flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-current text-yellow-500" />
+                    <span className="text-sm font-medium">4.8</span>
+                    <span className="text-sm text-gray-500">(124 avaliações)</span>
+                  </div>
+
+                  <p className="mb-3 flex items-start gap-2 text-sm text-gray-600">
+                    <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
+                    {selectedWorkshop.endereco}
                   </p>
-                )}
-                
-                <div className="flex gap-2">
-                  <Link 
-                    href={`/oficina/${selectedWorkshop.id}`}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded-lg text-center transition-colors"
-                  >
-                    Ver detalhes
-                  </Link>
-                  <button className="px-3 py-2 border border-gray-300 hover:border-gray-400 rounded-lg transition-colors">
-                    <Phone className="w-4 h-4 text-gray-600" />
-                  </button>
+
+                  {selectedWorkshop.telefone && (
+                    <p className="mb-3 flex items-center gap-2 text-sm text-gray-600">
+                      <Phone className="h-4 w-4 text-gray-400" />
+                      {selectedWorkshop.telefone}
+                    </p>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/oficina/${selectedWorkshop.id}`}
+                      className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-center text-sm text-white transition-colors hover:bg-blue-700"
+                    >
+                      Ver detalhes
+                    </Link>
+                    <button className="rounded-lg border border-gray-300 px-3 py-2 transition-colors hover:border-gray-400">
+                      <Phone className="h-4 w-4 text-gray-600" />
+                    </button>
+                  </div>
                 </div>
+
+                {/* Pointer arrow */}
+                <div className="absolute -bottom-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 transform border-b border-r border-gray-200 bg-white"></div>
               </div>
-              
-              {/* Pointer arrow */}
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-r border-b border-gray-200 rotate-45"></div>
-            </div>
-          </OverlayView>
-        )}
-      </GoogleMap>
+            </OverlayView>
+          )}
+        </GoogleMap>
         {!selectLocationMode && (
-        <Button
-          onClick={getUserLocation}
-          className="absolute top-4 left-4 bg-white text-black hover:bg-gray-100 shadow-md z-10"
-          size="sm"
-        >
-          <Navigation className="h-4 w-4 mr-2" />
-          Minha Localização
-        </Button>
-      )}
+          <Button
+            onClick={getUserLocation}
+            className="absolute left-4 top-4 z-10 bg-white text-black shadow-md hover:bg-gray-100"
+            size="sm"
+          >
+            <Navigation className="mr-2 h-4 w-4" />
+            Minha Localização
+          </Button>
+        )}
       </div>
     </div>
   )

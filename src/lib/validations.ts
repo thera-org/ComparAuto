@@ -6,13 +6,13 @@
 export const validateCPF = (cpf: string): boolean => {
   // Remove pontos e traços
   const cleanCPF = cpf.replace(/[^\d]/g, '')
-  
+
   // Verifica se tem 11 dígitos
   if (cleanCPF.length !== 11) return false
-  
+
   // Verifica se todos os dígitos são iguais
   if (/^(\d)\1{10}$/.test(cleanCPF)) return false
-  
+
   // Validação do primeiro dígito verificador
   let sum = 0
   for (let i = 0; i < 9; i++) {
@@ -21,7 +21,7 @@ export const validateCPF = (cpf: string): boolean => {
   let digit = 11 - (sum % 11)
   if (digit >= 10) digit = 0
   if (digit !== parseInt(cleanCPF.charAt(9))) return false
-  
+
   // Validação do segundo dígito verificador
   sum = 0
   for (let i = 0; i < 10; i++) {
@@ -30,35 +30,35 @@ export const validateCPF = (cpf: string): boolean => {
   digit = 11 - (sum % 11)
   if (digit >= 10) digit = 0
   if (digit !== parseInt(cleanCPF.charAt(10))) return false
-  
+
   return true
 }
 
 // Validação de CNPJ
 export const validateCNPJ = (cnpj: string): boolean => {
   const cleanCNPJ = cnpj.replace(/[^\d]/g, '')
-  
+
   if (cleanCNPJ.length !== 14) return false
   if (/^(\d)\1{13}$/.test(cleanCNPJ)) return false
-  
+
   // Validação dos dígitos verificadores
   const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
   const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
-  
+
   let sum = 0
   for (let i = 0; i < 12; i++) {
     sum += parseInt(cleanCNPJ.charAt(i)) * weights1[i]
   }
   let digit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
   if (digit !== parseInt(cleanCNPJ.charAt(12))) return false
-  
+
   sum = 0
   for (let i = 0; i < 13; i++) {
     sum += parseInt(cleanCNPJ.charAt(i)) * weights2[i]
   }
   digit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
   if (digit !== parseInt(cleanCNPJ.charAt(13))) return false
-  
+
   return true
 }
 
@@ -150,9 +150,9 @@ export const validateTime = (time: string): boolean => {
 export const isTimeAfter = (time1: string, time2: string): boolean => {
   const [hours1, minutes1] = time1.split(':').map(Number)
   const [hours2, minutes2] = time2.split(':').map(Number)
-  
+
   const totalMinutes1 = hours1 * 60 + minutes1
   const totalMinutes2 = hours2 * 60 + minutes2
-  
+
   return totalMinutes1 > totalMinutes2
 }

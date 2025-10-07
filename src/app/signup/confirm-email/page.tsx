@@ -1,83 +1,89 @@
-"use client";
+'use client'
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import { Mail, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react";
-import Image from "next/image";
-import styles from './confirm-email.module.css';
+import { Mail, CheckCircle, RefreshCw, ArrowLeft } from 'lucide-react'
+import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+
+import { supabase } from '@/lib/supabase'
+
+import styles from './confirm-email.module.css'
 
 function ConfirmEmailContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email');
-  
-  const [isResending, setIsResending] = useState(false);
-  const [resendMessage, setResendMessage] = useState("");
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email')
+
+  const [isResending, setIsResending] = useState(false)
+  const [resendMessage, setResendMessage] = useState('')
+  const [resendCooldown, setResendCooldown] = useState(0)
 
   // Cooldown para reenvio
   useEffect(() => {
     if (resendCooldown > 0) {
       const timer = setInterval(() => {
-        setResendCooldown(prev => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
+        setResendCooldown(prev => prev - 1)
+      }, 1000)
+      return () => clearInterval(timer)
     }
-  }, [resendCooldown]);
+  }, [resendCooldown])
 
   // Verifica se o usuário já está autenticado
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (session) {
-        router.replace("/");
+        router.replace('/')
       }
-    };
-    checkAuth();
+    }
+    checkAuth()
 
     // Escuta mudanças na autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        router.replace("/");
+        router.replace('/')
       }
-    });
+    })
 
-    return () => subscription.unsubscribe();
-  }, [router]);
+    return () => subscription.unsubscribe()
+  }, [router])
 
   const handleResendEmail = async () => {
-    if (!email) return;
-    
-    setIsResending(true);
-    setResendMessage("");
+    if (!email) return
+
+    setIsResending(true)
+    setResendMessage('')
 
     try {
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: email,
-      });
+      })
 
       if (error) {
-        setResendMessage("Erro ao reenviar e-mail. Tente novamente.");
+        setResendMessage('Erro ao reenviar e-mail. Tente novamente.')
       } else {
-        setResendMessage("E-mail reenviado com sucesso! Verifique sua caixa de entrada.");
-        setResendCooldown(60); // 60 segundos de cooldown
+        setResendMessage('E-mail reenviado com sucesso! Verifique sua caixa de entrada.')
+        setResendCooldown(60) // 60 segundos de cooldown
       }
     } catch {
-      setResendMessage("Erro inesperado. Tente novamente.");
+      setResendMessage('Erro inesperado. Tente novamente.')
     } finally {
-      setIsResending(false);
+      setIsResending(false)
     }
-  };
+  }
 
   const handleBackToSignup = () => {
-    router.push("/signup");
-  };
+    router.push('/signup')
+  }
 
   const handleGoToLogin = () => {
-    router.push("/login");
-  };
+    router.push('/login')
+  }
 
   if (!email) {
     return (
@@ -92,27 +98,25 @@ function ConfirmEmailContent() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <Image 
-            src="/logo.png" 
-            alt="ComparAuto Logo" 
-            width={60} 
-            height={60} 
-            className={styles.logo} 
+          <Image
+            src="/logo.png"
+            alt="ComparAuto Logo"
+            width={60}
+            height={60}
+            className={styles.logo}
           />
           <div className={styles.iconWrapper}>
             <Mail size={48} className={styles.mailIcon} />
           </div>
           <h2 className={styles.title}>Confirme seu e-mail</h2>
-          <p className={styles.subtitle}>
-            Enviamos um link de confirmação para:
-          </p>
+          <p className={styles.subtitle}>Enviamos um link de confirmação para:</p>
           <p className={styles.email}>{email}</p>
         </div>
 
@@ -134,12 +138,15 @@ function ConfirmEmailContent() {
 
           <div className={styles.note}>
             <p>
-              <strong>Não encontrou o e-mail?</strong> Verifique sua caixa de spam ou lixo eletrônico.
+              <strong>Não encontrou o e-mail?</strong> Verifique sua caixa de spam ou lixo
+              eletrônico.
             </p>
           </div>
 
           {resendMessage && (
-            <div className={`${styles.message} ${resendMessage.includes('sucesso') ? styles.success : styles.error}`}>
+            <div
+              className={`${styles.message} ${resendMessage.includes('sucesso') ? styles.success : styles.error}`}
+            >
               {resendMessage}
             </div>
           )}
@@ -159,27 +166,22 @@ function ConfirmEmailContent() {
             ) : resendCooldown > 0 ? (
               `Reenviar em ${resendCooldown}s`
             ) : (
-              "Reenviar e-mail"
+              'Reenviar e-mail'
             )}
           </button>
 
-          <button
-            onClick={handleGoToLogin}
-            className={styles.primaryButton}
-          >
+          <button onClick={handleGoToLogin} className={styles.primaryButton}>
             Já confirmei, fazer login
           </button>
 
-          <button
-            onClick={handleBackToSignup}
-            className={styles.textButton}
-          >
+          <button onClick={handleBackToSignup} className={styles.textButton}>
             <ArrowLeft size={16} />
             Voltar ao cadastro
           </button>
         </div>
-      </div>    </div>
-  );
+      </div>{' '}
+    </div>
+  )
 }
 
 function LoadingPage() {
@@ -191,7 +193,7 @@ function LoadingPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default function ConfirmEmailPage() {
@@ -199,5 +201,5 @@ export default function ConfirmEmailPage() {
     <Suspense fallback={<LoadingPage />}>
       <ConfirmEmailContent />
     </Suspense>
-  );
+  )
 }
