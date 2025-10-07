@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, ChangeEvent, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { uploadMultipleImages } from "@/lib/storage";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -95,23 +96,27 @@ const initialForm: FormType = {
 const servicosList = [
   { nome: "Troca de óleo", icon: "/oleo.png" },
   { nome: "Alinhamento e balanceamento", icon: "/balanceamento.png" },
-  { nome: "Elétrica", icon: "/filtro.png" },
+  { nome: "Elétrica", icon: "/eletrica.png" },
   { nome: "Mecânica geral", icon: "/freio.png" },
   { nome: "Ar-condicionado", icon: "/ar-condicionado.png" },
   { nome: "Freios", icon: "/freio.png" },
-  { nome: "Escapamento", icon: "/file.svg" },
-  { nome: "Suspensão", icon: "/polimento.png" },
+  { nome: "Sistema de escape", icon: "/escape.png" },
+  { nome: "Suspensão", icon: "/susp.png" },
   { nome: "Acessórios", icon: "/acessorios.png" },
   { nome: "Higienização", icon: "/higienizacao.png" },
   { nome: "Película", icon: "/pelicula.png" },
+  { nome: "Bateria", icon: "/bateria.png" },
+  { nome: "Injeção eletrônica", icon: "/injecao.png" },
+  { nome: "Filtros", icon: "/filtro.png" },
+  { nome: "Polimento", icon: "/polimento.png" },
 ];
 
 const pagamentosList = [
-  { nome: "Dinheiro", icon: "/file.svg" },
-  { nome: "Cartão de crédito", icon: "/file.svg" },
-  { nome: "Cartão de débito", icon: "/file.svg" },
-  { nome: "Pix", icon: "/file.svg" },
-  { nome: "Transferência", icon: "/file.svg" },
+  { nome: "Dinheiro", icon: "💵" },
+  { nome: "Cartão de crédito", icon: "💳" },
+  { nome: "Cartão de débito", icon: "💳" },
+  { nome: "Pix", icon: "📱" },
+  { nome: "Transferência", icon: "🏦" },
 ];
 
 const diasSemana = [
@@ -169,6 +174,27 @@ export default function MultiStepFullPageForm() {
     {}
   );  const [submitting, setSubmitting] = useState(false);
 
+  // Função para formatar valor em moeda
+  const formatCurrency = (value: string): string => {
+    // Remove tudo que não é dígito
+    const numbers = value.replace(/\D/g, '');
+    
+    // Converte para número e formata
+    const amount = parseFloat(numbers) / 100;
+    
+    if (isNaN(amount)) return 'R$ 0,00';
+    
+    return amount.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  };
+
+  // Função para extrair apenas números do valor formatado
+  const extractNumbers = (value: string): string => {
+    return value.replace(/\D/g, '');
+  };
+
   const handleSubmitOficina = async () => {
     try {
       setSubmitting(true);
@@ -198,124 +224,83 @@ export default function MultiStepFullPageForm() {
       }
 
       // Upload de imagens se houver
-      const imagensUrls: string[] = [];
+      let imagensUrls: string[] = [];
       if (form.imagens && form.imagens.length > 0) {
-        for (let i = 0; i < form.imagens.length; i++) {
-          const file = form.imagens[i];
-          const fileName = `${user.id}/${Date.now()}_${file.name}`;
+        console.log(`Fazendo upload de ${form.imagens.length} imagens...`);
+        try {
+          const filesArray = Array.from(form.imagens);
+          imagensUrls = await uploadMultipleImages(filesArray, 'oficinas');
+          console.log(`${imagensUrls.length} imagens enviadas com sucesso`);
           
-          const { error: uploadError } = await supabase.storage
-            .from('oficinas-imagens')
-            .upload(fileName, file);
-
-          if (uploadError) throw uploadError;
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('oficinas-imagens')
-            .getPublicUrl(fileName);
-
-          imagensUrls.push(publicUrl);
+          if (imagensUrls.length === 0) {
+            throw new Error('Nenhuma imagem foi enviada com sucesso. Verifique o tamanho e formato dos arquivos.');
+          }
+        } catch (uploadError) {
+          console.error('Erro no upload das imagens:', uploadError);
+          throw new Error('Erro ao fazer upload das imagens. Tente novamente.');
         }
       }
 
       // Inserir dados na tabela principal oficinas
+      console.log('Inserindo oficina no banco de dados...');
+      const oficinaInsertData = {
+        nome: form.nome_oficina,
+        endereco: `${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''}, ${form.bairro}, ${form.cidade} - ${form.estado}`,
+        telefone: form.telefone_fixo || form.whatsapp,
+        email: form.email,
+        descricao: form.descricao || null,
+        status: 'pendente',
+        user_id: user.id,
+        cnpj_cpf: form.cnpj_cpf || null,
+        razao_social: form.razao_social || null,
+        rua: form.rua,
+        numero: form.numero,
+        complemento: form.complemento || null,
+        bairro: form.bairro,
+        cidade: form.cidade,
+        estado: form.estado,
+        cep: form.cep,
+        telefone_fixo: form.telefone_fixo || null,
+        whatsapp: form.whatsapp,
+        site: form.site || null,
+        horario_funcionamento: `${form.horario_abertura} - ${form.horario_fechamento}`,
+        foto_url: imagensUrls.length > 0 ? imagensUrls[0] : null,
+        imagens_urls: imagensUrls.length > 0 ? imagensUrls : null,
+        servicos_oferecidos: form.servicosSelecionados.map(s => s.nome),
+        formas_pagamento: form.pagamentosSelecionados,
+        dias_funcionamento: form.diasSelecionados,
+        horario_abertura: form.horario_abertura,
+        horario_fechamento: form.horario_fechamento
+      };
+
       const { data: oficinaData, error: oficinaError } = await supabase
         .from('oficinas')
-        .insert({
-          nome: form.nome_oficina,
-          endereco: `${form.rua}, ${form.numero}${form.complemento ? `, ${form.complemento}` : ''}, ${form.bairro}, ${form.cidade} - ${form.estado}`,
-          telefone: form.telefone_fixo || form.whatsapp,
-          email: form.email,
-          descricao: form.descricao,
-          status: 'pendente',
-          user_id: user.id,
-          cnpj_cpf: form.cnpj_cpf,
-          razao_social: form.razao_social,
-          rua: form.rua,
-          numero: form.numero,
-          complemento: form.complemento,
-          bairro: form.bairro,
-          cidade: form.cidade,
-          estado: form.estado,
-          cep: form.cep,
-          telefone_fixo: form.telefone_fixo,
-          whatsapp: form.whatsapp,
-          site: form.site,
-          horario_funcionamento: `${form.horario_abertura} - ${form.horario_fechamento}`
-        })
+        .insert(oficinaInsertData)
         .select()
         .single();
 
-      if (oficinaError) throw oficinaError;
-
-      const oficinaId = oficinaData.id;
-
-      // Inserir serviços
-      if (form.servicosSelecionados && form.servicosSelecionados.length > 0) {
-        const servicosData = form.servicosSelecionados.map(servico => ({
-          oficina_id: oficinaId,
-          servico_nome: servico.nome,
-          servico_outros: form.servico_outros || null
-        }));
-
-        const { error: servicosError } = await supabase
-          .from('oficina_servicos')
-          .insert(servicosData);
-
-        if (servicosError) throw servicosError;
+      if (oficinaError) {
+        console.error('Erro ao inserir oficina:', oficinaError);
+        throw new Error(`Erro ao cadastrar oficina: ${oficinaError.message}`);
       }
+      
+      console.log('Oficina cadastrada com sucesso:', oficinaData);
 
-      // Inserir formas de pagamento
-      if (form.pagamentosSelecionados && form.pagamentosSelecionados.length > 0) {
-        const pagamentosData = form.pagamentosSelecionados.map(pagamento => ({
-          oficina_id: oficinaId,
-          forma_pagamento: pagamento,
-          pagamento_outros: form.pagamento_outros || null
-        }));
-
-        const { error: pagamentosError } = await supabase
-          .from('oficina_pagamentos')
-          .insert(pagamentosData);
-
-        if (pagamentosError) throw pagamentosError;
-      }
-
-      // Inserir horários
-      if (form.diasSelecionados && form.diasSelecionados.length > 0) {
-        const horariosData = form.diasSelecionados.map(dia => ({
-          oficina_id: oficinaId,
-          dia_semana: dia,
-          horario_abertura: form.horario_abertura,
-          horario_fechamento: form.horario_fechamento
-        }));
-
-        const { error: horariosError } = await supabase
-          .from('oficina_horarios')
-          .insert(horariosData);
-
-        if (horariosError) throw horariosError;
-      }
-
-      // Inserir imagens
-      if (imagensUrls.length > 0) {
-        const imagensData = imagensUrls.map((url, index) => ({
-          oficina_id: oficinaId,
-          url_imagem: url,
-          descricao: `Imagem ${index + 1}`,
-          ordem: index
-        }));
-
-        const { error: imagensError } = await supabase
-          .from('oficina_imagens')
-          .insert(imagensData);
-
-        if (imagensError) throw imagensError;
-      }
-
+      // Oficina cadastrada com sucesso! 
+      // Todos os dados (serviços, pagamentos, horários e imagens) já foram salvos na tabela principal
+      alert('Oficina cadastrada com sucesso! Aguarde a aprovação do administrador.');
+      
       setStep(9); // Go to confirmation step
     } catch (error) {
-      console.error('Erro ao enviar dados da oficina:', error);
-      alert('Erro ao enviar dados da oficina. Tente novamente.');
+      console.error('Erro completo ao enviar dados da oficina:', error);
+      
+      let errorMessage = 'Erro ao enviar dados da oficina. Tente novamente.';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      alert(`❌ ${errorMessage}\n\nDetalhes foram registrados no console. Por favor, tente novamente.`);
     } finally {
       setSubmitting(false);
     }
@@ -383,9 +368,11 @@ export default function MultiStepFullPageForm() {
     });
   };
   const handleServicoValor = (nome: string, valor: string) => {
+    // Formata o valor enquanto o usuário digita
+    const formattedValue = formatCurrency(valor);
     setForm(f => ({
       ...f,
-      servicosSelecionados: f.servicosSelecionados.map(s => s.nome === nome ? { ...s, valor } : s)
+      servicosSelecionados: f.servicosSelecionados.map(s => s.nome === nome ? { ...s, valor: formattedValue } : s)
     }));
   };
   const handlePagamentoCheck = (nome: string) => {
@@ -608,34 +595,60 @@ export default function MultiStepFullPageForm() {
         );
       case 3:
         return (
-          <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
-            <label className="font-medium">Selecione os serviços oferecidos *</label>
+          <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto">
+            <div>
+              <label className="block text-lg font-medium mb-2">Selecione os serviços oferecidos *</label>
+              <p className="text-sm text-gray-600 mb-4">Escolha os serviços e informe o valor médio cobrado</p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {servicosList.map(servico => {
                 const checked = form.servicosSelecionados.some(s => s.nome === servico.nome);
+                const servicoData = form.servicosSelecionados.find(s => s.nome === servico.nome);
+                
                 return (
-                  <div key={servico.nome} className="flex items-center gap-2 bg-white rounded-lg p-3 shadow-sm">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => handleServicoCheck(servico.nome)}
-                      className="w-5 h-5 accent-blue-600"
-                    />
-                    <Image src={servico.icon} alt={servico.nome} width={32} height={32} />
-                    <span className="flex-1">{servico.nome}</span>
-                    {checked && (
+                  <div 
+                    key={servico.nome} 
+                    className={`flex flex-col gap-3 bg-white rounded-xl p-4 shadow-md border-2 transition-all duration-200 ${
+                      checked ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
                       <input
-                        type="text"
-                        placeholder="Valor médio (R$)"
-                        value={form.servicosSelecionados.find(s => s.nome === servico.nome)?.valor || ""}
-                        onChange={e => handleServicoValor(servico.nome, e.target.value)}
-                        className="ml-2 px-2 py-1 border rounded w-32"
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => handleServicoCheck(servico.nome)}
+                        className="w-5 h-5 accent-blue-600"
                       />
+                      <Image src={servico.icon} alt={servico.nome} width={40} height={40} className="rounded" />
+                      <span className="flex-1 font-medium text-gray-800">{servico.nome}</span>
+                    </div>
+                    
+                    {checked && (
+                      <div className="ml-8">
+                        <label className="text-xs text-gray-600 mb-1 block">Valor médio</label>
+                        <input
+                          type="text"
+                          placeholder="Digite o valor"
+                          value={servicoData?.valor || ""}
+                          onChange={e => handleServicoValor(servico.nome, e.target.value)}
+                          className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none font-semibold text-green-700"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Ex: Digite "10000" para R$ 100,00</p>
+                      </div>
                     )}
                   </div>
                 );
               })}
             </div>
+            
+            {form.servicosSelecionados.length > 0 && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm font-medium text-green-800">
+                  ✓ {form.servicosSelecionados.length} {form.servicosSelecionados.length === 1 ? 'serviço selecionado' : 'serviços selecionados'}
+                </p>
+              </div>
+            )}
           </div>
         );
       case 4:
@@ -685,18 +698,25 @@ export default function MultiStepFullPageForm() {
       case 5:
         return (
           <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
-            <label className="font-medium">Formas de pagamento aceitas *</label>
-            <div className="flex flex-wrap gap-4">
+            <label className="font-medium text-lg">Formas de pagamento aceitas *</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {pagamentosList.map(pag => (
-                <label key={pag.nome} className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${form.pagamentosSelecionados.includes(pag.nome) ? "border-blue-600 bg-blue-50" : "border-gray-300 bg-white"}`}>
+                <label 
+                  key={pag.nome} 
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                    form.pagamentosSelecionados.includes(pag.nome) 
+                      ? "border-blue-600 bg-blue-50 shadow-md" 
+                      : "border-gray-300 bg-white hover:border-blue-300 hover:shadow-sm"
+                  }`}
+                >
                   <input
                     type="checkbox"
                     checked={form.pagamentosSelecionados.includes(pag.nome)}
                     onChange={() => handlePagamentoCheck(pag.nome)}
-                    className="accent-blue-600"
+                    className="w-5 h-5 accent-blue-600"
                   />
-                  <Image src={pag.icon} alt={pag.nome} width={24} height={24} />
-                  {pag.nome}
+                  <span className="text-2xl">{pag.icon}</span>
+                  <span className="font-medium">{pag.nome}</span>
                 </label>
               ))}
             </div>
@@ -704,24 +724,65 @@ export default function MultiStepFullPageForm() {
         );
       case 6:
         return (
-          <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
-            <label>Imagens da oficina *</label>
-            <input
-              name="imagens"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleChange}
-              className={`px-4 py-3 rounded-lg border ${
-                touched.imagens && (!form.imagens || form.imagens.length === 0)
-                  ? "border-red-500"
-                  : "border-gray-300"
-              }`}
-              required
-            />
-            <span className="text-gray-500 text-sm">
-              Envie até 5 imagens (fachada, área de serviço, etc.)
-            </span>
+          <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto">
+            <div>
+              <label className="block text-lg font-medium mb-3">Imagens da oficina *</label>
+              <div className="relative">
+                <input
+                  name="imagens"
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg,image/webp"
+                  multiple
+                  onChange={handleChange}
+                  className="hidden"
+                  id="file-upload"
+                  required
+                />
+                <label
+                  htmlFor="file-upload"
+                  className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                    touched.imagens && (!form.imagens || form.imagens.length === 0)
+                      ? "border-red-500 bg-red-50 hover:bg-red-100"
+                      : "border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-blue-400"
+                  }`}
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg className="w-12 h-12 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="mb-2 text-sm text-gray-500">
+                      <span className="font-semibold">Clique para fazer upload</span> ou arraste e solte
+                    </p>
+                    <p className="text-xs text-gray-500">PNG, JPG, JPEG ou WEBP (MAX. 5MB cada)</p>
+                  </div>
+                </label>
+              </div>
+              
+              {form.imagens && form.imagens.length > 0 && (
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm font-medium text-green-800 mb-2">
+                    ✓ {form.imagens.length} {form.imagens.length === 1 ? 'imagem selecionada' : 'imagens selecionadas'}
+                  </p>
+                  <ul className="text-xs text-green-700 space-y-1">
+                    {Array.from(form.imagens).map((file, index) => (
+                      <li key={index} className="truncate">• {file.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  💡 <strong>Dica:</strong> Envie até 5 imagens de qualidade mostrando:
+                </p>
+                <ul className="text-xs text-blue-700 mt-2 ml-6 space-y-1">
+                  <li>• Fachada da oficina</li>
+                  <li>• Área de atendimento</li>
+                  <li>• Equipamentos e ferramentas</li>
+                  <li>• Equipe de trabalho</li>
+                </ul>
+              </div>
+            </div>
           </div>
         );
       case 7:

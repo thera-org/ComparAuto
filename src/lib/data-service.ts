@@ -335,35 +335,24 @@ export class UserDataService {
     }
 
     try {
-      // Try both users and usuarios tables
-      let user = null
-      
+      // Buscar na tabela usuarios
       const { data: userData, error: userError } = await supabase
-        .from('users')
+        .from('usuarios')
         .select('*')
         .eq('id', id)
         .maybeSingle()
 
-      if (!userError && userData) {
-        user = userData
-      } else {
-        const { data: usuariosData, error: usuariosError } = await supabase
-          .from('usuarios')
-          .select('*')
-          .eq('id', id)
-          .maybeSingle()
-
-        if (!usuariosError && usuariosData) {
-          user = usuariosData
-        }
+      if (userError) {
+        console.error('Erro ao buscar usuário:', userError)
+        return null
       }
 
-      if (user) {
+      if (userData) {
         // Cache for 15 minutes
-        dataCache.set(cacheKey, user, 15 * 60 * 1000)
+        dataCache.set(cacheKey, userData, 15 * 60 * 1000)
       }
       
-      return user
+      return userData
     } catch (error) {
       console.error('Error fetching user:', error)
       throw error

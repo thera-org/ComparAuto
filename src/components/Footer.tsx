@@ -155,13 +155,13 @@ export default function Footer() {
                 <li>
                   <a href="tel:+5511999999999" className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center gap-3 group">
                     <Phone className="h-4 w-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                    (11) 99999-9999
+                    (98) 98571-8468
                   </a>
                 </li>
                 <li>
                   <div className="text-gray-300 flex items-center gap-3">
                     <MapPin className="h-4 w-4 text-purple-400" />
-                    São Paulo, Brasil
+                    São Luis, Maranhão
                   </div>
                 </li>
               </ul>

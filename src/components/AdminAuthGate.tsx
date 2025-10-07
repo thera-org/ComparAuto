@@ -30,14 +30,14 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
 
         // Verificar se o usuário é admin
         const { data: userData, error: userError } = await supabase
-          .from("users")
+          .from("usuarios")
           .select("role, nome, email")
           .eq("id", session.user.id)
           .eq("role", "admin")
           .single()
 
         if (userError || !userData) {
-          // Se falhar, tentar na tabela usuarios para compatibilidade
+          // Se falhar, limpar dados e redirecionar
           const { data: fallbackUserData, error: fallbackError } = await supabase
             .from("usuarios")
             .select("tipo, nome, email")

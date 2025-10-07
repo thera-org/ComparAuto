@@ -37,7 +37,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 // Função helper para verificar conexão
 export async function testSupabaseConnection(): Promise<boolean> {
   try {
-    const { error } = await supabase.from('users').select('count', { count: 'exact', head: true });
+    const { error } = await supabase.from('usuarios').select('count', { count: 'exact', head: true });
     return !error;
   } catch {
     return false;
