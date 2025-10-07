@@ -1,7 +1,7 @@
+import { MapPin, Phone, Heart, Star, Clock, Verified } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { memo } from "react"
-import { MapPin, Phone, Heart, Star, Clock, Verified } from "lucide-react"
 
 interface Oficina {
   id: string

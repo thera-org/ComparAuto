@@ -1,15 +1,16 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import OfficeCard from "@/components/OfficeCard"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Search, X, Wrench, Star, Shield, Clock, Award, Filter, SlidersHorizontal } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import Image from "next/image"
+import { useEffect, useState } from "react"
+
+import Footer from "@/components/Footer"
+import Header from "@/components/Header"
+import OfficeCard from "@/components/OfficeCard"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { supabase } from "@/lib/supabase"
 
 interface UserData {
   nome?: string

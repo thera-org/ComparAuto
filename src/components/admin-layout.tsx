@@ -1,16 +1,17 @@
 "use client"
 
-import type React from "react"
 
-import { useState, useEffect } from "react"
+import { LayoutDashboard, Users, Wrench, Menu, LogOut, Search } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { useState, useEffect } from "react"
+import type React from "react"
+
 import UserAvatar from "@/app/admin/user-avatar"
-import { LayoutDashboard, Users, Wrench, Menu, LogOut, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { supabase } from "@/lib/supabase"
 
 interface AdminLayoutProps {
   children: React.ReactNode

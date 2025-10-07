@@ -1,11 +1,5 @@
 "use client"
 
-import { useEffect, useState, ChangeEvent, FormEvent, useCallback } from "react"
-import { supabase } from "@/lib/supabase"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import type { UserProfile } from "@/types/user"
-import { useAppNotifications } from "@/hooks/useAppNotifications"
 import { 
   User, 
   Building2, 
@@ -25,8 +19,15 @@ import {
   XCircle,
   Store
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useEffect, useState, ChangeEvent, FormEvent, useCallback } from "react"
+
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { useAppNotifications } from "@/hooks/useAppNotifications"
+import { supabase } from "@/lib/supabase"
+import type { UserProfile } from "@/types/user"
 
 
 interface Oficina {
@@ -120,7 +121,7 @@ export default function ContaPage() {
   }, [])
 
   const fetchMinhasOficinas = useCallback(async () => {
-    if (!user) return
+    if (!user?.id) return
     
     setLoadingOficinas(true)
     try {
@@ -143,7 +144,7 @@ export default function ContaPage() {
     } finally {
       setLoadingOficinas(false)
     }
-  }, [user?.id])
+  }, [user])
 
   useEffect(() => {
     fetchUser()

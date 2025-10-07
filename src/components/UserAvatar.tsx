@@ -1,8 +1,9 @@
 "use client";
 
-import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+
+import { supabase } from "@/lib/supabase";
 
 interface User {
   email: string;

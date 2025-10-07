@@ -4,6 +4,8 @@
  */
 
 import '@testing-library/jest-dom'
+import { DataCache } from '@/lib/data-service'
+import { AppError } from '@/lib/errors'
 import {
   validateCPF,
   validateEmail,
@@ -11,8 +13,6 @@ import {
   validatePassword,
   sanitizeString,
 } from '@/lib/validations'
-import { DataCache } from '@/lib/data-service'
-import { AppError } from '@/lib/errors'
 
 describe('ComparAuto Integration Tests', () => {
   describe('Validation System', () => {

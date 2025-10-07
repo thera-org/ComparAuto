@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff, Loader2, Facebook, Apple, ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import styles from './signup.module.css';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { useNotifications } from '@/contexts/NotificationContext';
+import { supabase } from "@/lib/supabase";
+
+
+import styles from './signup.module.css';
+
 
 type AccountType = 'pessoal' | 'empresa' | null;
 type UserType = 'cliente' | 'oficina' | null;

@@ -1,8 +1,9 @@
 "use client"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import { useState, Fragment } from "react"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
+import { useState, Fragment } from "react"
+
+import Footer from "@/components/Footer"
+import Header from "@/components/Header"
 import { useAppNotifications } from "@/hooks/useAppNotifications"
 
 const TOPICOS = [

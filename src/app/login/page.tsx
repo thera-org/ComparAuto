@@ -1,13 +1,15 @@
 "use client";
-import type React from "react";
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff, AlertCircle, Loader2, LogIn, Facebook, Apple } from "lucide-react";
 import Image from "next/image";
-import styles from './login.module.css';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState, useEffect, useRef } from "react";
+
 import { useAppNotifications } from '@/hooks/useAppNotifications';
+import { supabase } from "@/lib/supabase";
+
+import styles from './login.module.css';
 
 // Regex simples para e-mail
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

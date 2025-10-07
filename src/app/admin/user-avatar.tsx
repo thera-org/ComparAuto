@@ -1,9 +1,9 @@
 "use client"
 
-import { supabase } from "@/lib/supabase"
+import { LogOut, LucideUser } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
-import { Skeleton } from "@/components/ui/skeleton"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, LucideUser } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+import { supabase } from "@/lib/supabase"
+
 
 interface UserProps {
   email: string

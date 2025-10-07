@@ -1,9 +1,10 @@
 "use client";
 
-import React from 'react';
-import { useNotifications, type Notification, type NotificationType } from '@/contexts/NotificationContext';
 import { X, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
+import React from 'react';
+
 import { Button } from '@/components/ui/button';
+import { useNotifications, type Notification, type NotificationType } from '@/contexts/NotificationContext';
 
 const NotificationItem: React.FC<{ notification: Notification }> = ({ notification }) => {
   const { removeNotification } = useNotifications();

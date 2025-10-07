@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, ChangeEvent, useEffect, useRef } from "react";
-import { supabase } from "@/lib/supabase";
-import { uploadMultipleImages } from "@/lib/storage";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import React, { useState, ChangeEvent, useEffect, useRef } from "react";
+
+import { uploadMultipleImages } from "@/lib/storage";
+import { supabase } from "@/lib/supabase";
 
 interface FormType {
   // Passo 0: Oficina

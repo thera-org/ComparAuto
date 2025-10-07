@@ -1,8 +1,9 @@
 "use client"
 
 import { AlertTriangle, Info, X } from "lucide-react"
-import { useEnvironmentCheck } from "@/hooks/useEnvironmentCheck"
 import { useState } from "react"
+
+import { useEnvironmentCheck } from "@/hooks/useEnvironmentCheck"
 
 export function EnvironmentWarnings() {
   const { hasRequiredEnvVars, missingVars, isMapsConfigured, isStripeConfigured } = useEnvironmentCheck()

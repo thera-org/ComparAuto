@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+
 import AdminLayout from "@/components/admin-layout";
 import AdminAuthGate from "@/components/AdminAuthGate";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNotifications } from '@/contexts/NotificationContext';
+import { supabase } from "@/lib/supabase";
 
 export default function CadastroUsuario() {
   const { success, error: showError } = useNotifications();

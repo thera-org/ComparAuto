@@ -1,18 +1,5 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import { uploadMultipleImages } from "@/lib/storage";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AdminLayout from "@/components/admin-layout";
-import AdminAuthGate from "@/components/AdminAuthGate";
-import dynamic from "next/dynamic";
-import Image from "next/image";
-import { useNotifications } from '@/contexts/NotificationContext';
 import { 
   MapPin, 
   Phone, 
@@ -26,6 +13,21 @@ import {
   X,
   ArrowLeft
 } from "lucide-react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { useRouter, useParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
+
+import AdminLayout from "@/components/admin-layout";
+import AdminAuthGate from "@/components/AdminAuthGate";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useNotifications } from '@/contexts/NotificationContext';
+import { uploadMultipleImages } from "@/lib/storage";
+import { supabase } from "@/lib/supabase";
+
 
 const Map = dynamic(() => import("@/components/WorkshopMap"), { ssr: false });
 

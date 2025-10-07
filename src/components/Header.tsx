@@ -1,13 +1,17 @@
 "use client";
 
+import type { User } from '@supabase/supabase-js';
+import { Search, Menu } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
 import { Button } from '@/components/ui/button';
-import { Search, Menu } from "lucide-react";
-import { UserDropdown } from "./UserDropdown";
 import { supabase } from "@/lib/supabase";
-import type { User } from '@supabase/supabase-js';
-import Image from "next/image";
+
+import { UserDropdown } from "./UserDropdown";
+
+
 
 
 export default function Header() {

@@ -1,11 +1,12 @@
 "use client";
 
-import { supabase } from "@/lib/supabase";
 import { ChevronDown, MessageSquare, Heart, User, HelpCircle, LogOut } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+import { supabase } from "@/lib/supabase";
 
 interface User {
   id: string;

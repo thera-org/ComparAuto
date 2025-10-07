@@ -1,26 +1,5 @@
 "use client"
 
-import type React from "react"
-
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-import AdminLayout from "@/components/admin-layout"
-import AdminAuthGate from "@/components/AdminAuthGate"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts"
 import { 
   Users, 
   Wrench, 
@@ -37,8 +16,30 @@ import {
   Clock,
   Star
 } from "lucide-react"
-import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
+import type React from "react"
+import { useEffect, useState } from "react"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts"
+
+import AdminLayout from "@/components/admin-layout"
+import AdminAuthGate from "@/components/AdminAuthGate"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { supabase } from "@/lib/supabase"
+
 
 interface StatsData {
   users: number

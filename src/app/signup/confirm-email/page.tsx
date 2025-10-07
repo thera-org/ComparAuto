@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { Mail, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+
+import { supabase } from "@/lib/supabase";
+
+
 import styles from './confirm-email.module.css';
 
 function ConfirmEmailContent() {

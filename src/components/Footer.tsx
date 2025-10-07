@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { Globe, Mail, Phone, MapPin, Heart, Star, Award, Shield } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
   return (

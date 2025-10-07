@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
 import { GoogleMap, OverlayView, useLoadScript } from "@react-google-maps/api"
-import { supabase } from "@/lib/supabase"
-import { Button } from "@/components/ui/button"
 import { Navigation, MapPin, Star, Phone } from "lucide-react"
 import Link from "next/link"
+import { useState, useEffect, useCallback, useRef } from "react"
+
+import { Button } from "@/components/ui/button"
+import { supabase } from "@/lib/supabase"
 
 interface Workshop {
   id: string

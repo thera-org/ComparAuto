@@ -1,14 +1,5 @@
 "use client"
 
-import { useParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { 
   MapPin, 
   Phone, 
@@ -26,7 +17,17 @@ import {
   MessageCircle
 } from "lucide-react"
 import dynamic from "next/dynamic"
+import Image from "next/image"
+import { useParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+
+import Footer from "@/components/Footer"
+import Header from "@/components/Header"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAppNotifications } from "@/hooks/useAppNotifications"
+import { supabase } from "@/lib/supabase"
 
 // Dinamically import map component
 const MapComponent = dynamic(() => import("@/components/OfficeDetailMap").then(mod => ({ default: mod.default })), { 
