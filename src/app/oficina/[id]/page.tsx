@@ -93,7 +93,7 @@ export default function OfficeDetailPage() {
   const handleRouteClick = () => {
     if (oficina) {
       let destination = ''
-      
+
       // Prioridade 1: Montar endereço completo dos campos separados
       if (oficina.rua && oficina.numero && oficina.cidade && oficina.estado) {
         const enderecoCompleto = [
@@ -103,11 +103,11 @@ export default function OfficeDetailPage() {
           oficina.bairro,
           oficina.cidade,
           oficina.estado,
-          oficina.cep
+          oficina.cep,
         ]
           .filter(Boolean) // Remove valores vazios/null/undefined
           .join(', ')
-        
+
         destination = encodeURIComponent(enderecoCompleto)
       }
       // Prioridade 2: Usar o campo endereco completo
@@ -116,9 +116,9 @@ export default function OfficeDetailPage() {
       }
       // Prioridade 3: Usar coordenadas se estiverem disponíveis
       else if (
-        oficina.latitude && 
-        oficina.longitude && 
-        oficina.latitude !== 0 && 
+        oficina.latitude &&
+        oficina.longitude &&
+        oficina.latitude !== 0 &&
         oficina.longitude !== 0 &&
         !isNaN(oficina.latitude) &&
         !isNaN(oficina.longitude)
@@ -361,7 +361,8 @@ export default function OfficeDetailPage() {
                         <p className="mt-1 text-sm text-gray-600">{oficina.endereco}</p>
                         {oficina.latitude && oficina.longitude && (
                           <p className="mt-1 text-xs text-gray-500">
-                            Coordenadas: {oficina.latitude.toFixed(6)}, {oficina.longitude.toFixed(6)}
+                            Coordenadas: {oficina.latitude.toFixed(6)},{' '}
+                            {oficina.longitude.toFixed(6)}
                           </p>
                         )}
                       </div>

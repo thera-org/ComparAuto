@@ -78,7 +78,11 @@ export async function POST(request: Request) {
     }
 
     // Criar oficina
-    const { data, error } = await supabaseAdmin.from('oficinas').insert(oficinaData).select().single()
+    const { data, error } = await supabaseAdmin
+      .from('oficinas')
+      .insert(oficinaData)
+      .select()
+      .single()
 
     if (error) {
       console.error('Erro ao criar oficina:', error)
@@ -117,7 +121,10 @@ export async function PATCH(request: Request) {
 
     if (error) {
       console.error('Erro ao atualizar oficina:', error)
-      return NextResponse.json({ error: 'Erro ao atualizar oficina', details: error }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Erro ao atualizar oficina', details: error },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({ oficina: data })

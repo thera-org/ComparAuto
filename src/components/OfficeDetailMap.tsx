@@ -83,7 +83,7 @@ export default function OfficeDetailMap({
   }
 
   return (
-    <div className="h-[300px] w-full rounded-lg overflow-hidden">
+    <div className="h-[300px] w-full overflow-hidden rounded-lg">
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={center}
