@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Pencil, Plus, MapPin, Phone, Mail } from 'lucide-react'
+import { Pencil, Plus, MapPin, Phone, Mail, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -169,35 +169,69 @@ export default function OficinasPage() {
 
   const onSubmit = async (data: z.infer<typeof oficinaSchema>) => {
     try {
+      // Obter usuário atual para verificação de admin
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        console.error('Usuário não autenticado')
+        return
+      }
+
       if (isEditing && currentOficina) {
-        // Atualizar oficina existente
-        const { error } = await supabase.from('oficinas').update(data).eq('id', currentOficina.id)
+        // Atualizar oficina existente via API admin
+        const response = await fetch('/api/admin/oficinas', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: currentOficina.id,
+            userId: user.id,
+            ...data,
+          }),
+        })
 
-        if (error) throw error
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Erro ao atualizar oficina')
+        }
+
+        const { oficina } = await response.json()
 
         // Atualizar estado local
-        setOficinas(oficinas.map(o => (o.id === currentOficina.id ? { ...o, ...data } : o)))
-        setFilteredOficinas(
-          filteredOficinas.map(o => (o.id === currentOficina.id ? { ...o, ...data } : o))
-        )
+        setOficinas(oficinas.map(o => (o.id === currentOficina.id ? oficina : o)))
+        setFilteredOficinas(filteredOficinas.map(o => (o.id === currentOficina.id ? oficina : o)))
       } else {
-        // Criar nova oficina
-        const { data: newOficina, error } = await supabase
-          .from('oficinas')
-          .insert(data)
-          .select()
-          .single()
+        // Criar nova oficina via API admin
+        const response = await fetch('/api/admin/oficinas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            ...data,
+          }),
+        })
 
-        if (error) throw error
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Erro ao criar oficina')
+        }
+
+        const { oficina } = await response.json()
 
         // Atualizar estado local
-        setOficinas([newOficina, ...oficinas])
-        setFilteredOficinas([newOficina, ...filteredOficinas])
+        setOficinas([oficina, ...oficinas])
+        setFilteredOficinas([oficina, ...filteredOficinas])
       }
 
       setDialogOpen(false)
     } catch (error) {
       console.error('Erro ao salvar oficina:', error)
+      alert(error instanceof Error ? error.message : 'Erro ao salvar oficina')
     }
   }
 
@@ -318,6 +352,50 @@ export default function OficinasPage() {
                               >
                                 Edição Completa
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-600 focus:text-red-600"
+                                onClick={async () => {
+                                  if (
+                                    !confirm(
+                                      `Tem certeza que deseja excluir a oficina "${oficina.nome}"? Esta ação não pode ser desfeita.`
+                                    )
+                                  ) {
+                                    return
+                                  }
+
+                                  try {
+                                    const {
+                                      data: { user },
+                                    } = await supabase.auth.getUser()
+                                    if (!user) return
+
+                                    const response = await fetch(
+                                      `/api/admin/oficinas?id=${oficina.id}&userId=${user.id}`,
+                                      {
+                                        method: 'DELETE',
+                                      }
+                                    )
+
+                                    if (!response.ok) {
+                                      throw new Error('Erro ao excluir oficina')
+                                    }
+
+                                    // Remover do estado local
+                                    setOficinas(oficinas.filter(o => o.id !== oficina.id))
+                                    setFilteredOficinas(
+                                      filteredOficinas.filter(o => o.id !== oficina.id)
+                                    )
+
+                                    alert('Oficina excluída com sucesso!')
+                                  } catch (error) {
+                                    console.error('Erro ao excluir:', error)
+                                    alert('Erro ao excluir oficina')
+                                  }
+                                }}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Excluir Oficina
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
 
@@ -326,20 +404,38 @@ export default function OficinasPage() {
                               <Button
                                 size="sm"
                                 onClick={async () => {
-                                  await supabase
-                                    .from('oficinas')
-                                    .update({ status: 'ativo' })
-                                    .eq('id', oficina.id)
-                                  setOficinas(
-                                    oficinas.map(o =>
-                                      o.id === oficina.id ? { ...o, status: 'ativo' } : o
+                                  try {
+                                    const {
+                                      data: { user },
+                                    } = await supabase.auth.getUser()
+                                    if (!user) return
+
+                                    const response = await fetch('/api/admin/oficinas', {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        id: oficina.id,
+                                        userId: user.id,
+                                        status: 'ativo',
+                                      }),
+                                    })
+
+                                    if (!response.ok) throw new Error('Erro ao aprovar oficina')
+
+                                    const { oficina: updatedOficina } = await response.json()
+
+                                    setOficinas(
+                                      oficinas.map(o => (o.id === oficina.id ? updatedOficina : o))
                                     )
-                                  )
-                                  setFilteredOficinas(
-                                    filteredOficinas.map(o =>
-                                      o.id === oficina.id ? { ...o, status: 'ativo' } : o
+                                    setFilteredOficinas(
+                                      filteredOficinas.map(o =>
+                                        o.id === oficina.id ? updatedOficina : o
+                                      )
                                     )
-                                  )
+                                  } catch (error) {
+                                    console.error('Erro ao aprovar:', error)
+                                    alert('Erro ao aprovar oficina')
+                                  }
                                 }}
                               >
                                 Aprovar
@@ -348,20 +444,38 @@ export default function OficinasPage() {
                                 size="sm"
                                 variant="destructive"
                                 onClick={async () => {
-                                  await supabase
-                                    .from('oficinas')
-                                    .update({ status: 'inativo' })
-                                    .eq('id', oficina.id)
-                                  setOficinas(
-                                    oficinas.map(o =>
-                                      o.id === oficina.id ? { ...o, status: 'inativo' } : o
+                                  try {
+                                    const {
+                                      data: { user },
+                                    } = await supabase.auth.getUser()
+                                    if (!user) return
+
+                                    const response = await fetch('/api/admin/oficinas', {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        id: oficina.id,
+                                        userId: user.id,
+                                        status: 'inativo',
+                                      }),
+                                    })
+
+                                    if (!response.ok) throw new Error('Erro ao recusar oficina')
+
+                                    const { oficina: updatedOficina } = await response.json()
+
+                                    setOficinas(
+                                      oficinas.map(o => (o.id === oficina.id ? updatedOficina : o))
                                     )
-                                  )
-                                  setFilteredOficinas(
-                                    filteredOficinas.map(o =>
-                                      o.id === oficina.id ? { ...o, status: 'inativo' } : o
+                                    setFilteredOficinas(
+                                      filteredOficinas.map(o =>
+                                        o.id === oficina.id ? updatedOficina : o
+                                      )
                                     )
-                                  )
+                                  } catch (error) {
+                                    console.error('Erro ao recusar:', error)
+                                    alert('Erro ao recusar oficina')
+                                  }
                                 }}
                               >
                                 Recusar

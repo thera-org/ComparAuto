@@ -589,11 +589,31 @@ export default function EditarOficinaPage() {
         cep: formData.cep.trim() || null,
       }
 
-      const { error } = await supabase.from('oficinas').update(oficinaData).eq('id', oficinaId)
+      // Obter usuário atual para verificação de admin
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-      if (error) {
-        console.error('Erro detalhado:', error)
-        throw error
+      if (!user) {
+        throw new Error('Usuário não autenticado')
+      }
+
+      // Atualizar oficina via API admin
+      const response = await fetch('/api/admin/oficinas', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: oficinaId,
+          userId: user.id,
+          ...oficinaData,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erro ao atualizar oficina')
       }
 
       setSaving(false)

@@ -16,7 +16,6 @@ import {
   Users,
   MessageCircle,
 } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -28,17 +27,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAppNotifications } from '@/hooks/useAppNotifications'
 import { supabase } from '@/lib/supabase'
-
-// Dinamically import map component
-const MapComponent = dynamic(
-  () => import('@/components/OfficeDetailMap').then(mod => ({ default: mod.default })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-64 animate-pulse rounded-lg bg-gray-100">Carregando mapa...</div>
-    ),
-  }
-)
 
 interface Oficina {
   id: string
@@ -56,6 +44,14 @@ interface Oficina {
   preco_medio?: number
   avaliacao?: number
   total_avaliacoes?: number
+  // Campos de endereço detalhado
+  rua?: string
+  numero?: string
+  complemento?: string
+  bairro?: string
+  cidade?: string
+  estado?: string
+  cep?: string
 }
 
 export default function OfficeDetailPage() {
@@ -96,7 +92,45 @@ export default function OfficeDetailPage() {
 
   const handleRouteClick = () => {
     if (oficina) {
-      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${oficina.latitude},${oficina.longitude}`
+      let destination = ''
+      
+      // Prioridade 1: Montar endereço completo dos campos separados
+      if (oficina.rua && oficina.numero && oficina.cidade && oficina.estado) {
+        const enderecoCompleto = [
+          oficina.rua,
+          oficina.numero,
+          oficina.complemento,
+          oficina.bairro,
+          oficina.cidade,
+          oficina.estado,
+          oficina.cep
+        ]
+          .filter(Boolean) // Remove valores vazios/null/undefined
+          .join(', ')
+        
+        destination = encodeURIComponent(enderecoCompleto)
+      }
+      // Prioridade 2: Usar o campo endereco completo
+      else if (oficina.endereco) {
+        destination = encodeURIComponent(oficina.endereco)
+      }
+      // Prioridade 3: Usar coordenadas se estiverem disponíveis
+      else if (
+        oficina.latitude && 
+        oficina.longitude && 
+        oficina.latitude !== 0 && 
+        oficina.longitude !== 0 &&
+        !isNaN(oficina.latitude) &&
+        !isNaN(oficina.longitude)
+      ) {
+        destination = `${oficina.latitude},${oficina.longitude}`
+      }
+      // Fallback final: buscar pelo nome
+      else {
+        destination = encodeURIComponent(oficina.nome)
+      }
+
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination}`
       window.open(googleMapsUrl, '_blank')
     }
   }
@@ -309,7 +343,7 @@ export default function OfficeDetailPage() {
                 </CardContent>
               </Card>
 
-              {/* Location Map */}
+              {/* Location Info */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -318,18 +352,30 @@ export default function OfficeDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-hidden rounded-lg">
-                    <MapComponent
-                      latitude={oficina.latitude}
-                      longitude={oficina.longitude}
-                      nome={oficina.nome}
-                      endereco={oficina.endereco}
-                    />
+                  <div className="space-y-4">
+                    {/* Endereço */}
+                    <div className="flex items-start rounded-lg bg-blue-50 p-4">
+                      <MapPin className="mr-3 h-5 w-5 flex-shrink-0 text-blue-600" />
+                      <div>
+                        <p className="font-medium text-gray-900">{oficina.nome}</p>
+                        <p className="mt-1 text-sm text-gray-600">{oficina.endereco}</p>
+                        {oficina.latitude && oficina.longitude && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            Coordenadas: {oficina.latitude.toFixed(6)}, {oficina.longitude.toFixed(6)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Botão para abrir no Google Maps */}
+                    <Button
+                      onClick={handleRouteClick}
+                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      <Navigation className="mr-2 h-4 w-4" />
+                      Ver no Google Maps
+                    </Button>
                   </div>
-                  <p className="mt-3 flex items-center text-sm text-gray-600">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    {oficina.endereco}
-                  </p>
                 </CardContent>
               </Card>
             </div>
