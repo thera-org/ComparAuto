@@ -23,6 +23,9 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     autoRefreshToken: true,
     persistSession: true,
+    // Configuração para OAuth funcionar corretamente
+    detectSessionInUrl: true,
+    flowType: 'pkce',
   },
   // Configurações de rede
   global: {

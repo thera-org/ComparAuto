@@ -54,6 +54,14 @@ import {
 } from '@/components/ui/table'
 import { supabase } from '@/lib/supabase'
 
+// Função para remover acentos e normalizar strings
+const removeAccents = (str: string): string => {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
 interface Oficina {
   id: string
   nome: string
@@ -63,6 +71,7 @@ interface Oficina {
   descricao: string
   status: string
   user_id: string
+  servicos_oferecidos?: string[]
 }
 
 const oficinaSchema = z.object({
@@ -137,12 +146,24 @@ export default function OficinasPage() {
   }, [])
 
   const handleSearch = (term: string) => {
-    const lowercaseTerm = term.toLowerCase()
-    const filtered = oficinas.filter(
-      oficina =>
-        oficina.nome.toLowerCase().includes(lowercaseTerm) ||
-        oficina.endereco.toLowerCase().includes(lowercaseTerm)
-    )
+    const normalizedTerm = removeAccents(term)
+    const filtered = oficinas.filter(oficina => {
+      // Busca no nome (sem acentos)
+      const matchNome = removeAccents(oficina.nome).includes(normalizedTerm)
+
+      // Busca no endereço (sem acentos)
+      const matchEndereco = removeAccents(oficina.endereco).includes(normalizedTerm)
+
+      // Busca no email (sem acentos)
+      const matchEmail = oficina.email && removeAccents(oficina.email).includes(normalizedTerm)
+
+      // Busca nos serviços oferecidos (sem acentos)
+      const matchServicos = oficina.servicos_oferecidos?.some((servico: string) =>
+        removeAccents(servico).includes(normalizedTerm)
+      )
+
+      return matchNome || matchEndereco || matchEmail || matchServicos
+    })
     setFilteredOficinas(filtered)
   }
 

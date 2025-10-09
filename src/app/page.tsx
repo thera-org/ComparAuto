@@ -41,6 +41,14 @@ interface Oficina {
   estado?: string
 }
 
+// Função para remover acentos e normalizar strings
+const removeAccents = (str: string): string => {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
 export default function Home() {
   const [, setUserData] = useState<UserData | null>(null)
   const [oficinas, setOficinas] = useState<Oficina[]>([])
@@ -147,12 +155,27 @@ export default function Home() {
   useEffect(() => {
     let filtered = oficinas
     if (debouncedSearchTerm) {
-      const term = debouncedSearchTerm.toLowerCase()
-      filtered = filtered.filter(
-        oficina =>
-          oficina.nome?.toLowerCase().includes(term) ||
-          oficina.endereco?.toLowerCase().includes(term)
-      )
+      const term = removeAccents(debouncedSearchTerm)
+      filtered = filtered.filter(oficina => {
+        // Busca no nome da oficina (sem acentos)
+        const matchNome = oficina.nome && removeAccents(oficina.nome).includes(term)
+
+        // Busca no endereço (sem acentos)
+        const matchEndereco = oficina.endereco && removeAccents(oficina.endereco).includes(term)
+
+        // Busca na cidade (sem acentos)
+        const matchCidade = oficina.cidade && removeAccents(oficina.cidade).includes(term)
+
+        // Busca no estado (sem acentos)
+        const matchEstado = oficina.estado && removeAccents(oficina.estado).includes(term)
+
+        // Busca nos serviços oferecidos (sem acentos)
+        const matchServicos = oficina.servicos_oferecidos?.some(servico =>
+          removeAccents(servico).includes(term)
+        )
+
+        return matchNome || matchEndereco || matchCidade || matchEstado || matchServicos
+      })
     }
     if (selectedCategory) {
       // Mapear o ID da categoria para o nome do serviço
@@ -179,7 +202,12 @@ export default function Home() {
 
       const servicoNome = categoryMap[selectedCategory]
       if (servicoNome) {
-        filtered = filtered.filter(oficina => oficina.servicos_oferecidos?.includes(servicoNome))
+        const servicoNormalizado = removeAccents(servicoNome)
+        filtered = filtered.filter(oficina =>
+          oficina.servicos_oferecidos?.some(servico =>
+            removeAccents(servico).includes(servicoNormalizado)
+          )
+        )
       }
     }
     setFilteredOficinas(filtered)

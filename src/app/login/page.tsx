@@ -147,7 +147,24 @@ export default function LoginPage() {
   const handleOAuthLogin = async (provider: 'google' | 'facebook' | 'apple') => {
     try {
       setLoading(true)
-      const { error } = await supabase.auth.signInWithOAuth({ provider })
+
+      // Pega o redirect parameter se existir
+      const params = new URLSearchParams(window.location.search)
+      const redirect = params.get('redirect')
+
+      // Define a URL de redirecionamento correta
+      const redirectTo =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`
+          : undefined
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo,
+        },
+      })
+
       if (error)
         setError('Erro ao entrar com ' + provider.charAt(0).toUpperCase() + provider.slice(1))
     } catch {
