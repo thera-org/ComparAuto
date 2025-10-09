@@ -36,8 +36,8 @@ export function UserDropdown() {
         setUser({
           id: user.id,
           email: user.email || '',
-          photoURL: user.user_metadata?.avatar_url || '',
-          displayName: user.user_metadata?.full_name || '',
+          photoURL: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+          displayName: user.user_metadata?.full_name || user.user_metadata?.name || '',
         })
       } else {
         setUser(null)

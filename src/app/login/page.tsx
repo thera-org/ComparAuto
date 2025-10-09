@@ -148,23 +148,15 @@ export default function LoginPage() {
     try {
       setLoading(true)
 
-      // Pega o redirect parameter se existir
-      const params = new URLSearchParams(window.location.search)
-      const redirect = params.get('redirect')
-
-      // Define a URL de redirecionamento correta
-      const redirectTo =
-        typeof window !== 'undefined'
-          ? `${window.location.origin}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`
-          : undefined
+      // Usar NEXT_PUBLIC_SITE_URL se disponível, caso contrário usar window.location.origin
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo,
+          redirectTo: baseUrl,
         },
       })
-
       if (error)
         setError('Erro ao entrar com ' + provider.charAt(0).toUpperCase() + provider.slice(1))
     } catch {

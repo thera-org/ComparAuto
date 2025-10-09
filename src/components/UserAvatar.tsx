@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 interface User {
+  id: string
   email: string
   photoURL?: string
   displayName?: string
@@ -28,9 +29,9 @@ export default function UserAvatar() {
 
       if (user) {
         setUser({
+          id: user.id,
           email: user.email || '',
-          photoURL: user.user_metadata?.avatar_url || '',
-          displayName: user.user_metadata?.full_name || '',
+          photoURL: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
         })
       } else {
         setUser(null)
