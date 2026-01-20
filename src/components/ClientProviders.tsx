@@ -2,6 +2,7 @@
 
 import { EnvironmentWarnings } from '@/components/EnvironmentWarnings'
 import { NotificationContainer } from '@/components/NotificationContainer'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { NotificationProvider } from '@/contexts/NotificationContext'
 
 interface ClientProvidersProps {
@@ -11,10 +12,12 @@ interface ClientProvidersProps {
 export function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <NotificationProvider>
-      {children}
-      <NotificationContainer />
-      {/* Comentado temporariamente para evitar avisos desnecessários */}
-      {/* {process.env.NODE_ENV === 'development' && <EnvironmentWarnings />} */}
+      <AuthProvider>
+        {children}
+        <NotificationContainer />
+        {/* Comentado temporariamente para evitar avisos desnecessários */}
+        {/* {process.env.NODE_ENV === 'development' && <EnvironmentWarnings />} */}
+      </AuthProvider>
     </NotificationProvider>
   )
 }

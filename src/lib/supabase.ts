@@ -1,6 +1,8 @@
 // src/lib/supabase.ts
 import { createClient } from '@supabase/supabase-js'
 
+import { clearAuthTokens } from './auth-token'
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key'
 
@@ -49,9 +51,8 @@ export async function testSupabaseConnection(): Promise<boolean> {
 export async function signOut() {
   try {
     await supabase.auth.signOut()
-    // Limpar dados locais
-    localStorage.removeItem('admin')
-    localStorage.removeItem('adminData')
+    // Limpar todos os tokens usando a função centralizada
+    clearAuthTokens()
     return { success: true }
   } catch (error) {
     console.error('Erro ao fazer logout:', error)
