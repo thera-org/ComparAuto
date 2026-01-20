@@ -33,16 +33,7 @@ export default function UserAvatar() {
         setLoading(false)
         return
       }
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser()
-
-      if (error) {
-        console.error('Error fetching user:', error)
-        setLoading(false)
-        return
-      }
+      const user = sessionData.session.user
 
       if (user) {
         setUser({

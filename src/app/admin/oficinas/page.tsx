@@ -192,8 +192,9 @@ export default function OficinasPage() {
     try {
       // Obter usuário atual para verificação de admin
       const {
-        data: { user },
-      } = await supabase.auth.getUser()
+        data: { session },
+      } = await supabase.auth.getSession()
+      const user = session?.user
 
       if (!user) {
         console.error('Usuário não autenticado')
@@ -386,8 +387,9 @@ export default function OficinasPage() {
 
                                   try {
                                     const {
-                                      data: { user },
-                                    } = await supabase.auth.getUser()
+                                      data: { session },
+                                    } = await supabase.auth.getSession()
+                                    const user = session?.user
                                     if (!user) return
 
                                     const response = await fetch(
@@ -427,8 +429,9 @@ export default function OficinasPage() {
                                 onClick={async () => {
                                   try {
                                     const {
-                                      data: { user },
-                                    } = await supabase.auth.getUser()
+                                      data: { session },
+                                    } = await supabase.auth.getSession()
+                                    const user = session?.user
                                     if (!user) return
 
                                     const response = await fetch('/api/admin/oficinas', {
@@ -467,8 +470,9 @@ export default function OficinasPage() {
                                 onClick={async () => {
                                   try {
                                     const {
-                                      data: { user },
-                                    } = await supabase.auth.getUser()
+                                      data: { session },
+                                    } = await supabase.auth.getSession()
+                                    const user = session?.user
                                     if (!user) return
 
                                     const response = await fetch('/api/admin/oficinas', {
