@@ -60,9 +60,10 @@ export default function ContaPage() {
   const fetchUser = useCallback(async () => {
     try {
       const {
-        data: { user },
+        data: { session },
         error,
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getSession()
+      const user = session?.user
       if (error || !user) {
         console.error('Erro ao obter usuário autenticado:', error)
         setUser(null)

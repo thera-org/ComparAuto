@@ -61,16 +61,18 @@ export default function Home() {
   useEffect(() => {
     const fetchUserData = async () => {
       const {
-        data: { user },
+        data: { session },
         error: authError,
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getSession()
 
       if (authError) {
-        console.error('Error fetching user:', authError)
+        console.error('Error fetching session:', authError)
         setUserData(null)
         setLoading(false)
         return
       }
+
+      const user = session?.user
 
       if (user) {
         try {
