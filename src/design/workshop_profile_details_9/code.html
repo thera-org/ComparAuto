@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mecânica São Luís Central - ComparAuto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FF385C", // Airbnb-like primary color (pink/red)
+              "background-light": "#FFFFFF",
+              "background-dark": "#0F172A",
+              "surface-light": "#F7F7F7",
+              "surface-dark": "#1E293B",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '0.75rem',
+              '2xl': '1rem',
+            },
+            keyframes: {
+                fadeIn: {
+                    '0%': { opacity: '0', transform: 'scale(0.95)' },
+                    '100%': { opacity: '1', transform: 'scale(1)' },
+                }
+            },
+            animation: {
+                fadeIn: 'fadeIn 0.2s ease-out',
+            }
+          },
+        },
+      };
+    </script>
+<style>::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+      }
+      .dark ::-webkit-scrollbar-thumb {
+        background-color: #475569;
+      }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-200">
+<header class="fixed w-full top-0 z-50 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+<div class="max-w-7xl mx-auto flex justify-between items-center">
+<a class="flex items-center gap-2" href="#">
+<span class="text-primary material-icons-outlined text-3xl">build_circle</span>
+<span class="text-primary text-xl font-bold tracking-tight">ComparAuto</span>
+</a>
+<div class="hidden md:flex items-center bg-white dark:bg-surface-dark border border-gray-300 dark:border-gray-600 rounded-full shadow-sm hover:shadow-md transition-shadow py-2.5 px-4 gap-4 divide-x divide-gray-300 dark:divide-gray-600">
+<button class="text-sm font-medium px-2 text-gray-900 dark:text-white truncate">Qualquer serviço</button>
+<button class="text-sm font-medium px-2 text-gray-900 dark:text-white truncate">Localização</button>
+<button class="text-sm text-gray-500 dark:text-gray-400 px-2 flex items-center gap-2">
+                    Filtros
+                    <div class="bg-primary p-2 rounded-full text-white flex items-center justify-center">
+<span class="material-icons text-sm">search</span>
+</div>
+</button>
+</div>
+<div class="flex items-center gap-4">
+<a class="hidden md:block text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 rounded-full transition" href="#">Cadastrar sua Oficina</a>
+<button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300">language</span>
+</button>
+<button class="flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-full p-1 pl-3 hover:shadow-md transition">
+<span class="material-icons text-gray-600 dark:text-gray-300">menu</span>
+<div class="bg-gray-500 text-white rounded-full p-1">
+<span class="material-icons text-xl">account_circle</span>
+</div>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-16 px-6 max-w-7xl mx-auto blur-sm select-none pointer-events-none">
+<section class="mb-6">
+<h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mb-2">Mecânica São Luís Central</h1>
+<div class="flex flex-wrap justify-between items-start gap-4">
+<div class="flex items-center flex-wrap gap-2 text-sm text-gray-800 dark:text-gray-300">
+<span class="flex items-center gap-1 font-medium">
+<span class="material-icons text-primary text-sm">star</span>
+                        4.92
+                    </span>
+<span>·</span>
+<a class="underline font-medium hover:text-gray-600 dark:hover:text-gray-400" href="#reviews">128 avaliações</a>
+<span>·</span>
+<span class="flex items-center gap-1">
+<span class="material-icons text-primary text-sm">verified</span>
+                        Oficina Verificada
+                    </span>
+<span>·</span>
+<span class="underline text-gray-600 dark:text-gray-400">Cohama, São Luís, Maranhão</span>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition underline decoration-1 underline-offset-2">
+<span class="material-icons-outlined text-sm">share</span>
+                        Compartilhar
+                    </button>
+<button class="flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition underline decoration-1 underline-offset-2">
+<span class="material-icons-outlined text-sm">favorite_border</span>
+                        Salvar
+                    </button>
+</div>
+</div>
+</section>
+<section class="grid grid-cols-1 md:grid-cols-4 gap-2 h-[300px] md:h-[450px] rounded-2xl overflow-hidden mb-12 relative">
+<div class="md:col-span-2 h-full">
+<img alt="Mecânico trabalhando em motor" class="w-full h-full object-cover hover:brightness-95 transition cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRuB4pA_OcppZ_Bx6GYjL1TQiwsH7TmlNV6smhKZTf7t_-qUPWuE9s5KNVVmCelhOmWWRErtOku-wh_2ZI9_XMs4Y69fegVn073x4fJLjbTeywpmf00ALAVq3fMaWZO0t5vgO-XOaDzZxPedI7qPsnRePl42VDMVWm6VksShJoCr_MDzzTWTuNpWDYtdB0iXpnTwdC-S81i9bdczhjDSCcslNBeg3MTZYibwSQSWqQkJGDjsUROsIxcUB2hwvr16-MPcSVKN3shdI"/>
+</div>
+<div class="hidden md:grid md:col-span-1 grid-rows-2 gap-2 h-full">
+<img alt="Oficina organizada" class="w-full h-full object-cover hover:brightness-95 transition cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ6-F3xQyuh4nTvycR3mED2uKMw4XCfWlPvXNvu7C7bzQAWdTJ3iMupg_PaQ06GoQoUAq0DQx8dgv1gM3xT3PptE9sL9WsmXexG6fQpPM3F1UJhxgR1tqj5Jdst7uhGYIoHkJMi97HthLYOZ-mpw-ag_rJ2ZUqZ5a2g-FvP_sRygqiko383Pt0SfWaihCQXaTc8qht-uAbK98kvlRj0bzjOgmlgHrkC7H-_imDdF678azRSvXIibxC-VBziVhhgHbnEToilbqWagQ"/>
+<img alt="Ferramentas automotivas" class="w-full h-full object-cover hover:brightness-95 transition cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtEZIwj-FD0cULxY-S2F__xRxCL8Vm99t3f3wE0VeWdPNc6HA9-6JkWzn2Ecsvk6pPwNibWhUVga6D_j8Ksz6Fq-kvwme5GxlvZC2yXCYfpVfnoBULJvCbq2MHuyLqCEMOmzki_OdG3ZtUKUF6kAeCFIkBQwsIxYLQX1By3TVwu50k18MMjy_hZQ44acWvIPbwdT4B_srhagnaDEnX_uWlZWKBeYLoU9ih_paGagejgIqNkgMutKPC1Z_zKe50kEHhVFyVTDZsRRY"/>
+</div>
+<div class="hidden md:grid md:col-span-1 grid-rows-2 gap-2 h-full">
+<img alt="Carro no elevador" class="w-full h-full object-cover hover:brightness-95 transition cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNn2pDyDx0X3hAd9uqpDAFrNwTfLBWCkqhX-JXliVWf0a6txuJ2yMhvw9144UXl-DRkTWGt-fjJQImsPskc3VZD9wNsIkYT6R962VlwcFXspVhl1h2aYj9l0YyUHoYGy8TSUFKe3EyYCpRvdqtEu2QuQ6yARq4o0zOmUDqfOXu5oHKcBGYfigeAu9-KizDsZESI7YgwR1y_yp56RW6k4s_CukvVYQFg8vwCJvm7MZHdouzy9_3MP_ZaFW7BbVNJydlU7Wd_pjRR0k"/>
+<img alt="Fachada da oficina" class="w-full h-full object-cover hover:brightness-95 transition cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxne71H49yHe_5nIWNZ1ia1QKvTYARpKwzxyxQyq9qbOFSgKLmanfJpJx8Ku8EPV0t-IYDGMWrf71cqf36aFkPnyqOEMXYOSmggYs-biRPJGqa1zWFAISgZ_4V4gAfXmtoUeYnkleJmpDPKCm4LOlwqCM9i0Hbhhl5QAQGjwEkmZ1vjmIU8VFTl7cKNJgaIBgti6FSukcYH09J9KEYJucogC-fpCSGr42gtYF1BJK9ZcOaTeB80SpWfkWpBjfIXMtRWlCXiek7m2k"/>
+</div>
+<button class="absolute bottom-4 right-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-1.5 rounded-lg border border-gray-900/10 dark:border-white/10 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+<span class="material-icons-outlined text-sm">grid_view</span>
+                Mostrar todas as fotos
+            </button>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+<div class="md:col-span-2">
+<div class="flex justify-between items-center pb-6 border-b border-gray-200 dark:border-gray-700">
+<div>
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white">Gerenciado por Roberto Silva</h2>
+<p class="text-gray-500 dark:text-gray-400 mt-1">15 anos de experiência · Especialista em Injeção</p>
+</div>
+<div class="h-14 w-14 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600">
+<img alt="Foto do gerente Roberto" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH2vIwszwmsHNf3CEqN6dvtxnnBA7MIoHODZXZX_qfCGgWZvtW37gSRvFqi-UdPhZ2C08ogFkyb1bm-uafbnYDopVJUVrLqRnCevzmAzFglBXeN_GkHY5kjRO_YFd07YS32OdByIoUG7d1ukKIda0twkw72Mxn2apMI0FeeUewsWMpxgzega6dNmwBskrUxHB0IjgvOwdnH4diDYEUpGP9qER9lRswRT3e3-FBBWESR-NABd6UrFdFuZlbPdcS95wRDh43Gxi7gKE"/>
+</div>
+</div>
+<div class="py-8 border-b border-gray-200 dark:border-gray-700 flex flex-col gap-6">
+<div class="flex gap-4">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300 text-2xl">verified_user</span>
+<div>
+<h3 class="font-semibold text-gray-900 dark:text-white">Garantia Estendida</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm">Oferecemos 6 meses de garantia em todos os serviços mecânicos.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300 text-2xl">meeting_room</span>
+<div>
+<h3 class="font-semibold text-gray-900 dark:text-white">Sala de Espera Confortável</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm">Wi-Fi gratuito, café e ar-condicionado enquanto você aguarda.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300 text-2xl">calendar_today</span>
+<div>
+<h3 class="font-semibold text-gray-900 dark:text-white">Agendamento Flexível</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm">Cancelamento gratuito até 24h antes do serviço.</p>
+</div>
+</div>
+</div>
+<div class="py-8 border-b border-gray-200 dark:border-gray-700">
+<p class="text-gray-800 dark:text-gray-300 leading-relaxed mb-4">
+                        A Mecânica São Luís Central é referência em serviços automotivos na região da Cohama. Com equipamentos de última geração e uma equipe certificada, garantimos o melhor diagnóstico para seu veículo. Atendemos nacionais e importados com transparência total.
+                    </p>
+<p class="text-gray-800 dark:text-gray-300 leading-relaxed">
+                        Nossos serviços incluem revisão geral, alinhamento 3D, balanceamento, troca de óleo, reparo de ar-condicionado e muito mais...
+                    </p>
+<button class="mt-4 flex items-center gap-1 font-semibold underline text-gray-900 dark:text-white">
+                        Mostrar mais <span class="material-icons text-base">expand_more</span>
+</button>
+</div>
+<div class="py-8 border-b border-gray-200 dark:border-gray-700">
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">O que essa oficina oferece</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+<span class="material-icons-outlined">wifi</span>
+<span>Wi-Fi Gratuito</span>
+</div>
+<div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+<span class="material-icons-outlined">local_parking</span>
+<span>Estacionamento privativo</span>
+</div>
+<div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+<span class="material-icons-outlined">ac_unit</span>
+<span>Ar-condicionado</span>
+</div>
+<div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+<span class="material-icons-outlined">videocam</span>
+<span>Monitoramento por câmeras</span>
+</div>
+<div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+<span class="material-icons-outlined">coffee</span>
+<span>Máquina de Café</span>
+</div>
+<div class="flex items-center gap-3 text-gray-700 dark:text-gray-300 line-through decoration-gray-400 decoration-2 opacity-60">
+<span class="material-icons-outlined">wash</span>
+<span>Lava-jato incluso</span>
+</div>
+</div>
+<button class="mt-8 px-6 py-3 border border-gray-800 dark:border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        Mostrar todas as 15 comodidades
+                    </button>
+</div>
+<div class="py-8">
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Disponibilidade</h2>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Selecione uma data para o diagnóstico.</p>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">
+<div class="flex justify-between items-center mb-4 min-w-[300px]">
+<span class="font-semibold text-gray-800 dark:text-white">Março 2025</span>
+<div class="flex gap-2">
+<button class="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full"><span class="material-icons text-sm">chevron_left</span></button>
+<button class="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full"><span class="material-icons text-sm">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-1 min-w-[300px] text-center text-sm">
+<div class="text-gray-400 py-2 text-xs">Dom</div>
+<div class="text-gray-400 py-2 text-xs">Seg</div>
+<div class="text-gray-400 py-2 text-xs">Ter</div>
+<div class="text-gray-400 py-2 text-xs">Qua</div>
+<div class="text-gray-400 py-2 text-xs">Qui</div>
+<div class="text-gray-400 py-2 text-xs">Sex</div>
+<div class="text-gray-400 py-2 text-xs">Sab</div>
+<div class="py-2 text-gray-300 dark:text-gray-600">28</div>
+<div class="py-2 text-gray-300 dark:text-gray-600">29</div>
+<div class="py-2 text-gray-300 dark:text-gray-600">30</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">1</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">2</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">3</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">4</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">5</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">6</div>
+<div class="py-2 bg-primary text-white rounded-full cursor-pointer font-bold">7</div>
+<div class="py-2 bg-primary/10 text-primary dark:text-primary rounded-full cursor-pointer">8</div>
+<div class="py-2 bg-primary/10 text-primary dark:text-primary rounded-full cursor-pointer">9</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">10</div>
+<div class="py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer">11</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md:col-span-1 relative">
+<div class="sticky top-28 w-full">
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-xl shadow-gray-200/50 dark:shadow-none">
+<div class="flex justify-between items-end mb-6">
+<div>
+<span class="text-2xl font-bold text-gray-900 dark:text-white">R$ 150</span>
+<span class="text-gray-500 dark:text-gray-400 text-sm"> / hora</span>
+</div>
+<div class="flex items-center text-sm">
+<span class="material-icons text-primary text-sm mr-1">star</span>
+<span class="font-bold text-gray-800 dark:text-gray-200">4.92</span>
+<span class="text-gray-400 mx-1">·</span>
+<span class="text-gray-500 underline decoration-gray-400">128 avaliações</span>
+</div>
+</div>
+<div class="border border-gray-400 rounded-xl mb-4 overflow-hidden">
+<div class="grid grid-cols-2 border-b border-gray-400">
+<div class="p-3 border-r border-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+<label class="block text-[10px] uppercase font-bold text-gray-800 dark:text-white tracking-wider">DATA</label>
+<div class="text-sm text-gray-600 dark:text-gray-300">07/03/2025</div>
+</div>
+<div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+<label class="block text-[10px] uppercase font-bold text-gray-800 dark:text-white tracking-wider">HORÁRIO</label>
+<div class="text-sm text-gray-600 dark:text-gray-300">09:00</div>
+</div>
+</div>
+<div class="p-3 relative hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+<label class="block text-[10px] uppercase font-bold text-gray-800 dark:text-white tracking-wider">SERVIÇO</label>
+<select class="w-full bg-transparent border-none p-0 text-sm text-gray-600 dark:text-gray-300 focus:ring-0 cursor-pointer">
+<option>Diagnóstico Completo</option>
+<option>Troca de Óleo</option>
+<option>Alinhamento e Balanceamento</option>
+</select>
+<span class="material-icons absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">expand_more</span>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-rose-600 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-rose-200 dark:shadow-none mb-4">
+                            Solicitar Orçamento
+                        </button>
+<p class="text-center text-xs text-gray-500 mb-6">Você não será cobrado ainda</p>
+<div class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+<div class="flex justify-between">
+<span class="underline decoration-gray-300">Diagnóstico (Estimado 1h)</span>
+<span>R$ 150</span>
+</div>
+<div class="flex justify-between">
+<span class="underline decoration-gray-300">Taxa de Serviço ComparAuto</span>
+<span>R$ 25</span>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-600 mt-4 pt-4 flex justify-between font-bold text-lg text-gray-800 dark:text-white">
+<span>Total estimado</span>
+<span>R$ 175</span>
+</div>
+</div>
+<div class="mt-6 flex justify-center gap-2 items-center text-gray-500 dark:text-gray-400 text-sm">
+<span class="material-icons text-gray-400">flag</span>
+<a class="underline hover:text-gray-800 dark:hover:text-gray-200" href="#">Denunciar este anúncio</a>
+</div>
+</div>
+</div>
+</div>
+<section class="mt-12 py-12 border-t border-gray-200 dark:border-gray-700" id="reviews">
+<h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-8 flex items-center gap-2">
+<span class="material-icons text-primary">star</span>
+                4.92 · 128 avaliações
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-x-12 gap-y-4 mb-10">
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-700 dark:text-gray-300 w-32">Limpeza</span>
+<div class="flex-1 mx-4 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="bg-gray-800 dark:bg-gray-200 h-full w-[95%]"></div>
+</div>
+<span class="text-gray-900 dark:text-white font-semibold">4.9</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-700 dark:text-gray-300 w-32">Precisão</span>
+<div class="flex-1 mx-4 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="bg-gray-800 dark:bg-gray-200 h-full w-[98%]"></div>
+</div>
+<span class="text-gray-900 dark:text-white font-semibold">5.0</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-700 dark:text-gray-300 w-32">Comunicação</span>
+<div class="flex-1 mx-4 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="bg-gray-800 dark:bg-gray-200 h-full w-[90%]"></div>
+</div>
+<span class="text-gray-900 dark:text-white font-semibold">4.8</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-700 dark:text-gray-300 w-32">Custo-benefício</span>
+<div class="flex-1 mx-4 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="bg-gray-800 dark:bg-gray-200 h-full w-[92%]"></div>
+</div>
+<span class="text-gray-900 dark:text-white font-semibold">4.9</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<img alt="Avatar usuário" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMO4S3RsGf0fqLa01jzc3bFfLmqis8216Aqzb5GQ7Goa3dzd_9tR2hfeW1tXDJK6EtjA9dgqirHsdFCpFBB151F5r-pTU9S86rgyWUOdwDvcHRTXWAWIVRKeD0yLkRsH-e-JDsa5SrsYdjw3LTt8JGIUP79hgNfS_dQLtVwp_RDTZhiY8JGmyMRVDdPsu9oKioH8J_deGcLRnev1S38s6gDcwEPiYGeHe261VjeNOS7DJNN4Mnf4C1DUcIM8ZBQnlL2bEvB2cBN98"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Carlos Eduardo</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">São Paulo, SP · Dezembro 2024</p>
+</div>
+</div>
+<p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        Excelente atendimento! O Roberto explicou tudo o que precisava ser feito no meu carro. Preço justo e serviço rápido. A sala de espera com café foi um diferencial incrível.
+                    </p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<img alt="Avatar usuário" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwGu0masLad8_T3tFguLinnE4OFRT9HIpjta0rE_uLrEnt9Pq1L7a_Do-PGue1PJGDT9jyKYjV_yXQ6b6jDMZDPhBzXT_bzg5FbymE-xQD6PgKhhmdO5p1cFUha8fpcw6wVRCMpvBAs4T5qdsHsWUcRQ9RVGckidb96romZZ8C7MJF5fZHNkdSvB75y132KOTL3kVxT8CpN2QTIWiBPtFVrfg5w6nta7JMfCpspUYnnPHT7FGNxcnjrOlEi_QzKR_n8kBKIRV5SC4"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Mariana Costa</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">São Luís, MA · Janeiro 2025</p>
+</div>
+</div>
+<p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        Gostei muito da transparência. O diagnóstico foi preciso e não tentaram empurrar serviços desnecessários. Recomendo demais!
+                    </p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<img alt="Avatar usuário" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1YcSCtI89A8H-Dhux4wpapemriLdUuuXOVAMYcmhDx-akNVPzWS7P50yPuYsN9WyvZes-r4HjkWbuuL0t4_Dqn8DURZsaNTUvr5nTMemuOn6Sa9ZSzhKZxyEnFyQTkc1rIMw64K9kK6k1HeRwjs26wkqsRHQXYN1rgSG-sVArHWINTqHR7fQX-DNw-DkTWuvwRXLKt545gVSLRJcR22YtOsKAtp343WrSr3309PQIGjEEp-WX-PTYsoiHbYyiCeDerA9R65qhUbg"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Pedro Alvarez</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">Imperatriz, MA · Fevereiro 2025</p>
+</div>
+</div>
+<p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        A oficina é impecável, muito limpa e organizada. O atendimento via app funcionou perfeitamente. Voltarei com certeza.
+                    </p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<img alt="Avatar usuário" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeOhrDjxlnLLtQV_EsuvhL86hNluma2g5Eho0lgu1pBjaMBIqaJnDlSsvq2svztHQx_hCUUEZNNFxnkFAvCUWahqblFxxxgbOjGdzn_q-aAG_7tBMvjqV31PIcPH2B962JsznBpBigqVYqDHKmtqT1VcTssPnbHIdpIC9FsygTuXca3cyTqHu3BaAfHYUkWtPUW8ypGGU6SlIaWqB8dx8NROSSE6PNMx-NKzNw77i-TJ1fAdnMEmO0n5bxtPjrWvDlw6tKKZ5wi8I"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Ana Julia</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">São Luís, MA · Fevereiro 2025</p>
+</div>
+</div>
+<p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        Muito atenciosos. Tive um problema de última hora e me encaixaram na agenda. O serviço ficou pronto no mesmo dia.
+                    </p>
+</div>
+</div>
+<button class="mt-10 px-6 py-3 border border-gray-800 dark:border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                Mostrar todas as 128 avaliações
+            </button>
+</section>
+<section class="py-12 border-t border-gray-200 dark:border-gray-700">
+<h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Onde você vai estar</h2>
+<p class="mb-6 text-gray-600 dark:text-gray-300">Cohama, São Luís, Maranhão, Brasil</p>
+<div class="w-full h-[480px] bg-gray-200 dark:bg-gray-800 rounded-2xl relative overflow-hidden group">
+<img alt="Mapa da localização" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 transition" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3x2zWmy5vgxFPyIki4LdbMpfjCjIaTlDcU238IzRdn_e7anmhsv_BAZfHUA2VeuDowzks0-7pJ8lOX5dI9nNzw61C8p128uFA2PwPLGzAPIht6uuceTvWA3pJVXOBUTbM9ciogg2uc6UKrv2gs11tg27l2SbozFjBgCR1wBHklJry1l3CNN3c3ALsrJWfm5TvisTV_nk1m3HekZkvaSho8Rjj1vrcRHouzJSQqQTOYqHluXPhCUc9hxlKpDxknHL_N6hWmVmtDu4"/>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-surface-dark p-3 rounded-full shadow-lg">
+<div class="bg-primary p-3 rounded-full text-white">
+<span class="material-icons">home_repair_service</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 pt-12 pb-6 blur-sm select-none pointer-events-none">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Suporte</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Central de Ajuda</a></li>
+<li><a class="hover:underline" href="#">AirCover para Oficinas</a></li>
+<li><a class="hover:underline" href="#">Cancelamento</a></li>
+<li><a class="hover:underline" href="#">Opções de cancelamento</a></li>
+<li><a class="hover:underline" href="#">Nossa resposta à COVID-19</a></li>
+<li><a class="hover:underline" href="#">Denunciar um problema</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Comunidade</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">ComparAuto.org: ajuda em desastres</a></li>
+<li><a class="hover:underline" href="#">Combate à discriminação</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Hospedagem</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Cadastre sua oficina</a></li>
+<li><a class="hover:underline" href="#">ComparAuto Cover para mecânicos</a></li>
+<li><a class="hover:underline" href="#">Recursos para oficinas</a></li>
+<li><a class="hover:underline" href="#">Fórum da comunidade</a></li>
+<li><a class="hover:underline" href="#">Hospedagem responsável</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">ComparAuto</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Newsroom</a></li>
+<li><a class="hover:underline" href="#">Saiba mais sobre novos recursos</a></li>
+<li><a class="hover:underline" href="#">Carta dos fundadores</a></li>
+<li><a class="hover:underline" href="#">Carreiras</a></li>
+<li><a class="hover:underline" href="#">Investidores</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+<div class="flex flex-wrap justify-center md:justify-start gap-2 mb-4 md:mb-0">
+<span>© 2025 ComparAuto, Inc.</span>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Privacidade</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Termos</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Mapa do site</a>
+</div>
+<div class="flex items-center gap-4 font-medium">
+<button class="flex items-center gap-1 hover:underline">
+<span class="material-icons text-base">language</span>
+                        Português (BR)
+                    </button>
+<button class="flex items-center gap-1 hover:underline">
+<span>R$</span>
+                        BRL
+                    </button>
+<div class="flex gap-3 ml-2">
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">facebook</i></a>
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">camera_alt</i></a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+<div aria-modal="true" class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog">
+<div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+<div class="relative w-full max-w-[520px] bg-white dark:bg-surface-dark rounded-xl shadow-2xl overflow-hidden flex flex-col transform transition-all animate-fadeIn">
+<div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+<button class="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition">
+<span class="material-icons text-xl">close</span>
+</button>
+<h3 class="font-bold text-gray-900 dark:text-white">Entrar ou cadastrar-se</h3>
+<div class="w-8"></div> 
+</div>
+<div class="p-6 overflow-y-auto max-h-[85vh]">
+<div class="flex mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+<button class="flex-1 py-2 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-surface-dark shadow-sm rounded-md transition-all">Entrar</button>
+<button class="flex-1 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all">Cadastrar-se</button>
+</div>
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">Bem-vindo ao ComparAuto</h2>
+<p class="text-sm text-gray-500 dark:text-gray-400">Entre para gerenciar seus agendamentos e viagens.</p>
+</div>
+<form class="space-y-4" onsubmit="event.preventDefault()">
+<div class="relative group">
+<input class="peer w-full px-4 pt-6 pb-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white bg-transparent focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white placeholder-transparent transition-all" id="auth-email" placeholder="Email" required="" type="email"/>
+<label class="absolute left-4 top-4 text-gray-500 text-sm transform -translate-y-3 scale-75 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 transition-all duration-200 pointer-events-none" for="auth-email">Email</label>
+</div>
+<div class="relative group">
+<input class="peer w-full px-4 pt-6 pb-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white bg-transparent focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white placeholder-transparent transition-all" id="auth-password" placeholder="Senha" required="" type="password"/>
+<label class="absolute left-4 top-4 text-gray-500 text-sm transform -translate-y-3 scale-75 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 transition-all duration-200 pointer-events-none" for="auth-password">Senha</label>
+</div>
+<div class="flex justify-between items-center text-xs">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-gray-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-gray-600 dark:text-gray-400">Lembrar de mim</span>
+</label>
+<a class="font-medium underline text-gray-900 dark:text-white hover:text-primary" href="#">Esqueceu a senha?</a>
+</div>
+<button class="w-full bg-primary hover:bg-[#E0294D] text-white font-bold py-3.5 rounded-lg transition-all shadow-lg shadow-primary/30 active:scale-[0.98]">
+                    Continuar
+                </button>
+</form>
+<div class="flex items-center gap-4 my-6">
+<div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+<span class="text-xs text-gray-500 font-medium">ou</span>
+<div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+</div>
+<div class="space-y-3">
+<button class="relative w-full flex items-center justify-between px-4 py-3 border border-gray-800 dark:border-gray-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition group">
+<svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
+<span class="text-sm font-medium text-gray-800 dark:text-white flex-1 text-center">Continuar com Google</span>
+<div class="w-5"></div>
+</button>
+<button class="relative w-full flex items-center justify-between px-4 py-3 border border-gray-800 dark:border-gray-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition group">
+<svg class="w-5 h-5 fill-[#1877F2]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
+<span class="text-sm font-medium text-gray-800 dark:text-white flex-1 text-center">Continuar com Facebook</span>
+<div class="w-5"></div>
+</button>
+<button class="relative w-full flex items-center justify-between px-4 py-3 border border-gray-800 dark:border-gray-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition group">
+<svg class="w-5 h-5 fill-black dark:fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.64 3.4 1.63-3.12 1.88-2.68 7.97 1.95 9.84-.5 1.1-1.15 2.23-2 3.54zm-2.91-17.76c.49 2.05-1.63 4.2-3.4 4.01-1.07-.1-2.43-1.51-2.14-3.56.55-1.99 2.84-4.04 5.54-3.46z"></path></svg>
+<span class="text-sm font-medium text-gray-800 dark:text-white flex-1 text-center">Continuar com Apple</span>
+<div class="w-5"></div>
+</button>
+</div>
+<div class="mt-6 text-center">
+<p class="text-xs text-gray-500 dark:text-gray-400">
+                    Ao continuar, você concorda com os <a class="underline font-medium text-gray-800 dark:text-gray-200" href="#">Termos de Serviço</a> da ComparAuto e confirma que leu nossa <a class="underline font-medium text-gray-800 dark:text-gray-200" href="#">Política de Privacidade</a>.
+                </p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

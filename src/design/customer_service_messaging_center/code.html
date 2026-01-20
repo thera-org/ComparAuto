@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Centro de Mensagens - ComparAuto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ff385c", // Airbnb-like pink/red
+                        "primary-hover": "#d9324e",
+                        "background-light": "#ffffff",
+                        "background-dark": "#121212",
+                        "surface-light": "#f7f7f7",
+                        "surface-dark": "#1e1e1e",
+                        "border-light": "#dddddd",
+                        "border-dark": "#333333",
+                        "text-light": "#222222",
+                        "text-dark": "#e0e0e0",
+                        "text-secondary-light": "#717171",
+                        "text-secondary-dark": "#a0a0a0",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': "0.75rem",
+                        '2xl': "1rem",
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
+                    }
+                },
+            },
+        };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-body antialiased flex flex-col min-h-screen">
+<header class="border-b border-border-light dark:border-border-dark sticky top-0 z-50 bg-background-light dark:bg-background-dark">
+<div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+<a class="flex items-center gap-2 text-primary font-bold text-2xl tracking-tighter" href="#">
+<span class="material-icons">build_circle</span>
+                ComparAuto
+            </a>
+<div class="hidden md:flex items-center border border-border-light dark:border-border-dark rounded-full py-2.5 px-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="px-4 font-medium text-sm border-r border-border-light dark:border-border-dark">Qualquer serviço</div>
+<div class="px-4 font-medium text-sm border-r border-border-light dark:border-border-dark">Localização</div>
+<div class="px-4 text-sm text-text-secondary-light dark:text-text-secondary-dark">Filtros</div>
+<div class="bg-primary text-white p-2 rounded-full ml-2 flex items-center justify-center w-8 h-8">
+<span class="material-icons text-sm">search</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<a class="text-sm font-medium hover:bg-surface-light dark:hover:bg-surface-dark px-4 py-2 rounded-full transition-colors hidden lg:block" href="#">Cadastrar sua Oficina</a>
+<a class="p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-full transition-colors" href="#">
+<span class="material-icons text-text-light dark:text-text-dark">language</span>
+</a>
+<div class="flex items-center border border-border-light dark:border-border-dark rounded-full p-1 pl-3 gap-2 hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-surface-dark">
+<span class="material-icons text-text-secondary-light dark:text-text-secondary-dark">menu</span>
+<div class="bg-text-secondary-light dark:bg-text-secondary-dark text-white rounded-full p-1">
+<span class="material-icons text-2xl">account_circle</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col max-w-[1440px] mx-auto w-full px-6 py-8 h-[calc(100vh-80px)]">
+<div class="flex border border-border-light dark:border-border-dark rounded-xl overflow-hidden h-full shadow-soft bg-white dark:bg-surface-dark">
+<aside class="w-full md:w-1/3 lg:w-[360px] flex flex-col border-r border-border-light dark:border-border-dark bg-white dark:bg-surface-dark h-full">
+<div class="p-6 border-b border-border-light dark:border-border-dark flex justify-between items-center">
+<h1 class="text-xl font-bold text-text-light dark:text-text-dark">Mensagens</h1>
+<button class="p-2 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-icons">filter_list</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto custom-scrollbar">
+<div class="flex items-start gap-4 p-4 cursor-pointer bg-surface-light dark:bg-[#2a2a2a] border-r-4 border-primary transition-colors">
+<img alt="Oficina Lanternagem Pro" class="w-12 h-12 rounded-full object-cover flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7kbwmmSKRV5cCcLzO5DPTBDe8D9Ipujs2nU4hXUJnLMXz6KLEZFpN9LXSFGDHGhYyaxwLB8B7n-WmTYi1o-AKDpV-6C8mNhQBlybXioq6HLrcd1RVTW_MmhEVpC-xX2_bBRAbYTDVov-9QP1R1x1ghrbgV_WnOUeGsIaBiPHxmuRMs0-N3K_ELoiN7ftyB0Vd4-KEKfIVp1bpDCV0HvJCTEIzMZXAKU1a9nWuV6WeZI47x9JyEmgLpIn_Yhkyx-6Ep-1fFkHPj1Y"/>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-semibold text-text-light dark:text-text-dark truncate">Lanternagem Pro</h3>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark whitespace-nowrap">09:41</span>
+</div>
+<p class="text-sm text-text-light dark:text-text-dark truncate font-medium">O orçamento ficou pronto. Posso enviar?</p>
+<div class="mt-2 text-xs text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="inline-block w-2 h-2 rounded-full bg-green-500"></span> Online
+                            </div>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 cursor-pointer hover:bg-surface-light dark:hover:bg-[#2a2a2a] transition-colors border-b border-border-light dark:border-border-dark border-opacity-40">
+<img alt="Auto Elétrica Volts" class="w-12 h-12 rounded-full object-cover flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZgm5msair-cZU3sKLI-8DsyBlLPRDDowTfKUVFEX9NETzwY-nuDTgpTzqDCqf7Y6MxERnB7814eDdmC73aR_4WtSi_kQVhYrKm05wzPdatxCeSa7CqxOcqUX-y4yMqGR4yk4wqAedySo4MESv9fBPVC-_1F8LTF-Z4IxroCt60WeNO9hoGYPD0uHxm8wBR1w2_zCiLh2Ky7WfYThBfPWobUJKToTVAPsaDTmD7LYx0tm9N-gDdehK_ck0AtXe0-KJdD8D63LRn5s"/>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-semibold text-text-light dark:text-text-dark truncate">Auto Elétrica Volts</h3>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark whitespace-nowrap">Ontem</span>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">Combinado! Te espero às 14h.</p>
+<span class="mt-1 text-xs px-2 py-0.5 bg-surface-light dark:bg-[#333] text-text-secondary-light dark:text-text-secondary-dark rounded-md inline-block">Agendado</span>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 cursor-pointer hover:bg-surface-light dark:hover:bg-[#2a2a2a] transition-colors border-b border-border-light dark:border-border-dark border-opacity-40">
+<div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-200 font-bold text-lg flex-shrink-0">
+                            SC
+                        </div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-semibold text-text-light dark:text-text-dark truncate">São Luís Central</h3>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark whitespace-nowrap">23 Out</span>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">Você: Obrigado pelo serviço!</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 cursor-pointer hover:bg-surface-light dark:hover:bg-[#2a2a2a] transition-colors border-b border-border-light dark:border-border-dark border-opacity-40">
+<img alt="Pneus &amp; Alinhamento SLZ" class="w-12 h-12 rounded-full object-cover flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-3acfA0xr4Zilw9lr4JMR2uWf1uqPTnLT3HjXXxCqW2o8gvpsnFFUtJeGd2GA0b8i6yytQIWTxtUSTE6ZbRRcTvJ5iDzRMD4a2sbjD1x8yWXftf7mdqYXOYiQE7iW4-YHl9PJ9jYfYN2tYlCzFOEajeHLM_jC7YI8Ga9sU03h0l6XZ7yTQVvXNuS9CnHvzl-J4NoA-mWPvyuVYCgR1EhwKhaMhLWJdz6Itnn1-w-dI7LmExvgUMPOr38OWLaHpy382-YqdEQ79Ps"/>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-semibold text-text-light dark:text-text-dark truncate">Pneus &amp; Alinhamento SLZ</h3>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark whitespace-nowrap">15 Out</span>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">Sim, temos pneus aro 17 em estoque.</p>
+</div>
+</div>
+</div>
+</aside>
+<section class="flex-grow flex flex-col bg-white dark:bg-surface-dark relative">
+<div class="h-20 border-b border-border-light dark:border-border-dark flex items-center justify-between px-6 flex-shrink-0 bg-white dark:bg-surface-dark z-10">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Lanternagem Pro" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj6s6-nouzVC6Y6hjWquGbNACdUfdBCU1lz847BdtwYZoseYByfqiWwXMqJ8sSF9ihFizY-MipR_agsK96q1z79hX3VrYjB9Hef5bCaljRyVB3RxSmD2q7tU5CpagpGFh71Yf3qIpH40fvXH3yW1NzA60IB24cckReITgiBlxZlKXk_BmmEN3K4e1TTcjFbDBQbS3lEMHaju76Vhs5AIi3_F8I7DlY_3-K0vHabOvK3r36sF4DTd91nUgpBJ9BMgrsUxN3XUUp078"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-surface-dark rounded-full"></div>
+</div>
+<div>
+<h2 class="font-semibold text-lg text-text-light dark:text-text-dark leading-tight">Lanternagem Pro</h2>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Tempo de resposta: &lt; 1 hora</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:block px-4 py-2 border border-border-light dark:border-border-dark rounded-lg text-sm font-medium hover:bg-surface-light dark:hover:bg-[#2a2a2a] transition-colors text-text-light dark:text-text-dark">
+                            Ver Perfil
+                        </button>
+<button class="p-2 text-text-secondary-light dark:text-text-secondary-dark hover:bg-surface-light dark:hover:bg-[#2a2a2a] rounded-full">
+<span class="material-icons">more_vert</span>
+</button>
+</div>
+</div>
+<div class="flex-grow overflow-y-auto p-6 flex flex-col gap-6 bg-surface-light dark:bg-[#121212]">
+<div class="flex justify-center">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark bg-white dark:bg-surface-dark px-3 py-1 rounded-full border border-border-light dark:border-border-dark shadow-sm">Hoje</span>
+</div>
+<div class="flex items-end gap-3 max-w-[80%] self-start">
+<img alt="Lanternagem Pro" class="w-8 h-8 rounded-full object-cover mb-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwjpOMLGwItOOiitNK7AexSt5J7DCT5RMiEZs4X7ZeakhMgi0czXY8jUIoMXG3q81uElV9QFeoa9qx-_Ah8QD-8eI5iX7l7mET7N2etE0NWwGtqfAFvtpWC4Ts8xYDvQ8Awq9UitqMEudjM5JGJrjbWpUz03p_2-R5FVT_yNuXyT7aXiFhFNY1mdX3XFaSvEMQlprRm5OtJJQYE7TmqswGmeCrQGNWYTpVlz5ssbpUdSacrIqx5jU33gC8jXH95X18QItyAR0ad94"/>
+<div>
+<div class="bg-white dark:bg-surface-dark p-4 rounded-2xl rounded-bl-none border border-border-light dark:border-border-dark shadow-sm text-text-light dark:text-text-dark">
+<p>Olá! Recebi as fotos do amassado no paralamas.</p>
+</div>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 ml-1 block">09:30</span>
+</div>
+</div>
+<div class="flex items-end gap-3 max-w-[80%] self-start">
+<div class="w-8 h-8 flex-shrink-0"></div> 
+<div>
+<div class="bg-white dark:bg-surface-dark p-4 rounded-2xl rounded-tl-none border border-border-light dark:border-border-dark shadow-sm text-text-light dark:text-text-dark">
+<p>Parece ser um reparo simples de martelinho de ouro, sem necessidade de pintura completa.</p>
+</div>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 ml-1 block">09:31</span>
+</div>
+</div>
+<div class="flex items-end gap-3 max-w-[80%] self-end flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold mb-1">EU</div>
+<div>
+<div class="bg-primary text-white p-4 rounded-2xl rounded-br-none shadow-sm">
+<p>Que ótima notícia! Eu estava preocupado com o valor.</p>
+</div>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 mr-1 block text-right">09:35</span>
+</div>
+</div>
+<div class="flex items-end gap-3 max-w-[80%] self-end flex-row-reverse">
+<div class="w-8 h-8 flex-shrink-0"></div>
+<div>
+<div class="bg-primary text-white p-4 rounded-2xl rounded-tr-none shadow-sm">
+<p>Vocês conseguem me passar um orçamento aproximado?</p>
+</div>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 mr-1 block text-right">09:36</span>
+</div>
+</div>
+<div class="flex items-end gap-3 max-w-[80%] self-start">
+<img alt="Lanternagem Pro" class="w-8 h-8 rounded-full object-cover mb-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf0a4AGKunnBS-kDIEiu5PR7uNKdtFEZJ8WVIAzh60EIjPbLOP7QT0WUTpDWuKsmgHHkSo8alXCVQsN5R13-g180n_6MAD1w-_JAV-bddDTrdQlurv2vYIgs9UqH20P14oPlZiGRI2GK6VONEKN-p3zJV9xGyv61VEdslgSFVHVV6ACz3gIaPMhSOefD7kJCIC2Ij0xSFyGRIvQMZCHDRDS-CDoaUhkd0aeHKfpD4SPbnnAk9J8SPnmvTMxIQOEE0dHgJUStAzgKA"/>
+<div>
+<div class="bg-white dark:bg-surface-dark p-4 rounded-2xl rounded-bl-none border border-border-light dark:border-border-dark shadow-sm text-text-light dark:text-text-dark">
+<p>O orçamento ficou pronto. Posso enviar?</p>
+</div>
+<div class="mt-2 ml-1 p-3 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl w-64 flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#252525]">
+<div class="bg-red-100 dark:bg-red-900 p-2 rounded-lg">
+<span class="material-icons text-red-500 text-xl">picture_as_pdf</span>
+</div>
+<div class="overflow-hidden">
+<p class="text-sm font-medium text-text-light dark:text-text-dark truncate">Orcamento_Reparo_Paralamas.pdf</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">120 KB</p>
+</div>
+</div>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 ml-1 block">09:41</span>
+</div>
+</div>
+</div>
+<div class="p-4 bg-white dark:bg-surface-dark border-t border-border-light dark:border-border-dark">
+<div class="max-w-4xl mx-auto flex items-end gap-3">
+<button class="p-3 text-text-secondary-light dark:text-text-secondary-dark hover:bg-surface-light dark:hover:bg-[#2a2a2a] rounded-full transition-colors" title="Adicionar fotos do veículo">
+<span class="material-icons text-2xl">add_photo_alternate</span>
+</button>
+<div class="flex-grow bg-surface-light dark:bg-[#121212] border border-border-light dark:border-border-dark rounded-3xl flex items-center px-4 py-2 focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-text-light dark:text-text-dark resize-none py-2 max-h-32 placeholder-text-secondary-light dark:placeholder-text-secondary-dark" placeholder="Escreva uma mensagem..." rows="1"></textarea>
+<button class="ml-2 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-icons text-xl">sentiment_satisfied_alt</span>
+</button>
+</div>
+<button class="p-3 bg-primary hover:bg-primary-hover text-white rounded-full transition-colors shadow-md flex items-center justify-center">
+<span class="material-icons text-xl ml-0.5">send</span>
+</button>
+</div>
+<p class="text-center text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">
+                        Nunca compartilhe senhas ou dados bancários por aqui.
+                    </p>
+</div>
+</section>
+</div>
+</main>
+<footer class="bg-white dark:bg-surface-dark border-t border-border-light dark:border-border-dark py-6 px-6 mt-auto">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<div class="flex gap-4">
+<span>© 2025 ComparAuto</span>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Privacidade</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Termos</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Mapa do site</a>
+</div>
+<div class="flex gap-4 font-medium text-text-light dark:text-text-dark">
+<button class="flex items-center gap-1 hover:underline">
+<span class="material-icons text-sm">language</span> Português (BR)
+                </button>
+<button class="hover:underline">
+                    R$ BRL
+                </button>
+</div>
+</div>
+</footer>
+
+</body></html>

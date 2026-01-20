@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Avaliação de Serviço - ComparAuto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FF385C", // Airbnb-like primary color (pink/red)
+              "background-light": "#FFFFFF",
+              "background-dark": "#0F172A",
+              "surface-light": "#F7F7F7",
+              "surface-dark": "#1E293B",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '0.75rem',
+              '2xl': '1rem',
+            },
+          },
+        },
+      };
+    </script>
+<style>::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+      }
+      .dark ::-webkit-scrollbar-thumb {
+        background-color: #475569;
+      }.star-rating-group:hover .material-icons {
+        color: #e5e7eb;}
+      .star-rating-group:hover button:hover ~ button .material-icons {
+         color: #e5e7eb;}
+      .star-rating-group button:hover .material-icons,
+      .star-rating-group:hover button:hover .material-icons,
+      .star-rating-group button:has(~ button:hover) .material-icons {
+        color: #FF385C !important;}
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-200">
+<header class="fixed w-full top-0 z-50 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+<div class="max-w-7xl mx-auto flex justify-between items-center">
+<a class="flex items-center gap-2" href="#">
+<span class="text-primary material-icons-outlined text-3xl">build_circle</span>
+<span class="text-primary text-xl font-bold tracking-tight">ComparAuto</span>
+</a>
+<div class="hidden md:flex items-center gap-6">
+<div class="text-sm font-medium text-gray-500 dark:text-gray-400">
+        Etapa 3 de 3: Avaliação
+    </div>
+<div class="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
+<div class="w-full h-full bg-primary"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300">notifications</span>
+</button>
+<button class="flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-full p-1 pl-3 hover:shadow-md transition">
+<span class="material-icons text-gray-600 dark:text-gray-300">menu</span>
+<div class="bg-gray-500 text-white rounded-full p-1">
+<span class="material-icons text-xl">account_circle</span>
+</div>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-28 pb-20 px-6 max-w-2xl mx-auto">
+<div class="flex items-start gap-5 mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
+<div class="w-24 h-24 rounded-xl overflow-hidden shadow-sm flex-shrink-0">
+<img alt="Mecânica São Luís" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRuB4pA_OcppZ_Bx6GYjL1TQiwsH7TmlNV6smhKZTf7t_-qUPWuE9s5KNVVmCelhOmWWRErtOku-wh_2ZI9_XMs4Y69fegVn073x4fJLjbTeywpmf00ALAVq3fMaWZO0t5vgO-XOaDzZxPedI7qPsnRePl42VDMVWm6VksShJoCr_MDzzTWTuNpWDYtdB0iXpnTwdC-S81i9bdczhjDSCcslNBeg3MTZYibwSQSWqQkJGDjsUROsIxcUB2hwvr16-MPcSVKN3shdI"/>
+</div>
+<div>
+<h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">Como foi sua experiência na Mecânica São Luís Central?</h1>
+<p class="text-gray-500 dark:text-gray-400 text-sm md:text-base">Diagnóstico Completo · Realizado em 07 de Março de 2025</p>
+</div>
+</div>
+<div class="space-y-8 mb-12">
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Avalie os aspectos do serviço</h2>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-lg transition-colors">
+<div>
+<span class="text-gray-800 dark:text-gray-200 font-medium text-lg block">Limpeza</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 block sm:hidden">Toque para avaliar</span>
+</div>
+<div class="flex gap-2 star-rating-group">
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-lg transition-colors">
+<div>
+<span class="text-gray-800 dark:text-gray-200 font-medium text-lg block">Comunicação</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 block sm:hidden">Toque para avaliar</span>
+</div>
+<div class="flex gap-2 star-rating-group">
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-lg transition-colors">
+<div>
+<span class="text-gray-800 dark:text-gray-200 font-medium text-lg block">Precisão</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 block sm:hidden">Toque para avaliar</span>
+</div>
+<div class="flex gap-2 star-rating-group">
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-lg transition-colors">
+<div>
+<span class="text-gray-800 dark:text-gray-200 font-medium text-lg block">Custo-benefício</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 block sm:hidden">Toque para avaliar</span>
+</div>
+<div class="flex gap-2 star-rating-group">
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+<button class="text-gray-300 dark:text-gray-600 transition"><span class="material-icons text-4xl">star</span></button>
+</div>
+</div>
+</div>
+<div class="mb-10">
+<label class="block text-xl font-semibold text-gray-900 dark:text-white mb-2" for="review-text">Conte sua experiência</label>
+<p class="text-gray-500 dark:text-gray-400 mb-4 text-sm">O que você mais gostou? O que poderia ser melhorado? Sua avaliação será pública.</p>
+<textarea class="w-full rounded-xl border-gray-400 dark:border-gray-600 bg-white dark:bg-surface-dark text-gray-900 dark:text-white p-4 focus:ring-2 focus:ring-primary focus:border-transparent h-48 resize-none shadow-sm placeholder-gray-400 transition" id="review-text" placeholder="Escreva aqui os detalhes da sua visita..."></textarea>
+</div>
+<div class="mb-12">
+<label class="block text-xl font-semibold text-gray-900 dark:text-white mb-2">Fotos do reparo</label>
+<p class="text-gray-500 dark:text-gray-400 mb-4 text-sm">Mostre como ficou o veículo após o serviço (opcional).</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="md:col-span-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-400 transition cursor-pointer group aspect-square">
+<div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-full mb-3 group-hover:scale-110 transition">
+<span class="material-icons-outlined text-2xl text-gray-600 dark:text-gray-300">add_a_photo</span>
+</div>
+<span class="text-sm text-gray-700 dark:text-gray-300 font-semibold">Adicionar fotos</span>
+<span class="text-xs text-gray-400 mt-1">até 5 fotos</span>
+</div>
+<div class="hidden md:flex md:col-span-2 items-center justify-center bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-700 text-gray-400 text-sm">
+                Nenhuma foto selecionada
+            </div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-8 border-t border-gray-200 dark:border-gray-700">
+<a class="text-sm font-semibold underline text-gray-900 dark:text-white hover:text-gray-600" href="#">Voltar</a>
+<button class="bg-gradient-to-r from-primary to-rose-600 hover:brightness-95 text-white text-lg font-semibold py-3.5 px-10 rounded-xl shadow-lg shadow-rose-200 dark:shadow-none transition transform active:scale-95">
+            Publicar Avaliação
+        </button>
+</div>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 pt-12 pb-6">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Suporte</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Central de Ajuda</a></li>
+<li><a class="hover:underline" href="#">AirCover para Oficinas</a></li>
+<li><a class="hover:underline" href="#">Cancelamento</a></li>
+<li><a class="hover:underline" href="#">Opções de cancelamento</a></li>
+<li><a class="hover:underline" href="#">Nossa resposta à COVID-19</a></li>
+<li><a class="hover:underline" href="#">Denunciar um problema</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Comunidade</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">ComparAuto.org: ajuda em desastres</a></li>
+<li><a class="hover:underline" href="#">Combate à discriminação</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Hospedagem</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Cadastre sua oficina</a></li>
+<li><a class="hover:underline" href="#">ComparAuto Cover para mecânicos</a></li>
+<li><a class="hover:underline" href="#">Recursos para oficinas</a></li>
+<li><a class="hover:underline" href="#">Fórum da comunidade</a></li>
+<li><a class="hover:underline" href="#">Hospedagem responsável</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">ComparAuto</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Newsroom</a></li>
+<li><a class="hover:underline" href="#">Saiba mais sobre novos recursos</a></li>
+<li><a class="hover:underline" href="#">Carta dos fundadores</a></li>
+<li><a class="hover:underline" href="#">Carreiras</a></li>
+<li><a class="hover:underline" href="#">Investidores</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+<div class="flex flex-wrap justify-center md:justify-start gap-2 mb-4 md:mb-0">
+<span>© 2025 ComparAuto, Inc.</span>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Privacidade</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Termos</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Mapa do site</a>
+</div>
+<div class="flex items-center gap-4 font-medium">
+<button class="flex items-center gap-1 hover:underline">
+<span class="material-icons text-base">language</span>
+                        Português (BR)
+                    </button>
+<button class="flex items-center gap-1 hover:underline">
+<span>R$</span>
+                        BRL
+                    </button>
+<div class="flex gap-3 ml-2">
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">facebook</i></a>
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">camera_alt</i></a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>

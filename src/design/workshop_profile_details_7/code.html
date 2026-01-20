@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Painel do Parceiro - ComparAuto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FF385C", // Airbnb-like primary color (pink/red)
+              "background-light": "#FFFFFF",
+              "background-dark": "#0F172A",
+              "surface-light": "#F7F7F7",
+              "surface-dark": "#1E293B",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '0.75rem',
+              '2xl': '1rem',
+            },
+          },
+        },
+      };
+    </script>
+<style>
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+      }
+      .dark ::-webkit-scrollbar-thumb {
+        background-color: #475569;
+      }
+    </style>
+</head>
+<body class="bg-surface-light dark:bg-background-dark text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-200">
+<header class="fixed w-full top-0 z-50 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700 px-6 h-20 flex items-center">
+<div class="max-w-7xl mx-auto flex justify-between items-center w-full">
+<a class="flex items-center gap-2" href="#">
+<span class="text-primary material-icons-outlined text-3xl">build_circle</span>
+<span class="text-primary text-xl font-bold tracking-tight">ComparAuto</span>
+<span class="ml-2 text-xs font-semibold uppercase tracking-wider text-gray-500 border border-gray-300 rounded px-1.5 py-0.5">Parceiro</span>
+</a>
+<nav class="hidden md:flex items-center gap-1">
+<a class="px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white border-b-2 border-primary" href="#">Hoje</a>
+<a class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition" href="#">Calendário</a>
+<a class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition flex items-center gap-2" href="#">
+                    Mensagens
+                    <span class="bg-primary text-white text-[10px] font-bold px-1.5 rounded-full">3</span>
+</a>
+<a class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition" href="#">Desempenho</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition relative">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border border-white dark:border-gray-900"></span>
+</button>
+<button class="flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-full p-1 pl-3 hover:shadow-md transition bg-white dark:bg-surface-dark">
+<span class="material-icons text-gray-600 dark:text-gray-300">menu</span>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-gray-200">
+<img alt="Foto do perfil" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH2vIwszwmsHNf3CEqN6dvtxnnBA7MIoHODZXZX_qfCGgWZvtW37gSRvFqi-UdPhZ2C08ogFkyb1bm-uafbnYDopVJUVrLqRnCevzmAzFglBXeN_GkHY5kjRO_YFd07YS32OdByIoUG7d1ukKIda0twkw72Mxn2apMI0FeeUewsWMpxgzega6dNmwBskrUxHB0IjgvOwdnH4diDYEUpGP9qER9lRswRT3e3-FBBWESR-NABd6UrFdFuZlbPdcS95wRDh43Gxi7gKE"/>
+</div>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-28 pb-16 px-6 max-w-7xl mx-auto">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Painel de Controle</h1>
+<p class="text-gray-500 dark:text-gray-400">Bem-vindo de volta, Roberto. Aqui está o resumo da sua oficina hoje.</p>
+</div>
+<button class="hidden md:flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition shadow-sm">
+<span class="material-icons-outlined text-lg">add</span>
+                Novo Agendamento Manual
+            </button>
+</div>
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-white dark:bg-surface-dark p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ganhos este mês</p>
+<h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-1">R$ 12.450</h3>
+</div>
+<div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
+<span class="material-icons-outlined text-green-600 dark:text-green-400">payments</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-sm">
+<span class="flex items-center text-green-600 font-medium bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
+<span class="material-icons text-sm mr-0.5">arrow_upward</span> 12%
+                    </span>
+<span class="text-gray-400 ml-1">vs. mês anterior</span>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Avaliação Média</p>
+<h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-1">4.92</h3>
+</div>
+<div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
+<span class="material-icons-outlined text-yellow-600 dark:text-yellow-400">star</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-sm">
+<span class="text-gray-900 dark:text-white font-medium">128</span>
+<span class="text-gray-400">avaliações totais</span>
+<span class="mx-1 text-gray-300">|</span>
+<span class="text-primary font-medium hover:underline cursor-pointer">Ver feedbacks</span>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm border-l-4 border-l-primary">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Novas Mensagens</p>
+<h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-1">3</h3>
+</div>
+<div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-xl">
+<span class="material-icons-outlined text-primary">chat</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-sm">
+<span class="text-gray-600 dark:text-gray-300">Tempo de resposta:</span>
+<span class="font-medium text-gray-900 dark:text-white">~1 hora</span>
+<a class="ml-auto text-sm font-medium text-primary hover:underline" href="#">Responder</a>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<div class="flex justify-between items-center">
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Chegadas de hoje</h2>
+<span class="text-sm font-medium text-gray-500 bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 px-3 py-1 rounded-full shadow-sm">
+                        Sexta-feira, 07 Mar
+                    </span>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+<div class="p-5 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition group cursor-pointer relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500 rounded-l-2xl"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-4">
+<div class="min-w-[80px] text-center md:text-left">
+<span class="block text-lg font-bold text-gray-900 dark:text-white">09:00</span>
+<span class="text-xs text-gray-500 uppercase font-semibold">Em andamento</span>
+</div>
+<div class="flex-1 flex items-center gap-3">
+<img alt="Avatar cliente" class="w-10 h-10 rounded-full object-cover border border-gray-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMO4S3RsGf0fqLa01jzc3bFfLmqis8216Aqzb5GQ7Goa3dzd_9tR2hfeW1tXDJK6EtjA9dgqirHsdFCpFBB151F5r-pTU9S86rgyWUOdwDvcHRTXWAWIVRKeD0yLkRsH-e-JDsa5SrsYdjw3LTt8JGIUP79hgNfS_dQLtVwp_RDTZhiY8JGmyMRVDdPsu9oKioH8J_deGcLRnev1S38s6gDcwEPiYGeHe261VjeNOS7DJNN4Mnf4C1DUcIM8ZBQnlL2bEvB2cBN98"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Carlos Eduardo</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">Honda Civic 2020 · <span class="text-gray-700 dark:text-gray-300 font-medium">Diagnóstico Completo</span></p>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-2 md:mt-0">
+<button class="p-2 text-gray-400 hover:text-primary transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="material-icons-outlined">chat_bubble_outline</span>
+</button>
+<button class="px-3 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition">
+                                    Detalhes
+                                </button>
+</div>
+</div>
+</div>
+<div class="p-5 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition group cursor-pointer relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-l-2xl"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-4">
+<div class="min-w-[80px] text-center md:text-left">
+<span class="block text-lg font-bold text-gray-900 dark:text-white">10:30</span>
+<span class="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Confirmado</span>
+</div>
+<div class="flex-1 flex items-center gap-3">
+<img alt="Avatar cliente" class="w-10 h-10 rounded-full object-cover border border-gray-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwGu0masLad8_T3tFguLinnE4OFRT9HIpjta0rE_uLrEnt9Pq1L7a_Do-PGue1PJGDT9jyKYjV_yXQ6b6jDMZDPhBzXT_bzg5FbymE-xQD6PgKhhmdO5p1cFUha8fpcw6wVRCMpvBAs4T5qdsHsWUcRQ9RVGckidb96romZZ8C7MJF5fZHNkdSvB75y132KOTL3kVxT8CpN2QTIWiBPtFVrfg5w6nta7JMfCpspUYnnPHT7FGNxcnjrOlEi_QzKR_n8kBKIRV5SC4"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Mariana Costa</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">Toyota Corolla · <span class="text-gray-700 dark:text-gray-300 font-medium">Alinhamento e Balanceamento</span></p>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-2 md:mt-0">
+<button class="p-2 text-gray-400 hover:text-primary transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="material-icons-outlined">chat_bubble_outline</span>
+</button>
+<button class="px-3 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition">
+                                    Detalhes
+                                </button>
+</div>
+</div>
+</div>
+<div class="p-5 hover:bg-gray-50 dark:hover:bg-gray-800 transition group cursor-pointer relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-300 dark:bg-gray-600 rounded-l-2xl"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-4">
+<div class="min-w-[80px] text-center md:text-left">
+<span class="block text-lg font-bold text-gray-900 dark:text-white">14:00</span>
+<span class="text-xs text-gray-500 uppercase font-semibold">Próximo</span>
+</div>
+<div class="flex-1 flex items-center gap-3">
+<img alt="Avatar cliente" class="w-10 h-10 rounded-full object-cover border border-gray-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1YcSCtI89A8H-Dhux4wpapemriLdUuuXOVAMYcmhDx-akNVPzWS7P50yPuYsN9WyvZes-r4HjkWbuuL0t4_Dqn8DURZsaNTUvr5nTMemuOn6Sa9ZSzhKZxyEnFyQTkc1rIMw64K9kK6k1HeRwjs26wkqsRHQXYN1rgSG-sVArHWINTqHR7fQX-DNw-DkTWuvwRXLKt545gVSLRJcR22YtOsKAtp343WrSr3309PQIGjEEp-WX-PTYsoiHbYyiCeDerA9R65qhUbg"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Pedro Alvarez</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">Fiat Toro · <span class="text-gray-700 dark:text-gray-300 font-medium">Troca de Óleo e Filtros</span></p>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-2 md:mt-0">
+<button class="p-2 text-gray-400 hover:text-primary transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="material-icons-outlined">chat_bubble_outline</span>
+</button>
+<button class="px-3 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition">
+                                    Detalhes
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex justify-center pt-2">
+<button class="text-sm font-semibold text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 rounded-lg transition">
+                        Ver agenda completa
+                    </button>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex justify-between items-center">
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Solicitações Pendentes</h2>
+<a class="text-sm font-medium text-primary hover:underline" href="#">Ver todas (4)</a>
+</div>
+<div class="bg-white dark:bg-surface-dark p-5 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm relative">
+<span class="absolute top-4 right-4 text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase tracking-wide">Novo</span>
+<div class="flex items-center gap-3 mb-4">
+<img alt="Avatar cliente" class="w-12 h-12 rounded-full object-cover border border-gray-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeOhrDjxlnLLtQV_EsuvhL86hNluma2g5Eho0lgu1pBjaMBIqaJnDlSsvq2svztHQx_hCUUEZNNFxnkFAvCUWahqblFxxxgbOjGdzn_q-aAG_7tBMvjqV31PIcPH2B962JsznBpBigqVYqDHKmtqT1VcTssPnbHIdpIC9FsygTuXca3cyTqHu3BaAfHYUkWtPUW8ypGGU6SlIaWqB8dx8NROSSE6PNMx-NKzNw77i-TJ1fAdnMEmO0n5bxtPjrWvDlw6tKKZ5wi8I"/>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">Ana Julia</h4>
+<p class="text-xs text-gray-500 dark:text-gray-400">Jeep Renegade · Revisão 10k</p>
+</div>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl mb-4 text-sm">
+<div class="flex items-center gap-2 text-gray-700 dark:text-gray-300 mb-1">
+<span class="material-icons text-sm text-gray-400">calendar_today</span>
+<span class="font-medium">10 Mar (Segunda)</span>
+</div>
+<div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+<span class="material-icons text-sm text-gray-400">schedule</span>
+<span class="font-medium">09:00 - 11:00</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            Recusar
+                        </button>
+<button class="flex items-center justify-center py-2 px-3 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-rose-600 transition shadow-sm shadow-rose-200 dark:shadow-none">
+                            Aceitar
+                        </button>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-5 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 font-bold text-lg">
+                            JP
+                        </div>
+<div>
+<h4 class="font-semibold text-gray-900 dark:text-white">João Paulo</h4>
+<p class="text-xs text-gray-500 dark:text-gray-400">Chevrolet Onix · Reparo Freios</p>
+</div>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl mb-4 text-sm">
+<div class="flex items-center gap-2 text-gray-700 dark:text-gray-300 mb-1">
+<span class="material-icons text-sm text-gray-400">calendar_today</span>
+<span class="font-medium">11 Mar (Terça)</span>
+</div>
+<div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+<span class="material-icons text-sm text-gray-400">schedule</span>
+<span class="font-medium">14:00 - 16:30</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            Recusar
+                        </button>
+<button class="flex items-center justify-center py-2 px-3 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-rose-600 transition shadow-sm shadow-rose-200 dark:shadow-none">
+                            Aceitar
+                        </button>
+</div>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 mt-6">
+<div class="flex gap-3">
+<span class="material-icons-outlined text-yellow-500">lightbulb</span>
+<div>
+<h4 class="text-sm font-bold text-gray-900 dark:text-white mb-1">Dica para aumentar ganhos</h4>
+<p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">Oficinas que respondem em menos de 1 hora têm 40% mais chances de fechar o serviço.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 pt-12 pb-6">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Suporte ao Parceiro</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Central de Ajuda</a></li>
+<li><a class="hover:underline" href="#">AirCover para Oficinas</a></li>
+<li><a class="hover:underline" href="#">Fórum da Comunidade</a></li>
+<li><a class="hover:underline" href="#">Recursos de Marketing</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Comunidade</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Eventos para Mecânicos</a></li>
+<li><a class="hover:underline" href="#">Histórias de Sucesso</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Ferramentas</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Gestão de Agenda</a></li>
+<li><a class="hover:underline" href="#">Relatórios Financeiros</a></li>
+<li><a class="hover:underline" href="#">API para Integração</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">ComparAuto</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Newsroom</a></li>
+<li><a class="hover:underline" href="#">Novos recursos</a></li>
+<li><a class="hover:underline" href="#">Carreiras</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+<div class="flex flex-wrap justify-center md:justify-start gap-2 mb-4 md:mb-0">
+<span>© 2025 ComparAuto, Inc.</span>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Privacidade</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Termos</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Mapa do site</a>
+</div>
+<div class="flex items-center gap-4 font-medium">
+<button class="flex items-center gap-1 hover:underline">
+<span class="material-icons text-base">language</span>
+                        Português (BR)
+                    </button>
+<button class="flex items-center gap-1 hover:underline">
+<span>R$</span>
+                        BRL
+                    </button>
+<div class="flex gap-3 ml-2">
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">facebook</i></a>
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">camera_alt</i></a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Confirmar Solicitação - ComparAuto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FF385C", // Airbnb-like primary color (pink/red)
+              "background-light": "#FFFFFF",
+              "background-dark": "#0F172A",
+              "surface-light": "#F7F7F7",
+              "surface-dark": "#1E293B",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '0.75rem',
+              '2xl': '1rem',
+            },
+          },
+        },
+      };
+    </script>
+<style>::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+      }
+      .dark ::-webkit-scrollbar-thumb {
+        background-color: #475569;
+      }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-200">
+<header class="fixed w-full top-0 z-50 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+<div class="max-w-7xl mx-auto flex justify-between items-center">
+<a class="flex items-center gap-2" href="#">
+<span class="text-primary material-icons-outlined text-3xl">build_circle</span>
+<span class="text-primary text-xl font-bold tracking-tight">ComparAuto</span>
+</a>
+<div class="hidden md:flex items-center gap-4 text-sm font-medium">
+<div class="flex items-center gap-2 text-primary">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs">1</span>
+<span>Revisar pedido</span>
+</div>
+<div class="w-8 h-[1px] bg-gray-300 dark:bg-gray-600"></div>
+<div class="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+<span class="flex items-center justify-center w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600 text-xs">2</span>
+<span>Aguardar confirmação</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:block text-xs font-semibold text-gray-500 uppercase tracking-wide">Ambiente Seguro</div>
+</div>
+</div>
+</header>
+<main class="pt-28 pb-16 px-6 max-w-7xl mx-auto">
+<div class="mb-8 flex items-center gap-2">
+<button class="p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition text-gray-800 dark:text-white">
+<span class="material-icons text-xl">chevron_left</span>
+</button>
+<h1 class="text-3xl font-semibold text-gray-900 dark:text-white">Solicitação de agendamento</h1>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-12 lg:gap-24">
+<div>
+<div class="border-b border-gray-200 dark:border-gray-700 pb-8 mb-8">
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Seu agendamento</h2>
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Data</div>
+<div class="text-gray-600 dark:text-gray-400 mt-1">15 de Março de 2025 · 09:00</div>
+</div>
+<button class="font-semibold underline text-gray-900 dark:text-white hover:text-gray-600">Editar</button>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Serviço</div>
+<div class="text-gray-600 dark:text-gray-400 mt-1">Troca de Óleo</div>
+</div>
+<button class="font-semibold underline text-gray-900 dark:text-white hover:text-gray-600">Editar</button>
+</div>
+</div>
+<div class="border-b border-gray-200 dark:border-gray-700 pb-8 mb-8">
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Forma de pagamento</h2>
+<div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-xl mb-4">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-300">credit_card</span>
+<div class="flex-1">
+<p class="font-medium text-gray-900 dark:text-white">Pagamento na Oficina</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">Você pagará diretamente ao mecânico após a conclusão do serviço.</p>
+</div>
+<span class="material-icons text-gray-400">check_circle</span>
+</div>
+</div>
+<div class="border-b border-gray-200 dark:border-gray-700 pb-8 mb-8">
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Mensagem para o mecânico</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Compartilhe detalhes sobre o modelo do seu carro ou problemas específicos.</p>
+<div class="relative">
+<textarea class="w-full border border-gray-300 dark:border-gray-600 rounded-xl p-4 h-32 bg-white dark:bg-surface-dark text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent resize-none" placeholder="Olá, Roberto! Tenho um Honda Civic 2018 e gostaria de verificar também..."></textarea>
+</div>
+</div>
+<div class="border-b border-gray-200 dark:border-gray-700 pb-8 mb-8">
+<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Política de cancelamento</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                    Cancelamento gratuito até 24 horas antes do agendamento. Se cancelar depois desse prazo, a oficina reserva o direito de não aceitar novos agendamentos imediatos. <span class="font-semibold underline text-gray-900 dark:text-white cursor-pointer">Saiba mais</span>
+</p>
+</div>
+<div class="pt-4">
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-6">
+                    Ao selecionar o botão abaixo, eu concordo com as <a class="underline font-semibold" href="#">Regras da Oficina</a>, <a class="underline font-semibold" href="#">Política de Reagendamento e Reembolso</a> e com os <a class="underline font-semibold" href="#">Termos de Serviço</a> do ComparAuto.
+                </p>
+<button class="w-full md:w-auto bg-primary hover:bg-rose-600 text-white text-lg font-bold py-4 px-12 rounded-xl transition shadow-lg shadow-rose-200/50 dark:shadow-none">
+                    Confirmar e Enviar Pedido
+                </button>
+</div>
+</div>
+<div class="relative hidden md:block">
+<div class="sticky top-28 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-xl shadow-gray-100 dark:shadow-none bg-white dark:bg-surface-dark">
+<div class="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-700 pb-6">
+<div class="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Mecânica São Luís Central" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRuB4pA_OcppZ_Bx6GYjL1TQiwsH7TmlNV6smhKZTf7t_-qUPWuE9s5KNVVmCelhOmWWRErtOku-wh_2ZI9_XMs4Y69fegVn073x4fJLjbTeywpmf00ALAVq3fMaWZO0t5vgO-XOaDzZxPedI7qPsnRePl42VDMVWm6VksShJoCr_MDzzTWTuNpWDYtdB0iXpnTwdC-S81i9bdczhjDSCcslNBeg3MTZYibwSQSWqQkJGDjsUROsIxcUB2hwvr16-MPcSVKN3shdI"/>
+</div>
+<div class="flex flex-col justify-center">
+<div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide mb-1">Oficina Verificada</div>
+<h3 class="text-base font-semibold text-gray-900 dark:text-white leading-snug">Mecânica São Luís Central</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Cohama, São Luís</p>
+<div class="flex items-center gap-1 mt-1 text-sm">
+<span class="material-icons text-primary text-sm">star</span>
+<span class="font-medium text-gray-900 dark:text-white">4.92</span>
+<span class="text-gray-400">(128)</span>
+</div>
+</div>
+</div>
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Detalhes do preço</h3>
+<div class="space-y-4 text-gray-600 dark:text-gray-300 text-sm">
+<div class="flex justify-between">
+<span class="underline decoration-gray-300">Troca de Óleo (Estimado)</span>
+<span>R$ 150,00</span>
+</div>
+<div class="flex justify-between">
+<span class="underline decoration-gray-300">Taxa de serviço</span>
+<span>R$ 25,00</span>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 mt-6 pt-6 flex justify-between items-center">
+<span class="font-bold text-gray-900 dark:text-white text-base">Total (BRL)</span>
+<span class="font-bold text-gray-900 dark:text-white text-lg">R$ 175,00</span>
+</div>
+<div class="mt-4 bg-gray-100 dark:bg-gray-800 p-3 rounded-lg flex gap-3 items-start">
+<span class="material-icons-outlined text-gray-500 mt-0.5 text-sm">info</span>
+<p class="text-xs text-gray-500 dark:text-gray-400 leading-tight">O valor final pode variar dependendo de peças adicionais necessárias após o diagnóstico.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 pt-12 pb-6">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Suporte</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Central de Ajuda</a></li>
+<li><a class="hover:underline" href="#">AirCover para Oficinas</a></li>
+<li><a class="hover:underline" href="#">Cancelamento</a></li>
+<li><a class="hover:underline" href="#">Opções de cancelamento</a></li>
+<li><a class="hover:underline" href="#">Nossa resposta à COVID-19</a></li>
+<li><a class="hover:underline" href="#">Denunciar um problema</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Comunidade</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">ComparAuto.org: ajuda em desastres</a></li>
+<li><a class="hover:underline" href="#">Combate à discriminação</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">Hospedagem</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Cadastre sua oficina</a></li>
+<li><a class="hover:underline" href="#">ComparAuto Cover para mecânicos</a></li>
+<li><a class="hover:underline" href="#">Recursos para oficinas</a></li>
+<li><a class="hover:underline" href="#">Fórum da comunidade</a></li>
+<li><a class="hover:underline" href="#">Hospedagem responsável</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-gray-900 dark:text-white mb-4">ComparAuto</h5>
+<ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+<li><a class="hover:underline" href="#">Newsroom</a></li>
+<li><a class="hover:underline" href="#">Saiba mais sobre novos recursos</a></li>
+<li><a class="hover:underline" href="#">Carta dos fundadores</a></li>
+<li><a class="hover:underline" href="#">Carreiras</a></li>
+<li><a class="hover:underline" href="#">Investidores</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 dark:text-gray-400">
+<div class="flex flex-wrap justify-center md:justify-start gap-2 mb-4 md:mb-0">
+<span>© 2025 ComparAuto, Inc.</span>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Privacidade</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Termos</a>
+<span class="hidden md:inline">·</span>
+<a class="hover:underline" href="#">Mapa do site</a>
+</div>
+<div class="flex items-center gap-4 font-medium">
+<button class="flex items-center gap-1 hover:underline">
+<span class="material-icons text-base">language</span>
+                    Português (BR)
+                </button>
+<button class="flex items-center gap-1 hover:underline">
+<span>R$</span>
+                    BRL
+                </button>
+<div class="flex gap-3 ml-2">
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">facebook</i></a>
+<a class="hover:text-gray-900 dark:hover:text-white" href="#"><i class="material-icons text-lg">camera_alt</i></a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>

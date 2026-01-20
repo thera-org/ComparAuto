@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Localização da Oficina - ComparAuto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FF385C", // Airbnb-like primary color (pink/red)
+              "background-light": "#FFFFFF",
+              "background-dark": "#0F172A",
+              "surface-light": "#F7F7F7",
+              "surface-dark": "#1E293B",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '0.75rem',
+              '2xl': '1rem',
+            },
+          },
+        },
+      };
+    </script>
+<style>::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+      }
+      .dark ::-webkit-scrollbar-thumb {
+        background-color: #475569;
+      }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 font-sans antialiased h-screen flex flex-col overflow-hidden">
+<header class="fixed w-full top-0 z-50 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700 px-6 h-20 flex items-center justify-between">
+<a class="flex items-center gap-2" href="#">
+<span class="text-primary material-icons-outlined text-3xl">build_circle</span>
+<span class="text-primary text-xl font-bold tracking-tight">ComparAuto</span>
+</a>
+<div class="flex items-center gap-4">
+<button class="text-sm font-medium px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition text-gray-600 dark:text-gray-300">
+            Salvar e sair
+        </button>
+<button class="hidden md:block text-sm font-medium px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition text-gray-600 dark:text-gray-300">
+            Dúvidas?
+        </button>
+</div>
+</header>
+<main class="flex-1 mt-20 relative w-full h-full">
+<div class="absolute inset-0 z-0 bg-gray-200 dark:bg-gray-800 overflow-hidden">
+<img alt="Mapa interativo da região" class="w-full h-full object-cover opacity-90 scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3x2zWmy5vgxFPyIki4LdbMpfjCjIaTlDcU238IzRdn_e7anmhsv_BAZfHUA2VeuDowzks0-7pJ8lOX5dI9nNzw61C8p128uFA2PwPLGzAPIht6uuceTvWA3pJVXOBUTbM9ciogg2uc6UKrv2gs11tg27l2SbozFjBgCR1wBHklJry1l3CNN3c3ALsrJWfm5TvisTV_nk1m3HekZkvaSho8Rjj1vrcRHouzJSQqQTOYqHluXPhCUc9hxlKpDxknHL_N6hWmVmtDu4"/>
+<div class="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center drop-shadow-2xl">
+<span class="material-icons text-primary text-6xl filter drop-shadow-md pb-1 relative top-2">location_on</span>
+<div class="w-4 h-2 bg-black/30 rounded-[100%] blur-[2px]"></div>
+<div class="bg-white dark:bg-surface-dark px-4 py-2 rounded-full shadow-xl mt-2 text-xs font-bold text-gray-800 dark:text-white whitespace-nowrap border border-gray-100 dark:border-gray-600 animate-bounce">
+                Arraste o mapa para ajustar
+            </div>
+</div>
+<div class="absolute top-1/3 left-[40%] p-1.5 bg-white dark:bg-surface-dark rounded-xl shadow-md flex items-center gap-1 opacity-80 hover:opacity-100 hover:scale-110 transition cursor-pointer">
+<span class="font-bold text-[10px] text-gray-800 dark:text-white px-1">R$ 120</span>
+</div>
+<div class="absolute bottom-1/4 right-[20%] p-1.5 bg-white dark:bg-surface-dark rounded-xl shadow-md flex items-center gap-1 opacity-80 hover:opacity-100 hover:scale-110 transition cursor-pointer">
+<span class="font-bold text-[10px] text-gray-800 dark:text-white px-1">R$ 180</span>
+</div>
+<div class="absolute top-[20%] right-[30%] p-1.5 bg-white dark:bg-surface-dark rounded-xl shadow-md flex items-center gap-1 opacity-80 hover:opacity-100 hover:scale-110 transition cursor-pointer">
+<span class="font-bold text-[10px] text-gray-800 dark:text-white px-1">R$ 150</span>
+</div>
+</div>
+<div class="absolute top-0 left-0 h-full w-full md:w-[480px] z-30 pointer-events-none flex flex-col justify-center p-4 md:p-6">
+<div class="bg-white dark:bg-surface-dark rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden pointer-events-auto max-h-[calc(100vh-120px)] overflow-y-auto w-full">
+<div class="p-6 md:p-8">
+<div class="mb-6">
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Onde fica sua oficina?</h1>
+<p class="text-sm text-gray-500 dark:text-gray-400">Confirme o endereço da sua oficina em São Luís. Sua localização exata só será mostrada aos clientes após a confirmação do agendamento.</p>
+</div>
+<form class="space-y-4" onsubmit="return false;">
+<div class="relative">
+<input class="peer block px-4 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-transparent rounded-xl border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer" id="cep" placeholder=" " type="text" value="65074-000"/>
+<label class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium bg-white dark:bg-surface-dark px-1" for="cep">CEP</label>
+<div class="absolute right-3 top-4">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+</div>
+<div class="relative">
+<input class="peer block px-4 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-transparent rounded-xl border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer" id="address" placeholder=" " type="text" value="Av. Daniel de La Touche"/>
+<label class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium bg-white dark:bg-surface-dark px-1" for="address">Endereço</label>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="relative">
+<input class="peer block px-4 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-transparent rounded-xl border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer" id="neighborhood" placeholder=" " type="text" value="Cohama"/>
+<label class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium bg-white dark:bg-surface-dark px-1" for="neighborhood">Bairro</label>
+</div>
+<div class="relative">
+<input class="peer block px-4 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-transparent rounded-xl border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer" id="number" placeholder=" " type="text"/>
+<label class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium bg-white dark:bg-surface-dark px-1" for="number">Número</label>
+</div>
+</div>
+<div class="relative">
+<input class="peer block px-4 pb-2.5 pt-5 w-full text-sm text-gray-500 bg-gray-50 rounded-xl border border-gray-300 appearance-none dark:text-gray-400 dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-0 peer cursor-not-allowed" disabled="" id="city" placeholder=" " type="text" value="São Luís, MA"/>
+<label class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium bg-transparent px-1" for="city">Cidade</label>
+<div class="absolute right-3 top-4">
+<span class="material-icons text-gray-400 text-lg">lock</span>
+</div>
+</div>
+<div class="relative">
+<input class="peer block px-4 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-transparent rounded-xl border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer" id="complement" placeholder=" " type="text"/>
+<label class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium bg-white dark:bg-surface-dark px-1" for="complement">Complemento (opcional)</label>
+</div>
+<div class="pt-4">
+<button class="w-full bg-gradient-to-r from-primary to-rose-600 hover:from-rose-600 hover:to-primary text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-rose-200 dark:shadow-none flex items-center justify-center gap-2">
+                            Confirmar Localização
+                        </button>
+</div>
+</form>
+<div class="mt-4 text-center">
+<button class="text-gray-500 dark:text-gray-400 text-sm font-medium hover:underline transition">
+                        Não encontrei meu endereço
+                    </button>
+</div>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800/50 p-4 border-t border-gray-200 dark:border-gray-700 flex items-start gap-3">
+<span class="material-icons-outlined text-gray-500 dark:text-gray-400 text-lg mt-0.5">lightbulb</span>
+<p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+<strong>Dica de Hospedagem:</strong> Oficinas com localização precisa recebem 30% mais agendamentos de revisão.
+                </p>
+</div>
+</div>
+</div>
+<div class="absolute bottom-8 right-8 z-20 flex flex-col gap-2">
+<button aria-label="Minha localização" class="bg-white dark:bg-surface-dark h-10 w-10 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white transition flex items-center justify-center border border-gray-100 dark:border-gray-600">
+<span class="material-icons text-xl">my_location</span>
+</button>
+<div class="flex flex-col rounded-lg shadow-lg bg-white dark:bg-surface-dark overflow-hidden border border-gray-100 dark:border-gray-600">
+<button aria-label="Zoom In" class="h-10 w-10 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white transition flex items-center justify-center border-b border-gray-100 dark:border-gray-600">
+<span class="material-icons text-xl">add</span>
+</button>
+<button aria-label="Zoom Out" class="h-10 w-10 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white transition flex items-center justify-center">
+<span class="material-icons text-xl">remove</span>
+</button>
+</div>
+</div>
+</main>
+
+</body></html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ComparAuto - Minha Conta</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ff385c", // Airbnb-ish Red/Pink
+              "primary-hover": "#d9324e",
+              "background-light": "#ffffff",
+              "background-dark": "#1f2937",
+              "surface-light": "#f7f7f7",
+              "surface-dark": "#374151",
+              "text-main-light": "#222222",
+              "text-main-dark": "#f3f4f6",
+              "text-secondary-light": "#717171",
+              "text-secondary-dark": "#9ca3af",
+            },
+            fontFamily: {
+              display: ["Circular Std", "Helvetica", "Arial", "sans-serif"],
+              sans: ["Circular Std", "Helvetica", "Arial", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '1rem',
+              '2xl': '1.5rem',
+            },
+            boxShadow: {
+              'card': '0 6px 16px rgba(0,0,0,0.12)',
+              'subtle': '0 1px 2px rgba(0,0,0,0.08)',
+            }
+          },
+        },
+      };
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-200">
+<header class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+<span class="material-icons text-primary text-3xl">build_circle</span>
+<span class="text-primary font-bold text-2xl tracking-tight">ComparAuto</span>
+</div>
+<div class="hidden md:flex items-center bg-white dark:bg-surface-dark border border-gray-300 dark:border-gray-600 rounded-full shadow-sm hover:shadow-md transition-shadow py-2 px-4 divide-x divide-gray-300 dark:divide-gray-600">
+<button class="px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Qualquer serviço</button>
+<button class="px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Localização</button>
+<div class="pl-4 flex items-center gap-3">
+<span class="text-sm text-gray-500 dark:text-gray-400">Filtros</span>
+<button class="bg-primary hover:bg-primary-hover text-white p-2 rounded-full flex items-center justify-center w-8 h-8">
+<span class="material-icons text-sm">search</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<a class="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-full transition-colors" href="#">Cadastrar sua Oficina</a>
+<button class="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-full transition-colors">
+<span class="material-icons-outlined">language</span>
+</button>
+<button class="flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-full p-1 pl-3 hover:shadow-md transition-shadow bg-white dark:bg-surface-dark">
+<span class="material-icons text-gray-500 dark:text-gray-400">menu</span>
+<div class="bg-gray-500 text-white rounded-full p-1">
+<span class="material-icons text-xl">person</span>
+</div>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<section class="mb-10">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div>
+<h1 class="text-3xl font-bold mb-2">Olá, Ricardo!</h1>
+<p class="text-text-secondary-light dark:text-text-secondary-dark">Gerencie seus dados e serviços automotivos.</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-subtle flex items-center gap-4 max-w-md w-full">
+<div class="relative w-12 h-12 flex-shrink-0">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+<path class="text-gray-300 dark:text-gray-600" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="75, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-primary">75%</span>
+</div>
+<div class="flex-1">
+<h3 class="text-sm font-semibold">Complete seu perfil</h3>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">Adicione seu veículo para recomendações personalizadas.</p>
+</div>
+<button class="text-sm text-primary font-medium hover:underline whitespace-nowrap">Completar</button>
+</div>
+</div>
+</section>
+<div class="flex flex-col lg:flex-row gap-10">
+<aside class="w-full lg:w-64 flex-shrink-0">
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-surface-dark text-primary font-medium rounded-lg" href="#">
+<span class="material-icons-outlined">person</span>
+                        Informações Pessoais
+                    </a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-surface-dark rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined">calendar_today</span>
+                        Meus Agendamentos
+                    </a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-surface-dark rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined">directions_car</span>
+                        Meus Veículos
+                    </a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-surface-dark rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined">credit_card</span>
+                        Pagamentos
+                    </a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-surface-dark rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined">security</span>
+                        Segurança
+                    </a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-surface-dark rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined">settings</span>
+                        Preferências
+                    </a>
+</nav>
+<div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6 px-4">
+<button class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 font-medium">Sair da conta</button>
+</div>
+</aside>
+<div class="flex-1">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-card transition-all cursor-pointer group">
+<div class="mb-4 text-primary bg-red-50 dark:bg-red-900/20 w-12 h-12 rounded-full flex items-center justify-center">
+<span class="material-icons-outlined">badge</span>
+</div>
+<h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Dados Pessoais</h3>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">Atualize suas informações de contato e endereço para facilitar o serviço.</p>
+<span class="text-sm font-medium underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 group-hover:decoration-primary transition-all">Editar dados</span>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-card transition-all cursor-pointer group">
+<div class="mb-4 text-primary bg-red-50 dark:bg-red-900/20 w-12 h-12 rounded-full flex items-center justify-center">
+<span class="material-icons-outlined">history</span>
+</div>
+<h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Histórico de Serviços</h3>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">Veja orçamentos passados e detalhes de manutenções realizadas.</p>
+<span class="text-sm font-medium underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 group-hover:decoration-primary transition-all">Ver histórico</span>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-card transition-all cursor-pointer group">
+<div class="mb-4 text-primary bg-red-50 dark:bg-red-900/20 w-12 h-12 rounded-full flex items-center justify-center">
+<span class="material-icons-outlined">directions_car</span>
+</div>
+<h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Meus Veículos</h3>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">Gerencie os carros cadastrados para agendamento rápido.</p>
+<span class="text-sm font-medium underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 group-hover:decoration-primary transition-all">Gerenciar veículos</span>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-card transition-all cursor-pointer group">
+<div class="mb-4 text-primary bg-red-50 dark:bg-red-900/20 w-12 h-12 rounded-full flex items-center justify-center">
+<span class="material-icons-outlined">payment</span>
+</div>
+<h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Pagamentos e Reembolsos</h3>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">Consulte faturas, recibos e status de reembolsos.</p>
+<span class="text-sm font-medium underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 group-hover:decoration-primary transition-all">Ver pagamentos</span>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-card transition-all cursor-pointer group">
+<div class="mb-4 text-primary bg-red-50 dark:bg-red-900/20 w-12 h-12 rounded-full flex items-center justify-center">
+<span class="material-icons-outlined">lock</span>
+</div>
+<h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Login e Segurança</h3>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">Altere sua senha e configure a autenticação de dois fatores.</p>
+<span class="text-sm font-medium underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 group-hover:decoration-primary transition-all">Atualizar segurança</span>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-card transition-all cursor-pointer group">
+<div class="mb-4 text-primary bg-red-50 dark:bg-red-900/20 w-12 h-12 rounded-full flex items-center justify-center">
+<span class="material-icons-outlined">help_outline</span>
+</div>
+<h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Central de Ajuda</h3>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">Tire dúvidas sobre serviços, pagamentos e suporte técnico.</p>
+<span class="text-sm font-medium underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 group-hover:decoration-primary transition-all">Obter ajuda</span>
+</div>
+</div>
+<div class="mt-10">
+<h2 class="text-xl font-bold mb-4">Atividade Recente</h2>
+<div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+<div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer">
+<div class="bg-green-100 text-green-600 p-2 rounded-full">
+<span class="material-icons text-sm">check_circle</span>
+</div>
+<div>
+<h4 class="text-sm font-semibold">Serviço Concluído</h4>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">A troca de óleo na oficina <strong>Oficina São Luís Central</strong> foi finalizada.</p>
+<span class="text-xs text-gray-400 mt-2 block">Hoje, 14:30</span>
+</div>
+</div>
+<div class="p-4 flex items-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer">
+<div class="bg-blue-100 text-blue-600 p-2 rounded-full">
+<span class="material-icons text-sm">schedule</span>
+</div>
+<div>
+<h4 class="text-sm font-semibold">Agendamento Confirmado</h4>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">Seu alinhamento na <strong>Pneus &amp; Alinhamento SLZ</strong> está marcado para amanhã.</p>
+<span class="text-xs text-gray-400 mt-2 block">Ontem, 09:15</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<section class="bg-surface-light dark:bg-surface-dark py-16 border-t border-gray-200 dark:border-gray-700 mt-12">
+<div class="max-w-4xl mx-auto px-4 text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-primary/20 text-primary mb-6">
+<span class="material-icons text-3xl">contact_support</span>
+</div>
+<h2 class="text-3xl font-bold mb-4">Precisa de ajuda?</h2>
+<p class="text-text-secondary-light dark:text-text-secondary-dark mb-8 max-w-2xl mx-auto">
+                Nossa Central de Ajuda está pronta para tirar todas as suas dúvidas sobre serviços, agendamentos e garantias de forma rápida e eficiente.
+            </p>
+<a class="inline-block px-8 py-3 rounded-full border border-gray-900 dark:border-white text-gray-900 dark:text-white font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="#">
+                Acessar Central de Ajuda
+            </a>
+</div>
+</section>
+<div class="bg-white dark:bg-background-dark py-12 border-b border-gray-200 dark:border-gray-700">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-100 dark:divide-gray-800">
+<div>
+<div class="text-3xl font-bold text-gray-900 dark:text-white">500+</div>
+<div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Oficinas Parceiras</div>
+</div>
+<div>
+<div class="text-3xl font-bold text-gray-900 dark:text-white">4.8★</div>
+<div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Avaliação Média</div>
+</div>
+<div>
+<div class="text-3xl font-bold text-gray-900 dark:text-white">50k+</div>
+<div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Clientes Satisfeitos</div>
+</div>
+<div>
+<div class="text-3xl font-bold text-gray-900 dark:text-white">100%</div>
+<div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Garantia</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="bg-white dark:bg-background-dark pt-12 pb-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+<div class="col-span-1 lg:col-span-1">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons text-primary text-2xl">build_circle</span>
+<span class="text-primary font-bold text-xl tracking-tight">ComparAuto</span>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
+                        Oferecemos qualidade, confiança e transparência em serviços automotivos, conectando clientes a oficinas.
+                    </p>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-icons-outlined text-primary text-sm">email</span>
+                            contato@comparauto.com
+                        </div>
+<div class="flex items-center gap-2 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-icons-outlined text-primary text-sm">phone</span>
+                            (98) 98571-8468
+                        </div>
+<div class="flex items-center gap-2 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-icons-outlined text-primary text-sm">place</span>
+                            São Luís, Maranhão
+                        </div>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-gray-900 dark:text-white mb-4">Plataforma</h4>
+<ul class="space-y-3 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<li><a class="hover:underline" href="#">Login</a></li>
+<li><a class="hover:underline" href="#">Criar Conta</a></li>
+<li><a class="hover:underline" href="#">Minha Conta</a></li>
+<li><a class="hover:underline" href="#">Mensagens</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-gray-900 dark:text-white mb-4">Legal</h4>
+<ul class="space-y-3 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<li><a class="hover:underline" href="#">Termos de Uso</a></li>
+<li><a class="hover:underline" href="#">Política de Privacidade</a></li>
+</ul>
+</div>
+<div class="col-span-1 lg:col-span-1">
+<div class="bg-gray-50 dark:bg-surface-dark rounded-xl p-6 border border-gray-100 dark:border-gray-700">
+<h4 class="font-bold text-gray-900 dark:text-white mb-2">Para Oficinas</h4>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mb-4">
+                            Aumente sua visibilidade e atraia mais clientes qualificados para o seu negócio.
+                        </p>
+<button class="w-full bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900 font-semibold py-2 px-4 rounded-lg text-sm transition-colors">
+                            Cadastrar sua Oficina
+                        </button>
+</div>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<div class="flex items-center gap-2">
+<span>© 2025 ComparAuto.</span>
+<span class="hidden md:inline">•</span>
+<span>Desenvolvido pela equipe ComparAuto.</span>
+</div>
+<div class="flex items-center gap-6 font-medium text-gray-900 dark:text-white">
+<div class="flex items-center gap-1 cursor-pointer">
+<span class="material-icons text-sm">language</span>
+                        Português (BR)
+                    </div>
+<div class="cursor-pointer">
+                        R$ BRL
+                    </div>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>
