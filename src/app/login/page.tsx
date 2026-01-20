@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import type React from 'react'
 import { useState, useEffect, useRef } from 'react'
 
+import { useAuth } from '@/contexts/AuthContext'
 import { useAppNotifications } from '@/hooks/useAppNotifications'
-import { supabase } from '@/lib/supabase'
 
 import styles from './login.module.css'
 
@@ -17,6 +17,8 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export default function LoginPage() {
   const router = useRouter()
   const { auth } = useAppNotifications()
+  const { isAuthenticated, isLoading: authLoading, login, loginWithOAuth } = useAuth()
+
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,27 +29,14 @@ export default function LoginPage() {
   const [blockedUntil, setBlockedUntil] = useState<number | null>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Checa autenticação ao montar
+  // Redireciona se já autenticado
   useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser()
-      if (error) return
-      if (user) {
-        // Se veio com redirect, manda para lá
-        const params = new URLSearchParams(window.location.search)
-        const redirect = params.get('redirect')
-        if (redirect) {
-          router.replace(redirect)
-        } else {
-          router.replace('/')
-        }
-      }
+    if (!authLoading && isAuthenticated) {
+      const params = new URLSearchParams(window.location.search)
+      const redirect = params.get('redirect')
+      router.replace(redirect || '/')
     }
-    checkAuth()
-  }, [router])
+  }, [authLoading, isAuthenticated, router])
 
   // Bloqueio temporário após 5 tentativas
   useEffect(() => {
@@ -82,60 +71,40 @@ export default function LoginPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-  } // Submissão do login
+  }
+
+  // Submissão do login
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError('')
+
     if (blockedUntil && Date.now() < blockedUntil) {
       const remainingTime = Math.ceil((blockedUntil - Date.now()) / 1000)
       setError(`Login temporariamente bloqueado. Tente novamente em ${remainingTime} segundos.`)
       return
     }
+
     if (emailError || passwordError) return
+
     setLoading(true)
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      })
+      const result = await login(formData.email, formData.password)
 
-      if (error) {
+      if (!result.success) {
         setLoginAttempts(a => a + 1)
-        if (error.message.includes('Invalid login credentials')) {
-          const errorMsg = 'E-mail ou senha incorretos.'
-          setError(errorMsg)
-          auth.loginError(errorMsg)
-        } else if (error.message.includes('Email not confirmed')) {
-          const errorMsg = 'Por favor, confirme seu e-mail antes de fazer login.'
-          setError(errorMsg)
-          auth.loginError(errorMsg)
-        } else if (error.message.includes('Too many requests')) {
-          const errorMsg = 'Muitas tentativas de login. Tente novamente mais tarde.'
-          setError(errorMsg)
-          auth.loginError(errorMsg)
-        } else {
-          const errorMsg = 'Falha ao fazer login. Verifique suas informações.'
-          setError(errorMsg)
-          auth.loginError(errorMsg)
-        }
+        setError(result.error || 'Falha ao fazer login.')
+        auth.loginError(result.error)
         return
-      } // Login bem-sucedido
-      if (data.session) {
-        // Reset login attempts on successful login
-        setLoginAttempts(0)
-
-        auth.loginSuccess()
-
-        // Verifica se há parâmetro de redirect
-        const params = new URLSearchParams(window.location.search)
-        const redirect = params.get('redirect')
-
-        if (redirect) {
-          router.replace(redirect)
-        } else {
-          router.replace('/')
-        }
       }
+
+      // Login bem-sucedido
+      setLoginAttempts(0)
+      auth.loginSuccess()
+
+      // Verifica se há parâmetro de redirect
+      const params = new URLSearchParams(window.location.search)
+      const redirect = params.get('redirect')
+      router.replace(redirect || '/')
     } catch {
       setError('Erro inesperado ao fazer login.')
     } finally {
@@ -147,18 +116,14 @@ export default function LoginPage() {
   const handleOAuthLogin = async (provider: 'google' | 'facebook' | 'apple') => {
     try {
       setLoading(true)
+      const result = await loginWithOAuth(provider)
 
-      // Usar NEXT_PUBLIC_SITE_URL se disponível, caso contrário usar window.location.origin
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: baseUrl,
-        },
-      })
-      if (error)
-        setError('Erro ao entrar com ' + provider.charAt(0).toUpperCase() + provider.slice(1))
+      if (!result.success) {
+        setError(
+          result.error ||
+            'Erro ao entrar com ' + provider.charAt(0).toUpperCase() + provider.slice(1)
+        )
+      }
     } catch {
       setError(
         'Erro inesperado ao entrar com ' + provider.charAt(0).toUpperCase() + provider.slice(1)
@@ -171,6 +136,21 @@ export default function LoginPage() {
   // Bloqueio de login
   const isBlocked = blockedUntil && Date.now() < blockedUntil
   const blockSeconds = isBlocked ? Math.ceil((blockedUntil! - Date.now()) / 1000) : 0
+
+  // Loading state enquanto verifica autenticação
+  if (authLoading) {
+    return (
+      <div className={styles.loginContainer}>
+        <div className={styles.loginCard}>
+          <div className={styles.loadingState}>
+            <Loader2 className={styles.spinning} size={32} />
+            <p>Verificando autenticação...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Renderização principal
   return (
     <div className={styles.loginContainer}>

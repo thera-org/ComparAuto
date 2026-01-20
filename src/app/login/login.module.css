@@ -277,6 +277,21 @@
   gap: 1.25rem;
 }
 
+/* Loading State */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+}
+
+.loadingState p {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .loginCard {
