@@ -48,7 +48,9 @@ export function UserDropdown() {
     fetchUser()
 
     // Listener para mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user
       if (user) {
         setUser({
