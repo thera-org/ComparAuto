@@ -12,9 +12,9 @@ export default function CadastroOficina() {
   async function handleCadastroClick(e: React.MouseEvent) {
     e.preventDefault()
     const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (!session?.user) {
       // Not logged in, redirect to login with redirect param
       router.push('/login?redirect=/cadastro-oficina/formulario')
     } else {

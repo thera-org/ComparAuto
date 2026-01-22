@@ -23,15 +23,16 @@ export function UserDropdown() {
   useEffect(() => {
     const fetchUser = async () => {
       const {
-        data: { user },
+        data: { session },
         error,
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getSession()
 
       if (error) {
-        console.error('Error fetching user:', error)
+        console.error('Error fetching session:', error)
         return
       }
 
+      const user = session?.user
       if (user) {
         setUser({
           id: user.id,
@@ -45,6 +46,25 @@ export function UserDropdown() {
     }
 
     fetchUser()
+
+    // Listener para mudanças de autenticação
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user
+      if (user) {
+        setUser({
+          id: user.id,
+          email: user.email || '',
+          photoURL: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+          displayName: user.user_metadata?.full_name || user.user_metadata?.name || '',
+        })
+      } else {
+        setUser(null)
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const handleSignOut = async () => {

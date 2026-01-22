@@ -197,8 +197,9 @@ export default function MultiStepFullPageForm() {
       setSubmitting(true)
 
       const {
-        data: { user },
-      } = await supabase.auth.getUser()
+        data: { session },
+      } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) throw new Error('Usuário não autenticado')
 
       // Verificar se o usuário existe na tabela usuarios
@@ -353,12 +354,13 @@ export default function MultiStepFullPageForm() {
     avatar_url: string
   } | null>(null)
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user
+      if (user) {
         setUserData({
-          nome: data.user.user_metadata?.full_name || data.user.email || 'Usuário',
-          email: data.user.email || '',
-          avatar_url: data.user.user_metadata?.avatar_url || '/placeholder.svg',
+          nome: user.user_metadata?.full_name || user.email || 'Usuário',
+          email: user.email || '',
+          avatar_url: user.user_metadata?.avatar_url || '/placeholder.svg',
         })
       }
     })

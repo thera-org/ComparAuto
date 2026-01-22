@@ -18,14 +18,16 @@ export default function UserAvatar() {
   useEffect(() => {
     const fetchUser = async () => {
       const {
-        data: { user },
+        data: { session },
         error,
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getSession()
 
       if (error) {
-        console.error('Error fetching user:', error)
+        console.error('Error fetching session:', error)
         return
       }
+
+      const user = session?.user
 
       if (user) {
         setUser({
