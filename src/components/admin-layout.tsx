@@ -1,15 +1,11 @@
 'use client'
 
-import { LayoutDashboard, Users, Wrench, Menu, LogOut, Search } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import type React from 'react'
 
 import UserAvatar from '@/app/admin/user-avatar'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { supabase } from '@/lib/supabase'
 
 interface AdminLayoutProps {
@@ -26,6 +22,7 @@ export default function AdminLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [adminName, setAdminName] = useState<string | null>(null)
 
   useEffect(() => {
@@ -39,11 +36,8 @@ export default function AdminLayout({
   }, [])
 
   useEffect(() => {
-    // Verificar autenticação e obter dados do admin
     const getAdminData = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
 
       if (session?.user) {
         const { data: userData } = await supabase
@@ -64,72 +58,38 @@ export default function AdminLayout({
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    // Limpar qualquer dado local
     localStorage.removeItem('admin')
     localStorage.removeItem('adminData')
     window.location.href = '/admin/login'
   }
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    // Limpar qualquer dado local
-    localStorage.removeItem('admin')
-    localStorage.removeItem('adminData')
-    router.push('/admin/login')
-  }
-
   const navItems = [
-    {
-      href: '/admin',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      description: 'Visão geral do sistema',
-    },
-    {
-      href: '/admin/usuarios',
-      label: 'Usuários',
-      icon: Users,
-      description: 'Gerenciar usuários',
-    },
-    {
-      href: '/admin/oficinas',
-      label: 'Oficinas',
-      icon: Wrench,
-      description: 'Gerenciar oficinas',
-    },
+    { href: '/admin', label: 'Dashboard', icon: 'dashboard', description: 'Visão geral' },
+    { href: '/admin/usuarios', label: 'Usuários', icon: 'people', description: 'Gerenciar usuários' },
+    { href: '/admin/oficinas', label: 'Oficinas', icon: 'build', description: 'Gerenciar oficinas' },
   ]
 
   const renderNavigation = () => (
-    <nav className="space-y-2 py-4">
+    <nav className="space-y-1 py-4 px-3">
       {navItems.map(item => {
         const isActive = pathname === item.href
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`group flex items-center rounded-lg px-4 py-3 text-sm transition-all duration-200 ${
+            onClick={() => setSidebarOpen(false)}
+            className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all ${
               isActive
-                ? 'bg-primary text-primary-foreground shadow-lg'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-md'
+                ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                : 'text-gray-600  hover:bg-gray-100 :bg-gray-800'
             }`}
           >
-            <item.icon
-              className={`mr-3 h-5 w-5 transition-colors ${
-                isActive
-                  ? 'text-primary-foreground'
-                  : 'text-muted-foreground group-hover:text-foreground'
-              }`}
-            />
+            <span className={`material-icons-outlined text-xl ${isActive ? 'text-white' : ''}`}>{item.icon}</span>
             <div className="flex-1">
               <div className="font-medium">{item.label}</div>
-              <div
-                className={`text-xs ${
-                  isActive ? 'text-primary-foreground/70' : 'text-muted-foreground/70'
-                }`}
-              >
-                {item.description}
-              </div>
+              <div className={`text-xs ${isActive ? 'text-white/70' : 'text-gray-400'}`}>{item.description}</div>
             </div>
+            {isActive && <span className="material-icons text-white/70 text-sm">chevron_right</span>}
           </Link>
         )
       })}
@@ -137,91 +97,108 @@ export default function AdminLayout({
   )
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Sidebar para desktop */}
-      <aside className="hidden flex-col border-r bg-white shadow-xl md:flex md:w-72">
-        <div className="border-b bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-          <h1 className="text-xl font-bold text-white">ComparAuto Admin</h1>
-          <p className="mt-1 text-sm text-blue-100">Painel Administrativo</p>
+    <div className="flex min-h-screen bg-white ">
+      {/* Mobile Overlay */}
+      {sidebarOpen && isMobile && (
+        <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed md:sticky top-0 left-0 z-50 h-screen w-72 flex flex-col
+        bg-white  border-r border-gray-200  shadow-xl
+        transition-transform duration-300
+        ${isMobile ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
+      `}>
+        {/* Logo */}
+        <div className="p-6 border-b border-gray-200 ">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+              <span className="material-icons text-white">admin_panel_settings</span>
+            </div>
+            <div>
+              <h1 className="font-bold text-gray-900 ">ComparAuto</h1>
+              <p className="text-xs text-gray-500 ">Painel Admin</p>
+            </div>
+          </div>
         </div>
+
+        {/* Navigation */}
         <div className="flex-1 overflow-auto">{renderNavigation()}</div>
-        <div className="mt-auto border-t bg-slate-50 p-4">
+
+        {/* User Section */}
+        <div className="p-4 border-t border-gray-200  bg-[#F7F7F7] ">
           <div className="flex items-center justify-between">
-            <UserAvatar />
-            <Button
-              variant="ghost"
-              size="icon"
+            <div className="flex items-center gap-3">
+              <UserAvatar />
+              <div className="hidden lg:block">
+                <p className="text-sm font-medium text-gray-900  truncate max-w-[120px]">{adminName}</p>
+                <p className="text-xs text-gray-500">Administrador</p>
+              </div>
+            </div>
+            <button
               onClick={handleSignOut}
               title="Sair"
-              className="text-muted-foreground hover:text-red-600"
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 :bg-red-900/20 rounded-lg transition"
             >
-              <LogOut className="h-5 w-5" />
-            </Button>
+              <span className="material-icons">logout</span>
+            </button>
           </div>
         </div>
       </aside>
-      {/* Conteúdo principal */}
-      <div className="flex flex-1 flex-col">
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="flex h-16 items-center border-b bg-white px-6 shadow-sm">
+        <header className="sticky top-0 z-30 flex items-center h-16 px-6 bg-white  border-b border-gray-200  shadow-sm">
+          {/* Mobile Menu Button */}
           {isMobile && (
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="mr-4">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72 p-0">
-                {
-                  (
-                    <>
-                      <div className="border-b bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-                        <h1 className="text-xl font-bold text-white">ComparAuto Admin</h1>
-                        <p className="mt-1 text-sm text-blue-100">Painel Administrativo</p>
-                      </div>
-                      <div className="flex-1 overflow-auto">{renderNavigation()}</div>
-                      <div className="mt-auto border-t bg-slate-50 p-4">
-                        <Button variant="outline" className="w-full" onClick={handleSignOut}>
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Sair
-                        </Button>
-                      </div>
-                    </>
-                  ) as React.ReactNode
-                }
-              </SheetContent>
-            </Sheet>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 mr-4 text-gray-500 hover:text-gray-700 :text-gray-300 hover:bg-gray-100 :bg-gray-800 rounded-lg transition"
+            >
+              <span className="material-icons">menu</span>
+            </button>
           )}
+
+          {/* Search */}
           {onSearch && (
-            <div className="relative max-w-md flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
-              <Input
+            <div className="relative flex-1 max-w-md">
+              <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">search</span>
+              <input
                 type="search"
                 placeholder={searchPlaceholder}
-                className="w-full border-slate-200 bg-slate-50 pl-10 focus:bg-white"
                 onChange={e => onSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-[#F7F7F7]  border border-gray-200  rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition"
               />
             </div>
           )}
+
+          {/* Right Section */}
           <div className="ml-auto flex items-center gap-4">
-            <div className="hidden sm:block">
-              <span className="text-sm text-muted-foreground">
-                Bem-vindo, <strong className="text-foreground">{adminName}</strong>
+            <button className="relative p-2 text-gray-500 hover:text-gray-700 :text-gray-300 hover:bg-gray-100 :bg-gray-800 rounded-lg transition">
+              <span className="material-icons-outlined">notifications</span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+            </button>
+
+            <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-gray-200 ">
+              <span className="text-sm text-gray-500 ">
+                Olá, <strong className="text-gray-900 ">{adminName}</strong>
               </span>
             </div>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              size="sm"
-              className="bg-slate-100 hover:bg-slate-200"
+
+            <button
+              onClick={handleSignOut}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600  hover:text-red-600 :text-red-400 hover:bg-red-50 :bg-red-900/20 rounded-lg transition"
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
+              <span className="material-icons text-lg">logout</span>
+              Sair
+            </button>
           </div>
         </header>
-        {/* Conteúdo da página */}
-        <main className="flex-1 overflow-auto bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto p-6">
           {children}
         </main>
       </div>
