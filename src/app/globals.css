@@ -1,13 +1,98 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-/* Scrollbar customizada */
+/* ========================================
+   ComparAuto Design System - Tailwind v4
+   ======================================== */
+
+@theme {
+  /* Primary Colors - Airbnb inspired */
+  --color-primary: #ff385c;
+  --color-primary-hover: #e31c5f;
+  --color-primary-foreground: #ffffff;
+
+  /* Background Colors */
+  --color-background-light: #ffffff;
+  --color-background-dark: #0f172a;
+
+  /* Surface Colors */
+  --color-surface-light: #f7f7f7;
+  --color-surface-dark: #1e293b;
+
+  /* Border Colors */
+  --color-border-light: #dddddd;
+  --color-border-dark: #333333;
+
+  /* Text Colors */
+  --color-text-light: #222222;
+  --color-text-dark: #e0e0e0;
+  --color-text-secondary-light: #717171;
+  --color-text-secondary-dark: #a0a0a0;
+
+  /* Shadows */
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.12);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Ensure light mode by default */
+html {
+  color-scheme: light;
+}
+
+/* Base body styles */
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #222222;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+
+/* Scrollbar hide utility */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* No scrollbar for horizontal scroll */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Base body styles */
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Primary color as CSS variable */
+:root {
+  --primary: #ff385c;
+  --primary-hover: #d9324e;
 }
 
 /* Gradientes personalizados */
@@ -15,10 +100,21 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+.gradient-primary {
+  background: linear-gradient(to right, #ff385c, #d9324e);
+}
+
 .glass-effect {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Material Icons Support */
+.material-icons,
+.material-icons-outlined,
+.material-symbols-outlined {
+  font-feature-settings: 'liga';
 }
 
 /* Transição suave para o dropdown */
@@ -391,40 +487,6 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }
 
 /* Enhanced modern animations and effects */
