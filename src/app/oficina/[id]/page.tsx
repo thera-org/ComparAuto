@@ -149,16 +149,16 @@ export default function OfficeDetailPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+        <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-gray-50 via-primary/5 to-gray-100">
           <div className="space-y-8 text-center">
             <div className="relative mx-auto h-32 w-32">
-              <div className="loading-rotate absolute inset-0 rounded-full border-4 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 opacity-80"></div>
+              <div className="loading-rotate absolute inset-0 rounded-full border-4 border-transparent bg-gradient-to-r from-primary to-primary-hover opacity-80"></div>
               <div className="absolute inset-1 rounded-full bg-white"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <Wrench className="loading-bounce h-8 w-8 text-blue-600" />
+                <Wrench className="loading-bounce h-8 w-8 text-primary" />
               </div>
             </div>
-            <h2 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent">
+            <h2 className="bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-2xl font-bold text-transparent">
               Carregando detalhes da oficina...
             </h2>
           </div>
@@ -172,14 +172,14 @@ export default function OfficeDetailPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+        <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
           <div className="space-y-6 text-center">
             <div className="text-6xl">🚗</div>
             <h2 className="text-3xl font-bold text-gray-800">Oficina não encontrada</h2>
             <p className="text-gray-600">
               A oficina que você está procurando não existe ou foi removida.
             </p>
-            <Button onClick={() => router.back()} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={() => router.back()} className="bg-primary hover:bg-primary-hover">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
@@ -253,7 +253,7 @@ export default function OfficeDetailPage() {
 
               {/* Status and Category */}
               <div className="flex gap-3">
-                <Badge className="bg-green-500 px-3 py-1.5 text-white hover:bg-green-500">
+                <Badge className="bg-primary px-3 py-1.5 text-white hover:bg-primary">
                   <div className="mr-2 h-2 w-2 animate-pulse rounded-full bg-white"></div>
                   Online
                 </Badge>
@@ -276,7 +276,7 @@ export default function OfficeDetailPage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Button
                   onClick={handleRouteClick}
-                  className="h-14 rounded-xl bg-blue-600 text-lg text-white shadow-lg transition-all duration-300 hover:bg-blue-700 hover:shadow-xl"
+                  className="h-14 rounded-xl bg-primary text-lg text-white shadow-lg transition-all duration-300 hover:bg-primary-hover hover:shadow-xl"
                 >
                   <Navigation className="mr-2 h-5 w-5" />
                   Como chegar
@@ -285,7 +285,7 @@ export default function OfficeDetailPage() {
                 <Button
                   onClick={handleCallClick}
                   variant="outline"
-                  className="h-14 rounded-xl border-blue-200 text-lg text-blue-600 shadow-lg transition-all duration-300 hover:bg-blue-50 hover:shadow-xl"
+                  className="h-14 rounded-xl border-primary/20 text-lg text-primary shadow-lg transition-all duration-300 hover:bg-primary/5 hover:shadow-xl"
                 >
                   <Phone className="mr-2 h-5 w-5" />
                   {oficina.telefone || 'Ligar'}
@@ -296,7 +296,7 @@ export default function OfficeDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Wrench className="mr-2 h-5 w-5 text-blue-600" />
+                    <Wrench className="mr-2 h-5 w-5 text-primary" />
                     Sobre a oficina
                   </CardTitle>
                 </CardHeader>
@@ -315,7 +315,7 @@ export default function OfficeDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Car className="mr-2 h-5 w-5 text-blue-600" />
+                    <Car className="mr-2 h-5 w-5 text-primary" />
                     Serviços disponíveis
                   </CardTitle>
                 </CardHeader>
@@ -334,8 +334,8 @@ export default function OfficeDetailPage() {
                         'Mecânica geral',
                       ]
                     ).map((servico, index) => (
-                      <div key={index} className="flex items-center rounded-lg bg-blue-50 p-3">
-                        <div className="mr-3 h-2 w-2 rounded-full bg-blue-500"></div>
+                      <div key={index} className="flex items-center rounded-lg bg-primary/5 p-3">
+                        <div className="mr-3 h-2 w-2 rounded-full bg-primary"></div>
                         <span className="text-sm font-medium text-gray-700">{servico}</span>
                       </div>
                     ))}
@@ -347,15 +347,15 @@ export default function OfficeDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <MapPin className="mr-2 h-5 w-5 text-blue-600" />
+                    <MapPin className="mr-2 h-5 w-5 text-primary" />
                     Localização
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {/* Endereço */}
-                    <div className="flex items-start rounded-lg bg-blue-50 p-4">
-                      <MapPin className="mr-3 h-5 w-5 flex-shrink-0 text-blue-600" />
+                    <div className="flex items-start rounded-lg bg-primary/5 p-4">
+                      <MapPin className="mr-3 h-5 w-5 flex-shrink-0 text-primary" />
                       <div>
                         <p className="font-medium text-gray-900">{oficina.nome}</p>
                         <p className="mt-1 text-sm text-gray-600">{oficina.endereco}</p>
@@ -371,7 +371,7 @@ export default function OfficeDetailPage() {
                     {/* Botão para abrir no Google Maps */}
                     <Button
                       onClick={handleRouteClick}
-                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                      className="w-full bg-primary text-white hover:bg-primary-hover"
                     >
                       <Navigation className="mr-2 h-4 w-4" />
                       Ver no Google Maps
@@ -426,7 +426,7 @@ export default function OfficeDetailPage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Users className="mr-2 h-4 w-4 text-blue-500" />
+                      <Users className="mr-2 h-4 w-4 text-primary" />
                       <span className="text-gray-700">Clientes</span>
                     </div>
                     <span className="font-bold">{oficina.total_avaliacoes || 127}+</span>
@@ -434,7 +434,7 @@ export default function OfficeDetailPage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Award className="mr-2 h-4 w-4 text-purple-500" />
+                      <Award className="mr-2 h-4 w-4 text-primary" />
                       <span className="text-gray-700">Experiência</span>
                     </div>
                     <span className="font-bold">15+ anos</span>
@@ -442,7 +442,7 @@ export default function OfficeDetailPage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Shield className="mr-2 h-4 w-4 text-green-500" />
+                      <Shield className="mr-2 h-4 w-4 text-primary" />
                       <span className="text-gray-700">Garantia</span>
                     </div>
                     <span className="font-bold">6 meses</span>
@@ -456,14 +456,14 @@ export default function OfficeDetailPage() {
                   <CardTitle className="text-lg">Ações rápidas</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full bg-green-600 text-white hover:bg-green-700">
+                  <Button className="w-full bg-primary text-white hover:bg-primary-hover">
                     <Calendar className="mr-2 h-4 w-4" />
                     Agendar serviço
                   </Button>
 
                   <Button
                     variant="outline"
-                    className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                    className="w-full border-primary/20 text-primary hover:bg-primary/5"
                   >
                     <MessageCircle className="mr-2 h-4 w-4" />
                     Enviar mensagem
@@ -472,7 +472,7 @@ export default function OfficeDetailPage() {
                   <Button
                     variant="outline"
                     onClick={handleRouteClick}
-                    className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
+                    className="w-full border-primary/20 text-primary hover:bg-primary/5"
                   >
                     <Navigation className="mr-2 h-4 w-4" />
                     Ver rota
@@ -486,9 +486,9 @@ export default function OfficeDetailPage() {
                   <CardTitle className="text-lg">Preços</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="rounded-lg bg-blue-50 p-4 text-center">
+                  <div className="rounded-lg bg-primary/5 p-4 text-center">
                     <p className="text-sm text-gray-600">Serviços a partir de</p>
-                    <p className="text-3xl font-bold text-blue-600">
+                    <p className="text-3xl font-bold text-primary">
                       R$ {oficina.preco_medio || 50}
                     </p>
                     <p className="mt-1 text-xs text-gray-500">*Consulte condições</p>
