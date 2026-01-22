@@ -12,7 +12,8 @@ const FEATURES = [
   {
     icon: 'visibility',
     title: 'Visibilidade Nacional',
-    description: 'Sua oficina aparece para milhares de motoristas buscando serviços automotivos na sua região.',
+    description:
+      'Sua oficina aparece para milhares de motoristas buscando serviços automotivos na sua região.',
   },
   {
     icon: 'star',
@@ -22,7 +23,8 @@ const FEATURES = [
   {
     icon: 'dashboard',
     title: 'Gestão Facilitada',
-    description: 'Gerencie informações, horários e serviços da sua oficina de forma simples e rápida.',
+    description:
+      'Gerencie informações, horários e serviços da sua oficina de forma simples e rápida.',
   },
   {
     icon: 'payments',
@@ -32,10 +34,26 @@ const FEATURES = [
 ]
 
 const STEPS = [
-  { icon: 'edit_note', title: 'Cadastro', description: 'Preencha seus dados e informações da oficina.' },
-  { icon: 'verified', title: 'Aprovação', description: 'Nosso time valida e publica sua oficina na plataforma.' },
-  { icon: 'people', title: 'Novos Clientes', description: 'Receba solicitações e aumente seu faturamento.' },
-  { icon: 'insights', title: 'Gestão Fácil', description: 'Atualize seus dados e acompanhe avaliações em tempo real.' },
+  {
+    icon: 'edit_note',
+    title: 'Cadastro',
+    description: 'Preencha seus dados e informações da oficina.',
+  },
+  {
+    icon: 'verified',
+    title: 'Aprovação',
+    description: 'Nosso time valida e publica sua oficina na plataforma.',
+  },
+  {
+    icon: 'people',
+    title: 'Novos Clientes',
+    description: 'Receba solicitações e aumente seu faturamento.',
+  },
+  {
+    icon: 'insights',
+    title: 'Gestão Fácil',
+    description: 'Atualize seus dados e acompanhe avaliações em tempo real.',
+  },
 ]
 
 const TESTIMONIALS = [
@@ -64,7 +82,9 @@ export default function CadastroOficina() {
 
   async function handleCadastroClick(e: React.MouseEvent) {
     e.preventDefault()
-    const { data: { session } } = await supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
     if (!session?.user) {
       router.push('/login?redirect=/cadastro-oficina/formulario')
     } else {
@@ -78,48 +98,48 @@ export default function CadastroOficina() {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative pt-20 pb-24 px-6 overflow-hidden">
+        <section className="relative overflow-hidden px-6 pb-24 pt-20">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10"></div>
-          <div className="max-w-6xl mx-auto relative z-10">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="relative z-10 mx-auto max-w-6xl">
+            <div className="grid items-center gap-12 md:grid-cols-2">
               <div className="text-center md:text-left">
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
+                <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
                   <span className="material-icons text-sm">trending_up</span>
                   Mais de 500 oficinas já confiam na ComparAuto
                 </span>
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                <h1 className="mb-6 text-4xl font-bold leading-tight text-gray-900 md:text-5xl">
                   Sua oficina no <span className="text-primary">topo do Brasil!</span>
                 </h1>
-                <p className="text-lg text-gray-600 mb-8 max-w-xl">
-                  Cadastre sua oficina na ComparAuto e conquiste novos clientes todos os dias. 
+                <p className="mb-8 max-w-xl text-lg text-gray-600">
+                  Cadastre sua oficina na ComparAuto e conquiste novos clientes todos os dias.
                   Visibilidade, confiança e crescimento para o seu negócio!
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <div className="flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
                   <button
                     onClick={handleCadastroClick}
-                    className="px-8 py-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-lg shadow-primary/20 transition flex items-center justify-center gap-2"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-primary-hover"
                   >
                     <span className="material-icons">rocket_launch</span>
                     Começar agora - É grátis!
                   </button>
                   <Link
                     href="#como-funciona"
-                    className="px-8 py-4 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                    className="flex items-center justify-center gap-2 rounded-xl border border-gray-300 px-8 py-4 font-semibold text-gray-700 transition hover:bg-gray-50"
                   >
                     <span className="material-icons">play_circle</span>
                     Ver como funciona
                   </Link>
                 </div>
               </div>
-              <div className="hidden md:block relative">
-                <div className="relative w-full aspect-square max-w-md mx-auto">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl rotate-6"></div>
-                  <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden">
+              <div className="relative hidden md:block">
+                <div className="aspect-square relative mx-auto w-full max-w-md">
+                  <div className="absolute inset-0 rotate-6 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5"></div>
+                  <div className="absolute inset-0 overflow-hidden rounded-3xl bg-white shadow-2xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/workshop-hero.jpg"
                       alt="Oficina mecânica"
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                   </div>
@@ -130,22 +150,26 @@ export default function CadastroOficina() {
         </section>
 
         {/* Features Grid */}
-        <section className="py-20 px-6 bg-[#F7F7F7]">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Por que escolher a ComparAuto?</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">Tudo o que sua oficina precisa para crescer, em uma única plataforma.</p>
+        <section className="bg-[#F7F7F7] px-6 py-20">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">
+                Por que escolher a ComparAuto?
+              </h2>
+              <p className="mx-auto max-w-2xl text-gray-600">
+                Tudo o que sua oficina precisa para crescer, em uma única plataforma.
+              </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
               {FEATURES.map((feature, index) => (
                 <div
                   key={index}
-                  className="bg-white p-6 rounded-2xl border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  className="rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-                    <span className="material-icons text-primary text-2xl">{feature.icon}</span>
+                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
+                    <span className="material-icons text-2xl text-primary">{feature.icon}</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                  <h3 className="mb-2 font-semibold text-gray-900">{feature.title}</h3>
                   <p className="text-sm text-gray-600">{feature.description}</p>
                 </div>
               ))}
@@ -154,22 +178,26 @@ export default function CadastroOficina() {
         </section>
 
         {/* How it Works */}
-        <section id="como-funciona" className="py-20 px-6 bg-white">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Como funciona?</h2>
-              <p className="text-gray-600">Em apenas 4 passos simples você já começa a receber novos clientes.</p>
+        <section id="como-funciona" className="bg-white px-6 py-20">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">Como funciona?</h2>
+              <p className="text-gray-600">
+                Em apenas 4 passos simples você já começa a receber novos clientes.
+              </p>
             </div>
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid gap-8 md:grid-cols-4">
               {STEPS.map((step, index) => (
-                <div key={index} className="text-center relative">
+                <div key={index} className="relative text-center">
                   {index < STEPS.length - 1 && (
-                    <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gray-200"></div>
+                    <div className="absolute left-1/2 top-8 hidden h-0.5 w-full bg-gray-200 md:block"></div>
                   )}
-                  <div className="relative z-10 w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/30">
+                  <div className="relative z-10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/30">
                     <span className="material-icons text-2xl">{step.icon}</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{index + 1}. {step.title}</h3>
+                  <h3 className="mb-2 font-semibold text-gray-900">
+                    {index + 1}. {step.title}
+                  </h3>
                   <p className="text-sm text-gray-600">{step.description}</p>
                 </div>
               ))}
@@ -178,26 +206,27 @@ export default function CadastroOficina() {
         </section>
 
         {/* Testimonials */}
-        <section className="py-20 px-6 bg-[#F7F7F7]">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Quem já está com a gente recomenda!</h2>
+        <section className="bg-[#F7F7F7] px-6 py-20">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">
+                Quem já está com a gente recomenda!
+              </h2>
               <p className="text-gray-600">Veja o que nossos parceiros estão dizendo.</p>
             </div>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid gap-8 md:grid-cols-3">
               {TESTIMONIALS.map((testimonial, index) => (
-                <div
-                  key={index}
-                  className="bg-white p-8 rounded-2xl border border-gray-100"
-                >
-                  <div className="flex items-center gap-1 mb-4">
+                <div key={index} className="rounded-2xl border border-gray-100 bg-white p-8">
+                  <div className="mb-4 flex items-center gap-1">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="material-icons text-yellow-400 text-lg">star</span>
+                      <span key={i} className="material-icons text-lg text-yellow-400">
+                        star
+                      </span>
                     ))}
                   </div>
-                  <p className="text-gray-700 mb-6 italic">"{testimonial.text}"</p>
+                  <p className="mb-6 italic text-gray-700">"{testimonial.text}"</p>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                       <span className="material-icons text-primary">person</span>
                     </div>
                     <div>
@@ -212,36 +241,39 @@ export default function CadastroOficina() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 px-6 bg-primary relative overflow-hidden">
+        <section className="relative overflow-hidden bg-primary px-6 py-20">
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
+            <div className="absolute left-0 top-0 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"></div>
+            <div className="absolute bottom-0 right-0 h-96 w-96 translate-x-1/2 translate-y-1/2 rounded-full bg-white"></div>
           </div>
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Pronto para crescer com a ComparAuto?</h2>
-            <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-              Junte-se a centenas de oficinas que já aumentaram seu faturamento com a nossa plataforma.
+          <div className="relative z-10 mx-auto max-w-4xl text-center">
+            <h2 className="mb-6 text-3xl font-bold text-white md:text-4xl">
+              Pronto para crescer com a ComparAuto?
+            </h2>
+            <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+              Junte-se a centenas de oficinas que já aumentaram seu faturamento com a nossa
+              plataforma.
             </p>
             <button
               onClick={handleCadastroClick}
-              className="px-10 py-4 bg-white text-primary font-semibold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 mx-auto"
+              className="mx-auto flex items-center gap-2 rounded-xl bg-white px-10 py-4 font-semibold text-primary shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
               <span className="material-icons">add_business</span>
               Cadastrar minha oficina agora
             </button>
-            <p className="text-white/60 text-sm mt-4">É rápido, gratuito e sem compromisso!</p>
+            <p className="mt-4 text-sm text-white/60">É rápido, gratuito e sem compromisso!</p>
           </div>
         </section>
 
         {/* Contact */}
-        <section className="py-16 px-6 bg-white">
-          <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Ficou com dúvidas?</h3>
-            <p className="text-gray-600 mb-6">Nossa equipe está pronta para ajudar você!</p>
+        <section className="bg-white px-6 py-16">
+          <div className="mx-auto max-w-4xl text-center">
+            <h3 className="mb-4 text-xl font-semibold text-gray-900">Ficou com dúvidas?</h3>
+            <p className="mb-6 text-gray-600">Nossa equipe está pronta para ajudar você!</p>
             <div className="flex flex-wrap justify-center gap-6">
               <a
                 href="mailto:contato@comparauto.com.br"
-                className="flex items-center gap-2 px-6 py-3 bg-[#F7F7F7] border border-gray-200 rounded-xl hover:border-primary transition"
+                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-[#F7F7F7] px-6 py-3 transition hover:border-primary"
               >
                 <span className="material-icons text-primary">email</span>
                 <span className="text-gray-700">contato@comparauto.com.br</span>
@@ -250,7 +282,7 @@ export default function CadastroOficina() {
                 href="https://wa.me/5511999999999"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 bg-green-50 border border-green-200 rounded-xl hover:bg-green-100 transition"
+                className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-6 py-3 transition hover:bg-green-100"
               >
                 <span className="material-icons text-green-600">chat</span>
                 <span className="text-green-700">(11) 99999-9999</span>

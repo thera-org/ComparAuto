@@ -51,39 +51,39 @@ export default function AjudaPage() {
 
       <main className="flex-grow pt-6">
         {/* Hero Section */}
-        <section className="bg-[#F7F7F7]  py-16 px-6 border-b border-gray-200 ">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900  mb-8">
+        <section className="border-b  border-gray-200 bg-[#F7F7F7] px-6 py-16 ">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="mb-8 text-3xl font-bold text-gray-900  md:text-4xl">
               Como podemos ajudar?
             </h1>
-            <div className="relative max-w-2xl mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <div className="relative mx-auto max-w-2xl">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                 <span className="material-icons text-gray-500">search</span>
               </div>
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-full border border-gray-300  shadow-sm focus:border-primary focus:ring focus:ring-primary/20 bg-white  text-gray-900  placeholder-gray-500  text-lg transition-shadow hover:shadow-md"
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full rounded-full border border-gray-300 bg-white py-4 pl-12  pr-4 text-lg text-gray-900 placeholder-gray-500 shadow-sm  transition-shadow  hover:shadow-md  focus:border-primary focus:ring focus:ring-primary/20"
                 placeholder="Buscar por dúvidas, artigos ou tópicos..."
               />
             </div>
           </div>
         </section>
 
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="mx-auto max-w-7xl px-6 py-12">
           {/* Breadcrumb */}
-          <nav className="flex text-sm text-gray-500  mb-8">
+          <nav className="mb-8 flex text-sm  text-gray-500">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
               <li className="inline-flex items-center">
-                <Link href="/" className="inline-flex items-center hover:text-gray-900 :text-white">
-                  <span className="material-icons text-sm mr-2">home</span>
+                <Link href="/" className=":text-white inline-flex items-center hover:text-gray-900">
+                  <span className="material-icons mr-2 text-sm">home</span>
                   Início
                 </Link>
               </li>
               <li>
                 <div className="flex items-center">
-                  <span className="material-icons text-sm text-gray-400 mx-1">chevron_right</span>
+                  <span className="material-icons mx-1 text-sm text-gray-400">chevron_right</span>
                   <span className="font-medium text-gray-900 ">Central de Ajuda</span>
                 </div>
               </li>
@@ -92,18 +92,20 @@ export default function AjudaPage() {
 
           {/* Topics Grid */}
           <section className="mb-16">
-            <h2 className="text-xl font-semibold text-gray-900  mb-6">Navegue por tópicos</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {TOPICOS.map((topico) => (
+            <h2 className="mb-6 text-xl font-semibold  text-gray-900">Navegue por tópicos</h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {TOPICOS.map(topico => (
                 <Link
                   key={topico.id}
                   href={`#${topico.id}`}
-                  className="group p-6 border border-gray-200  rounded-xl hover:shadow-lg hover:border-gray-300 :border-gray-600 transition duration-200 bg-white "
+                  className=":border-gray-600 group rounded-xl border  border-gray-200 bg-white p-6 transition duration-200 hover:border-gray-300 hover:shadow-lg "
                 >
-                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition">
-                    <span className="material-icons-outlined text-primary text-2xl">{topico.icon}</span>
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 transition group-hover:bg-primary/20">
+                    <span className="material-icons-outlined text-2xl text-primary">
+                      {topico.icon}
+                    </span>
                   </div>
-                  <h3 className="font-semibold text-gray-900  mb-2">{topico.title}</h3>
+                  <h3 className="mb-2 font-semibold  text-gray-900">{topico.title}</h3>
                   <p className="text-sm text-gray-500 ">{topico.description}</p>
                 </Link>
               ))}
@@ -112,18 +114,18 @@ export default function AjudaPage() {
 
           {/* Articles Section */}
           <section className="mb-12">
-            <h2 className="text-xl font-semibold text-gray-900  mb-6">Artigos Recomendados</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+            <h2 className="mb-6 text-xl font-semibold  text-gray-900">Artigos Recomendados</h2>
+            <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
               {ARTIGOS.map((artigo, index) => (
                 <Link
                   key={index}
                   href={artigo.href}
-                  className="flex justify-between items-center p-4 rounded-lg hover:bg-[#F7F7F7] :bg-surface-dark transition group"
+                  className=":bg-surface-dark group flex items-center justify-between rounded-lg p-4 transition hover:bg-[#F7F7F7]"
                 >
-                  <span className="text-gray-700  group-hover:text-primary transition-colors">
+                  <span className="text-gray-700  transition-colors group-hover:text-primary">
                     {artigo.title}
                   </span>
-                  <span className="material-icons text-gray-400 text-sm group-hover:translate-x-1 transition-transform">
+                  <span className="material-icons text-sm text-gray-400 transition-transform group-hover:translate-x-1">
                     arrow_forward_ios
                   </span>
                 </Link>
@@ -132,64 +134,75 @@ export default function AjudaPage() {
           </section>
 
           {/* Contact Section */}
-          <section className="bg-[#F7F7F7]  rounded-2xl p-8 md:p-12 text-center border border-gray-200 ">
-            <h3 className="text-2xl font-semibold text-gray-900  mb-3">
+          <section className="rounded-2xl  border border-gray-200 bg-[#F7F7F7] p-8 text-center md:p-12 ">
+            <h3 className="mb-3 text-2xl font-semibold  text-gray-900">
               Não encontrou o que procurava?
             </h3>
-            <p className="text-gray-600  mb-8 max-w-2xl mx-auto">
-              Nossa equipe de especialistas está disponível para ajudar você com qualquer problema relacionado à plataforma ou serviços de oficinas.
+            <p className="mx-auto  mb-8 max-w-2xl text-gray-600">
+              Nossa equipe de especialistas está disponível para ajudar você com qualquer problema
+              relacionado à plataforma ou serviços de oficinas.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button className="px-6 py-3 bg-primary hover:bg-primary-hover text-white font-medium rounded-lg transition shadow-lg shadow-primary/30">
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+              <button className="rounded-lg bg-primary px-6 py-3 font-medium text-white shadow-lg shadow-primary/30 transition hover:bg-primary-hover">
                 Abrir Chamado
               </button>
-              <button className="px-6 py-3 bg-white  border border-gray-300  text-gray-900  font-medium rounded-lg hover:bg-gray-50 :bg-gray-700 transition">
+              <button className=":bg-gray-700 rounded-lg border  border-gray-300 bg-white  px-6  py-3 font-medium text-gray-900 transition hover:bg-gray-50">
                 Chat Online
               </button>
             </div>
           </section>
 
           {/* Contact Info Box */}
-          <div className="mt-12 p-6 bg-white  rounded-xl border border-gray-200  shadow-sm">
-            <h4 className="text-lg font-bold text-gray-900  mb-6 flex items-center gap-2">
+          <div className="mt-12 rounded-xl border  border-gray-200 bg-white p-6  shadow-sm">
+            <h4 className="mb-6 flex items-center  gap-2 text-lg font-bold text-gray-900">
               <span className="material-icons text-primary">support_agent</span>
               Fale Conosco
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100  rounded-full">
-                  <span className="material-icons text-gray-600  text-sm">email</span>
+                <div className="rounded-full bg-gray-100  p-2">
+                  <span className="material-icons text-sm  text-gray-600">email</span>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Email</p>
-                  <a href="mailto:suporte@comparauto.com.br" className="text-gray-900  font-medium hover:text-primary transition">
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Email</p>
+                  <a
+                    href="mailto:suporte@comparauto.com.br"
+                    className="font-medium  text-gray-900 transition hover:text-primary"
+                  >
                     suporte@comparauto.com.br
                   </a>
-                  <p className="text-xs text-gray-500 mt-1">Tempo de resposta: até 24h</p>
+                  <p className="mt-1 text-xs text-gray-500">Tempo de resposta: até 24h</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100  rounded-full">
-                  <span className="material-icons text-gray-600  text-sm">phone</span>
+                <div className="rounded-full bg-gray-100  p-2">
+                  <span className="material-icons text-sm  text-gray-600">phone</span>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Telefone</p>
-                  <a href="tel:08001234567" className="text-gray-900  font-medium hover:text-primary transition">
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-500">
+                    Telefone
+                  </p>
+                  <a
+                    href="tel:08001234567"
+                    className="font-medium  text-gray-900 transition hover:text-primary"
+                  >
                     0800 123 4567
                   </a>
-                  <p className="text-xs text-gray-500 mt-1">Segunda a Sexta, 08h às 18h</p>
+                  <p className="mt-1 text-xs text-gray-500">Segunda a Sexta, 08h às 18h</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100  rounded-full">
-                  <span className="material-icons text-gray-600  text-sm">chat</span>
+                <div className="rounded-full bg-gray-100  p-2">
+                  <span className="material-icons text-sm  text-gray-600">chat</span>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Chat ao Vivo</p>
-                  <button className="text-gray-900  font-medium hover:text-primary transition text-left">
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-500">
+                    Chat ao Vivo
+                  </p>
+                  <button className="text-left  font-medium text-gray-900 transition hover:text-primary">
                     Iniciar conversa
                   </button>
-                  <p className="text-xs text-gray-500 mt-1">Disponível agora</p>
+                  <p className="mt-1 text-xs text-gray-500">Disponível agora</p>
                 </div>
               </div>
             </div>

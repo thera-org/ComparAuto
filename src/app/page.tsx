@@ -69,7 +69,9 @@ export default function Home() {
         const matchNome = oficina.nome && removeAccents(oficina.nome).includes(term)
         const matchEndereco = oficina.endereco && removeAccents(oficina.endereco).includes(term)
         const matchCidade = oficina.cidade && removeAccents(oficina.cidade).includes(term)
-        const matchServicos = oficina.servicos_oferecidos?.some(s => removeAccents(s).includes(term))
+        const matchServicos = oficina.servicos_oferecidos?.some(s =>
+          removeAccents(s).includes(term)
+        )
         return matchNome || matchEndereco || matchCidade || matchServicos
       })
     }
@@ -92,8 +94,12 @@ export default function Home() {
     setFilteredOficinas(filtered)
   }, [debouncedSearchTerm, selectedCategory, oficinas])
 
-  const handleCategorySelect = (id: string) => setSelectedCategory(selectedCategory === id ? null : id)
-  const clearFilters = () => { setSearchTerm(''); setSelectedCategory(null) }
+  const handleCategorySelect = (id: string) =>
+    setSelectedCategory(selectedCategory === id ? null : id)
+  const clearFilters = () => {
+    setSearchTerm('')
+    setSelectedCategory(null)
+  }
 
   const mainCategories = [
     { id: 'mecanica', name: 'Mecânica', icon: 'build' },
@@ -104,7 +110,7 @@ export default function Home() {
   ]
 
   return (
-    <div className="flex min-h-screen flex-col bg-white text-gray-800 font-sans antialiased">
+    <div className="flex min-h-screen flex-col bg-white font-sans text-gray-800 antialiased">
       <Header />
 
       {/* Spacer for fixed header */}
@@ -130,7 +136,10 @@ export default function Home() {
                 </button>
               ))}
             </div>
-            <Button variant="outline" className="gap-2 rounded-xl border-gray-300 text-gray-700 hover:bg-gray-50">
+            <Button
+              variant="outline"
+              className="gap-2 rounded-xl border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
               <SlidersHorizontal className="h-4 w-4" />
               Filtros
             </Button>
@@ -140,12 +149,12 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="w-full px-6 py-8">
-        <div 
-          className="relative h-[400px] overflow-hidden rounded-3xl bg-cover bg-center mx-auto"
+        <div
+          className="relative mx-auto h-[400px] overflow-hidden rounded-3xl bg-cover bg-center"
           style={{ backgroundImage: 'url(/hero-bg.jpg)', maxWidth: '1400px' }}
         >
           <div className="absolute inset-0 bg-black/50"></div>
-          <div className="relative z-10 h-full flex flex-col justify-center px-12">
+          <div className="relative z-10 flex h-full flex-col justify-center px-12">
             <h1 className="mb-6 text-5xl font-bold text-white md:text-6xl">Sua oficina ideal</h1>
             <p className="mb-10 max-w-lg text-xl text-white">
               Conectamos você à oficina perfeita para seu veículo.
@@ -166,19 +175,27 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             <div className="text-center">
               <div className="text-3xl font-bold text-gray-900">500+</div>
-              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">Oficinas Parceiras</div>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Oficinas Parceiras
+              </div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-gray-900">4.8★</div>
-              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">Avaliação Média</div>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Avaliação Média
+              </div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-gray-900">50k+</div>
-              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">Clientes Satisfeitos</div>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Clientes Satisfeitos
+              </div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-gray-900">100%</div>
-              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">Garantia</div>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Garantia
+              </div>
             </div>
           </div>
         </div>
@@ -193,7 +210,10 @@ export default function Home() {
                 <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-gray-900 shadow-sm">
                   <Search className="h-3 w-3" />
                   {mainCategories.find(c => c.id === selectedCategory)?.name}
-                  <button onClick={() => setSelectedCategory(null)} className="ml-1 rounded-full p-0.5 hover:bg-gray-100">
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className="ml-1 rounded-full p-0.5 hover:bg-gray-100"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </span>
@@ -202,12 +222,18 @@ export default function Home() {
                 <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-gray-900 shadow-sm">
                   <Search className="h-3 w-3" />
                   &quot;{searchTerm}&quot;
-                  <button onClick={() => setSearchTerm('')} className="ml-1 rounded-full p-0.5 hover:bg-gray-100">
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="ml-1 rounded-full p-0.5 hover:bg-gray-100"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </span>
               )}
-              <button onClick={clearFilters} className="text-sm font-medium text-primary hover:underline">
+              <button
+                onClick={clearFilters}
+                className="text-sm font-medium text-primary hover:underline"
+              >
                 Limpar filtros
               </button>
             </div>
@@ -240,7 +266,10 @@ export default function Home() {
                 <div className="mb-8 flex items-center justify-between">
                   <div>
                     <h2 className="mb-1 text-xl font-semibold text-gray-900">
-                      {filteredOficinas.length} {filteredOficinas.length === 1 ? 'oficina encontrada' : 'oficinas encontradas'}
+                      {filteredOficinas.length}{' '}
+                      {filteredOficinas.length === 1
+                        ? 'oficina encontrada'
+                        : 'oficinas encontradas'}
                     </h2>
                     <p className="text-sm text-gray-500">
                       {selectedCategory
@@ -248,7 +277,10 @@ export default function Home() {
                         : 'Todas as oficinas disponíveis na sua região'}
                     </p>
                   </div>
-                  <Button variant="outline" className="gap-2 rounded-xl border-gray-300 text-gray-700">
+                  <Button
+                    variant="outline"
+                    className="gap-2 rounded-xl border-gray-300 text-gray-700"
+                  >
                     <SlidersHorizontal className="h-4 w-4" />
                     Ordenar
                   </Button>
@@ -258,7 +290,11 @@ export default function Home() {
               {filteredOficinas.length > 0 && (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filteredOficinas.map((oficina, index) => (
-                    <div key={oficina.id} className="transform transition-all hover:scale-[1.02]" style={{ animationDelay: `${index * 0.05}s` }}>
+                    <div
+                      key={oficina.id}
+                      className="transform transition-all hover:scale-[1.02]"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
                       <OfficeCard oficina={oficina} />
                     </div>
                   ))}
@@ -271,13 +307,24 @@ export default function Home() {
                     <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
                       <Search className="h-10 w-10 text-gray-400" />
                     </div>
-                    <h3 className="mb-3 text-xl font-semibold text-gray-900">Nenhuma oficina encontrada</h3>
-                    <p className="mb-6 text-gray-500">Não encontramos oficinas que correspondam aos seus critérios.</p>
+                    <h3 className="mb-3 text-xl font-semibold text-gray-900">
+                      Nenhuma oficina encontrada
+                    </h3>
+                    <p className="mb-6 text-gray-500">
+                      Não encontramos oficinas que correspondam aos seus critérios.
+                    </p>
                     <div className="flex justify-center gap-3">
-                      <Button onClick={clearFilters} className="bg-primary text-white hover:bg-rose-600">
+                      <Button
+                        onClick={clearFilters}
+                        className="bg-primary text-white hover:bg-rose-600"
+                      >
                         Limpar filtros
                       </Button>
-                      <Button variant="outline" onClick={() => setSearchTerm('')} className="border-gray-300">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSearchTerm('')}
+                        className="border-gray-300"
+                      >
                         Ver todas
                       </Button>
                     </div>

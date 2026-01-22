@@ -362,7 +362,10 @@ export default function ContaPage() {
           <div className="text-center">
             <XCircle className="mx-auto mb-4 h-16 w-16 text-red-500" />
             <p className="text-lg text-red-600">Erro ao carregar usuário. Faça login novamente.</p>
-            <Button onClick={() => router.push('/login')} className="mt-4 bg-primary hover:bg-primary-hover">
+            <Button
+              onClick={() => router.push('/login')}
+              className="mt-4 bg-primary hover:bg-primary-hover"
+            >
               Fazer Login
             </Button>
           </div>
@@ -378,20 +381,22 @@ export default function ContaPage() {
     <div className="flex min-h-screen flex-col bg-white text-gray-900">
       <Header />
 
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+      <main className="mx-auto w-full max-w-7xl flex-grow px-4 py-10 sm:px-6 lg:px-8">
         {/* Header Section */}
         <section className="mb-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Olá, {user.nome?.split(' ')[0] || 'Usuário'}!</h1>
+              <h1 className="mb-2 text-3xl font-bold">
+                Olá, {user.nome?.split(' ')[0] || 'Usuário'}!
+              </h1>
               <p className="text-gray-500">Gerencie seus dados e serviços automotivos.</p>
             </div>
 
             {/* Profile Completion Card */}
             {profileCompletion < 100 && (
-              <div className="bg-[#F7F7F7] p-4 rounded-xl shadow-subtle flex items-center gap-4 max-w-md w-full border border-gray-200">
-                <div className="relative w-12 h-12 flex-shrink-0">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+              <div className="flex w-full max-w-md items-center gap-4 rounded-xl border border-gray-200 bg-[#F7F7F7] p-4 shadow-subtle">
+                <div className="relative h-12 w-12 flex-shrink-0">
+                  <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
                     <path
                       className="text-gray-300"
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -408,13 +413,13 @@ export default function ContaPage() {
                       strokeWidth="3"
                     />
                   </svg>
-                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-primary">
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-xs font-bold text-primary">
                     {profileCompletion}%
                   </span>
                 </div>
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold">Complete seu perfil</h3>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="mt-1 text-xs text-gray-500">
                     Adicione suas informações para recomendações personalizadas.
                   </p>
                 </div>
@@ -423,7 +428,7 @@ export default function ContaPage() {
                     setActiveTab('perfil')
                     setEdit(true)
                   }}
-                  className="text-sm text-primary font-medium hover:underline whitespace-nowrap"
+                  className="whitespace-nowrap text-sm font-medium text-primary hover:underline"
                 >
                   Completar
                 </button>
@@ -432,17 +437,17 @@ export default function ContaPage() {
           </div>
         </section>
 
-        <div className="flex flex-col lg:flex-row gap-10">
+        <div className="flex flex-col gap-10 lg:flex-row">
           {/* Sidebar Navigation */}
-          <aside className="w-full lg:w-64 flex-shrink-0">
+          <aside className="w-full flex-shrink-0 lg:w-64">
             <nav className="space-y-1">
-              {MENU_ITEMS.map((item) => (
+              {MENU_ITEMS.map(item => (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
+                  className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors ${
                     activeTab === item.id
-                      ? 'bg-gray-100 text-primary font-medium'
+                      ? 'bg-gray-100 font-medium text-primary'
                       : 'text-gray-500 hover:bg-gray-50'
                   }`}
                 >
@@ -451,10 +456,10 @@ export default function ContaPage() {
                 </button>
               ))}
             </nav>
-            <div className="mt-8 border-t border-gray-200 pt-6 px-4">
+            <div className="mt-8 border-t border-gray-200 px-4 pt-6">
               <button
                 onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-gray-800 font-medium flex items-center gap-2"
+                className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-800"
               >
                 <LogOut className="h-4 w-4" />
                 Sair da conta
@@ -467,21 +472,25 @@ export default function ContaPage() {
             {/* Quick Actions Grid - Show on perfil tab */}
             {activeTab === 'perfil' && !edit && (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                  {QUICK_ACTIONS.map((action) => (
+                <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {QUICK_ACTIONS.map(action => (
                     <div
                       key={action.id}
-                      onClick={() => action.href ? router.push(action.href) : setActiveTab(action.tab || 'perfil')}
-                      className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer group"
+                      onClick={() =>
+                        action.href
+                          ? router.push(action.href)
+                          : setActiveTab(action.tab || 'perfil')
+                      }
+                      className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-lg"
                     >
-                      <div className="mb-4 text-primary bg-red-50 w-12 h-12 rounded-full flex items-center justify-center">
+                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-primary">
                         <span className="material-icons-outlined">{action.icon}</span>
                       </div>
-                      <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                      <h3 className="mb-2 text-lg font-semibold transition-colors group-hover:text-primary">
                         {action.title}
                       </h3>
-                      <p className="text-sm text-gray-500 mb-4">{action.desc}</p>
-                      <span className="text-sm font-medium underline decoration-gray-300 underline-offset-4 group-hover:decoration-primary transition-all">
+                      <p className="mb-4 text-sm text-gray-500">{action.desc}</p>
+                      <span className="text-sm font-medium underline decoration-gray-300 underline-offset-4 transition-all group-hover:decoration-primary">
                         {action.action}
                       </span>
                     </div>
@@ -489,32 +498,32 @@ export default function ContaPage() {
                 </div>
 
                 {/* Personal Info Section */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="mb-6 flex items-center justify-between">
                     <h2 className="text-xl font-bold">Informações Pessoais</h2>
                     <button
                       onClick={() => setEdit(true)}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-50"
                     >
                       <Edit className="h-4 w-4" />
                       Editar
                     </button>
                   </div>
 
-                  <div className="flex items-start gap-6 mb-6">
+                  <div className="mb-6 flex items-start gap-6">
                     {user.avatar_url ? (
                       <Image
                         src={user.avatar_url}
                         alt="Avatar"
                         width={80}
                         height={80}
-                        className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
-                        onError={(e) => {
+                        className="h-20 w-20 rounded-full border-2 border-gray-200 object-cover"
+                        onError={e => {
                           e.currentTarget.src = '/placeholder.svg'
                         }}
                       />
                     ) : (
-                      <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-200">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-gray-200 bg-gray-100">
                         <User className="h-8 w-8 text-gray-400" />
                       </div>
                     )}
@@ -524,13 +533,13 @@ export default function ContaPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Telefone</p>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="rounded-lg bg-gray-50 p-4">
+                      <p className="mb-1 text-sm text-gray-500">Telefone</p>
                       <p className="font-medium">{user.telefone || 'Não informado'}</p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Endereço</p>
+                    <div className="rounded-lg bg-gray-50 p-4">
+                      <p className="mb-1 text-sm text-gray-500">Endereço</p>
                       <p className="font-medium">{user.endereco || 'Não informado'}</p>
                     </div>
                   </div>
@@ -540,12 +549,12 @@ export default function ContaPage() {
 
             {/* Edit Profile Form */}
             {activeTab === 'perfil' && edit && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="mb-6 flex items-center justify-between">
                   <h2 className="text-xl font-bold">Editar Informações</h2>
                   <button
                     onClick={() => setEdit(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="rounded-full p-2 transition-colors hover:bg-gray-100"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -553,7 +562,7 @@ export default function ContaPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Avatar Upload */}
-                  <div className="flex items-center gap-6 p-6 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-6 rounded-xl bg-gray-50 p-6">
                     <div className="relative">
                       {form.avatar_url ? (
                         <Image
@@ -561,17 +570,17 @@ export default function ContaPage() {
                           alt="Avatar"
                           width={96}
                           height={96}
-                          className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
-                          onError={(e) => {
+                          className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-lg"
+                          onError={e => {
                             e.currentTarget.src = '/placeholder.svg'
                           }}
                         />
                       ) : (
-                        <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-lg">
+                        <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-gray-200 shadow-lg">
                           <User className="h-10 w-10 text-gray-400" />
                         </div>
                       )}
-                      <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-primary p-2 shadow-lg hover:bg-primary-hover transition-colors">
+                      <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-primary p-2 shadow-lg transition-colors hover:bg-primary-hover">
                         <Camera className="h-4 w-4 text-white" />
                         <input
                           type="file"
@@ -583,66 +592,66 @@ export default function ContaPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Foto do Perfil</h3>
-                      <p className="text-sm text-gray-500 mt-1">PNG, JPG ou GIF. Max 2MB</p>
+                      <p className="mt-1 text-sm text-gray-500">PNG, JPG ou GIF. Max 2MB</p>
                     </div>
                   </div>
 
                   {/* Form Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Nome Completo *</label>
+                      <label className="mb-2 block text-sm font-medium">Nome Completo *</label>
                       <input
                         name="nome"
                         value={form.nome}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="Seu nome completo"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">E-mail *</label>
+                      <label className="mb-2 block text-sm font-medium">E-mail *</label>
                       <input
                         name="email"
                         type="email"
                         value={form.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="seu@email.com"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Telefone</label>
+                      <label className="mb-2 block text-sm font-medium">Telefone</label>
                       <input
                         name="telefone"
                         value={form.telefone}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="(11) 99999-9999"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Endereço</label>
+                      <label className="mb-2 block text-sm font-medium">Endereço</label>
                       <input
                         name="endereco"
                         value={form.endereco}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="Rua, Número, Cidade - Estado"
                       />
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-4 pt-6 border-t border-gray-200">
+                  <div className="flex gap-4 border-t border-gray-200 pt-6">
                     <button
                       type="submit"
                       disabled={saving}
-                      className="flex-1 py-3 px-6 bg-primary hover:bg-primary-hover text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
                     >
                       {saving ? (
                         <>
@@ -660,7 +669,7 @@ export default function ContaPage() {
                       type="button"
                       onClick={() => setEdit(false)}
                       disabled={saving}
-                      className="px-8 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      className="rounded-lg border border-gray-300 px-8 py-3 font-medium transition-colors hover:bg-gray-50"
                     >
                       Cancelar
                     </button>
@@ -675,11 +684,11 @@ export default function ContaPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-2xl font-bold">Minhas Oficinas</h2>
-                    <p className="text-gray-500 mt-1">Gerencie suas oficinas cadastradas</p>
+                    <p className="mt-1 text-gray-500">Gerencie suas oficinas cadastradas</p>
                   </div>
                   <button
                     onClick={() => router.push('/cadastro-oficina')}
-                    className="px-6 py-3 bg-primary hover:bg-primary-hover text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                    className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover"
                   >
                     <Store className="h-4 w-4" />
                     Cadastrar Nova Oficina
@@ -692,60 +701,61 @@ export default function ContaPage() {
                     <p className="mt-4 text-gray-500">Carregando oficinas...</p>
                   </div>
                 ) : minhasOficinas.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {minhasOficinas.map((oficina) => (
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {minhasOficinas.map(oficina => (
                       <div
                         key={oficina.id}
-                        className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all"
+                        className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg"
                       >
                         <div className="p-6">
-                          <div className="flex items-start justify-between mb-4">
+                          <div className="mb-4 flex items-start justify-between">
                             <h3 className="text-lg font-bold">{oficina.nome}</h3>
                             {getStatusBadge(oficina.status)}
                           </div>
 
                           {oficina.endereco && (
-                            <p className="flex items-start gap-2 text-gray-500 mb-3 text-sm">
-                              <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                            <p className="mb-3 flex items-start gap-2 text-sm text-gray-500">
+                              <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" />
                               {oficina.endereco}
                             </p>
                           )}
 
                           {oficina.telefone && (
-                            <p className="flex items-center gap-2 text-gray-500 mb-3 text-sm">
+                            <p className="mb-3 flex items-center gap-2 text-sm text-gray-500">
                               <Phone className="h-4 w-4" />
                               {oficina.telefone}
                             </p>
                           )}
 
-                          {oficina.servicos_oferecidos && oficina.servicos_oferecidos.length > 0 && (
-                            <div className="mb-4">
-                              <div className="flex flex-wrap gap-2">
-                                {oficina.servicos_oferecidos.slice(0, 3).map((servico, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
-                                    {servico}
-                                  </Badge>
-                                ))}
-                                {oficina.servicos_oferecidos.length > 3 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{oficina.servicos_oferecidos.length - 3}
-                                  </Badge>
-                                )}
+                          {oficina.servicos_oferecidos &&
+                            oficina.servicos_oferecidos.length > 0 && (
+                              <div className="mb-4">
+                                <div className="flex flex-wrap gap-2">
+                                  {oficina.servicos_oferecidos.slice(0, 3).map((servico, idx) => (
+                                    <Badge key={idx} variant="outline" className="text-xs">
+                                      {servico}
+                                    </Badge>
+                                  ))}
+                                  {oficina.servicos_oferecidos.length > 3 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      +{oficina.servicos_oferecidos.length - 3}
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
 
-                          <div className="flex gap-2 mt-4">
+                          <div className="mt-4 flex gap-2">
                             <button
                               onClick={() => router.push(`/oficina/${oficina.id}`)}
-                              className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-50"
                             >
                               Ver Detalhes
                             </button>
                             {oficina.status === 'ativo' && (
                               <button
                                 onClick={() => router.push(`/admin/oficinas/editar/${oficina.id}`)}
-                                className="flex-1 py-2 px-4 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
                               >
                                 <Edit className="h-3 w-3" />
                                 Editar
@@ -754,8 +764,8 @@ export default function ContaPage() {
                           </div>
 
                           {oficina.status === 'pendente' && (
-                            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                              <p className="text-xs text-yellow-800 flex items-center gap-1">
+                            <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
+                              <p className="flex items-center gap-1 text-xs text-yellow-800">
                                 <Clock className="h-3 w-3" />
                                 Aguardando aprovação do administrador
                               </p>
@@ -766,13 +776,13 @@ export default function ContaPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white border border-gray-200 rounded-xl py-16 text-center">
+                  <div className="rounded-xl border border-gray-200 bg-white py-16 text-center">
                     <Store className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-                    <h3 className="text-xl font-semibold mb-2">Nenhuma oficina cadastrada</h3>
-                    <p className="text-gray-500 mb-6">Comece cadastrando sua primeira oficina</p>
+                    <h3 className="mb-2 text-xl font-semibold">Nenhuma oficina cadastrada</h3>
+                    <p className="mb-6 text-gray-500">Comece cadastrando sua primeira oficina</p>
                     <button
                       onClick={() => router.push('/cadastro-oficina')}
-                      className="px-6 py-3 bg-primary hover:bg-primary-hover text-white font-semibold rounded-lg transition-colors inline-flex items-center gap-2"
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover"
                     >
                       <Store className="h-4 w-4" />
                       Cadastrar Oficina
@@ -786,7 +796,7 @@ export default function ContaPage() {
             {(activeTab === 'preferencias' || activeTab === 'seguranca') && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">
+                  <h2 className="mb-2 text-2xl font-bold">
                     {activeTab === 'seguranca' ? 'Segurança' : 'Preferências'}
                   </h2>
                   <p className="text-gray-500">
@@ -796,39 +806,43 @@ export default function ContaPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="rounded-xl border border-gray-200 bg-white p-6 transition-all hover:shadow-lg">
                     <Bell className="mb-4 h-8 w-8 text-primary" />
-                    <h3 className="text-lg font-semibold mb-2">Notificações</h3>
-                    <p className="text-gray-500 text-sm mb-4">Gerencie como você recebe notificações</p>
-                    <button className="w-full py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                    <h3 className="mb-2 text-lg font-semibold">Notificações</h3>
+                    <p className="mb-4 text-sm text-gray-500">
+                      Gerencie como você recebe notificações
+                    </p>
+                    <button className="w-full rounded-lg border border-gray-300 py-2 text-sm font-medium transition-colors hover:bg-gray-50">
                       Configurar
                     </button>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all">
+                  <div className="rounded-xl border border-gray-200 bg-white p-6 transition-all hover:shadow-lg">
                     <Shield className="mb-4 h-8 w-8 text-green-600" />
-                    <h3 className="text-lg font-semibold mb-2">Privacidade</h3>
-                    <p className="text-gray-500 text-sm mb-4">Controle suas configurações de privacidade</p>
-                    <button className="w-full py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                    <h3 className="mb-2 text-lg font-semibold">Privacidade</h3>
+                    <p className="mb-4 text-sm text-gray-500">
+                      Controle suas configurações de privacidade
+                    </p>
+                    <button className="w-full rounded-lg border border-gray-300 py-2 text-sm font-medium transition-colors hover:bg-gray-50">
                       Gerenciar
                     </button>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all">
+                  <div className="rounded-xl border border-gray-200 bg-white p-6 transition-all hover:shadow-lg">
                     <Settings className="mb-4 h-8 w-8 text-purple-600" />
-                    <h3 className="text-lg font-semibold mb-2">Alterar Senha</h3>
-                    <p className="text-gray-500 text-sm mb-4">Atualize sua senha de acesso</p>
-                    <button className="w-full py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                    <h3 className="mb-2 text-lg font-semibold">Alterar Senha</h3>
+                    <p className="mb-4 text-sm text-gray-500">Atualize sua senha de acesso</p>
+                    <button className="w-full rounded-lg border border-gray-300 py-2 text-sm font-medium transition-colors hover:bg-gray-50">
                       Alterar
                     </button>
                   </div>
 
-                  <div className="bg-white border-2 border-red-200 rounded-xl p-6 hover:shadow-lg transition-all">
+                  <div className="rounded-xl border-2 border-red-200 bg-white p-6 transition-all hover:shadow-lg">
                     <XCircle className="mb-4 h-8 w-8 text-red-600" />
-                    <h3 className="text-lg font-semibold mb-2">Excluir Conta</h3>
-                    <p className="text-gray-500 text-sm mb-4">Remover permanentemente sua conta</p>
-                    <button className="w-full py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors">
+                    <h3 className="mb-2 text-lg font-semibold">Excluir Conta</h3>
+                    <p className="mb-4 text-sm text-gray-500">Remover permanentemente sua conta</p>
+                    <button className="w-full rounded-lg border border-red-300 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">
                       Excluir
                     </button>
                   </div>
@@ -837,17 +851,25 @@ export default function ContaPage() {
             )}
 
             {/* Placeholder for other tabs */}
-            {(activeTab === 'agendamentos' || activeTab === 'veiculos' || activeTab === 'pagamentos') && (
-              <div className="bg-white border border-gray-200 rounded-xl py-16 text-center">
-                <span className="material-icons-outlined text-6xl text-gray-300 mb-4">
-                  {activeTab === 'agendamentos' ? 'calendar_today' : activeTab === 'veiculos' ? 'directions_car' : 'credit_card'}
+            {(activeTab === 'agendamentos' ||
+              activeTab === 'veiculos' ||
+              activeTab === 'pagamentos') && (
+              <div className="rounded-xl border border-gray-200 bg-white py-16 text-center">
+                <span className="material-icons-outlined mb-4 text-6xl text-gray-300">
+                  {activeTab === 'agendamentos'
+                    ? 'calendar_today'
+                    : activeTab === 'veiculos'
+                      ? 'directions_car'
+                      : 'credit_card'}
                 </span>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="mb-2 text-xl font-semibold">
                   {activeTab === 'agendamentos' && 'Meus Agendamentos'}
                   {activeTab === 'veiculos' && 'Meus Veículos'}
                   {activeTab === 'pagamentos' && 'Pagamentos'}
                 </h3>
-                <p className="text-gray-500 mb-6">Esta funcionalidade estará disponível em breve.</p>
+                <p className="mb-6 text-gray-500">
+                  Esta funcionalidade estará disponível em breve.
+                </p>
               </div>
             )}
           </div>
@@ -855,18 +877,19 @@ export default function ContaPage() {
       </main>
 
       {/* Help Section */}
-      <section className="bg-[#F7F7F7] py-16 border-t border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-primary/20 text-primary mb-6">
+      <section className="border-t border-gray-200 bg-[#F7F7F7] py-16">
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary/20 text-primary">
             <span className="material-icons text-3xl">contact_support</span>
           </div>
-          <h2 className="text-3xl font-bold mb-4">Precisa de ajuda?</h2>
-          <p className="text-gray-500 mb-8 max-w-2xl mx-auto">
-            Nossa Central de Ajuda está pronta para tirar todas as suas dúvidas sobre serviços, agendamentos e garantias de forma rápida e eficiente.
+          <h2 className="mb-4 text-3xl font-bold">Precisa de ajuda?</h2>
+          <p className="mx-auto mb-8 max-w-2xl text-gray-500">
+            Nossa Central de Ajuda está pronta para tirar todas as suas dúvidas sobre serviços,
+            agendamentos e garantias de forma rápida e eficiente.
           </p>
           <Link
             href="/ajuda"
-            className="inline-block px-8 py-3 rounded-full border border-gray-900 text-gray-900 font-semibold hover:bg-gray-100 transition-colors"
+            className="inline-block rounded-full border border-gray-900 px-8 py-3 font-semibold text-gray-900 transition-colors hover:bg-gray-100"
           >
             Acessar Central de Ajuda
           </Link>

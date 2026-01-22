@@ -58,8 +58,8 @@ const OfficeCard = memo(function OfficeCard({
           >
             <Heart
               className={`h-6 w-6 drop-shadow-md transition-colors ${
-                isFavorite 
-                  ? 'fill-primary text-primary' 
+                isFavorite
+                  ? 'fill-primary text-primary'
                   : 'fill-black/50 text-white hover:fill-primary hover:text-primary'
               }`}
             />
@@ -78,10 +78,8 @@ const OfficeCard = memo(function OfficeCard({
         <div className="flex flex-col pt-3">
           {/* Title and Rating Row */}
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-gray-900  line-clamp-1">
-              {oficina.nome}
-            </h3>
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <h3 className="line-clamp-1 font-semibold  text-gray-900">{oficina.nome}</h3>
+            <div className="flex flex-shrink-0 items-center gap-1">
               <Star className="h-4 w-4 fill-current text-gray-900 " />
               <span className="text-sm font-medium text-gray-900 ">
                 {oficina.avaliacao || '4.92'}
@@ -90,22 +88,20 @@ const OfficeCard = memo(function OfficeCard({
           </div>
 
           {/* Location */}
-          <div className="flex items-center gap-1 mt-1">
+          <div className="mt-1 flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5 text-gray-500 " />
-            <span className="text-sm text-gray-500  line-clamp-1">
-              {oficina.endereco}
-            </span>
+            <span className="line-clamp-1 text-sm  text-gray-500">{oficina.endereco}</span>
           </div>
 
           {/* Services */}
-          <p className="text-sm text-gray-500  mt-1 line-clamp-1">
+          <p className="mt-1 line-clamp-1  text-sm text-gray-500">
             {(oficina.servicos || ['Mecânica Geral', 'Elétrica']).slice(0, 2).join(' · ')}
           </p>
 
           {/* Price */}
           <div className="mt-2">
             <span className="font-semibold text-gray-900 ">R$ 150</span>
-            <span className="text-gray-500  text-sm"> / hora</span>
+            <span className="text-sm  text-gray-500"> / hora</span>
           </div>
         </div>
       </Link>
