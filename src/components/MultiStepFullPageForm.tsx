@@ -185,11 +185,6 @@ export default function MultiStepFullPageForm() {
     })
   }
 
-  // Função para extrair apenas números do valor formatado
-  const extractNumbers = (value: string): string => {
-    return value.replace(/\D/g, '')
-  }
-
   const handleSubmitOficina = async () => {
     try {
       setSubmitting(true)
@@ -404,35 +399,36 @@ export default function MultiStepFullPageForm() {
     })
   }
 
-  const estados = [
-    'AC',
-    'AL',
-    'AP',
-    'AM',
-    'BA',
-    'CE',
-    'DF',
-    'ES',
-    'GO',
-    'MA',
-    'MT',
-    'MS',
-    'MG',
-    'PA',
-    'PB',
-    'PR',
-    'PE',
-    'PI',
-    'RJ',
-    'RN',
-    'RS',
-    'RO',
-    'RR',
-    'SC',
-    'SP',
-    'SE',
-    'TO',
-  ]
+  // Estados não usado - cidade fixa em São Luís, MA
+  // const estados = [
+  //   'AC',
+  //   'AL',
+  //   'AP',
+  //   'AM',
+  //   'BA',
+  //   'CE',
+  //   'DF',
+  //   'ES',
+  //   'GO',
+  //   'MA',
+  //   'MT',
+  //   'MS',
+  //   'MG',
+  //   'PA',
+  //   'PB',
+  //   'PR',
+  //   'PE',
+  //   'PI',
+  //   'RJ',
+  //   'RN',
+  //   'RS',
+  //   'RO',
+  //   'RR',
+  //   'SC',
+  //   'SP',
+  //   'SE',
+  //   'TO',
+  // ]
 
   // Campos de cada passo
   const renderStep = () => {
@@ -499,10 +495,12 @@ export default function MultiStepFullPageForm() {
           <div className="fixed inset-0 z-50 flex">
             {/* Mapa de Fundo */}
             <div className="absolute inset-0 z-0 overflow-hidden bg-gray-200">
-              <img
+              <Image
                 alt="Mapa interativo da região"
                 className="h-full w-full scale-110 object-cover opacity-90"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3x2zWmy5vgxFPyIki4LdbMpfjCjIaTlDcU238IzRdn_e7anmhsv_BAZfHUA2VeuDowzks0-7pJ8lOX5dI9nNzw61C8p128uFA2PwPLGzAPIht6uuceTvWA3pJVXOBUTbM9ciogg2uc6UKrv2gs11tg27l2SbozFjBgCR1wBHklJry1l3CNN3c3ALsrJWfm5TvisTV_nk1m3HekZkvaSho8Rjj1vrcRHouzJSQqQTOYqHluXPhCUc9hxlKpDxknHL_N6hWmVmtDu4"
+                fill
+                unoptimized
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent"></div>
 
