@@ -71,8 +71,8 @@ const initialForm: FormType = {
   numero: '',
   complemento: '',
   bairro: '',
-  cidade: '',
-  estado: '',
+  cidade: 'São Luís',
+  estado: 'MA',
   telefone_fixo: '',
   whatsapp: '',
   email: '',
@@ -139,9 +139,7 @@ function validateStep(
     case 0:
       return !!form.nome_oficina
     case 1:
-      return (
-        !!form.cep && !!form.rua && !!form.numero && !!form.bairro && !!form.cidade && !!form.estado
-      )
+      return !!form.cep && !!form.rua && !!form.numero && !!form.bairro
     case 2:
       return !!form.whatsapp && !!form.email
     case 3:
@@ -338,9 +336,10 @@ export default function MultiStepFullPageForm() {
           if (!data.erro) {
             setForm(f => ({
               ...f,
+              rua: data.logradouro || '',
               bairro: data.bairro || '',
-              cidade: data.localidade || '',
-              estado: data.uf || '',
+              cidade: data.localidade || 'São Luís',
+              estado: data.uf || 'MA',
             }))
           }
         })
@@ -440,162 +439,368 @@ export default function MultiStepFullPageForm() {
     switch (step) {
       case 0:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-            <label className="text-lg font-medium">Nome da oficina *</label>
+          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4">
+            <div className="mb-2">
+              <h2 className="mb-1 text-2xl font-bold text-gray-800">Informações da Oficina</h2>
+              <p className="text-sm text-gray-600">Preencha os dados básicos da sua oficina</p>
+            </div>
+
+            {/* Nome da Oficina */}
             <input
               name="nome_oficina"
               value={form.nome_oficina}
               onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.nome_oficina && !form.nome_oficina ? 'border-red-500' : 'border-gray-300'
-              } bg-white text-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400`}
-              placeholder="Digite o nome da oficina"
+              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Nome da Oficina *"
               required
             />
-            {touched.nome_oficina && !form.nome_oficina && (
-              <span className="text-sm text-red-500">Campo obrigatório</span>
-            )}
-            <label className="font-medium">CNPJ ou CPF</label>
+
+            {/* CNPJ/CPF */}
             <input
               name="cnpj_cpf"
               value={form.cnpj_cpf}
               onChange={handleChange}
-              className="rounded-lg border border-gray-300 px-4 py-3"
+              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="CNPJ ou CPF"
             />
-            <label className="font-medium">Razão social</label>
+
+            {/* Razão Social */}
             <input
               name="razao_social"
               value={form.razao_social}
               onChange={handleChange}
-              className="rounded-lg border border-gray-300 px-4 py-3"
+              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Razão Social"
             />
-            <label className="font-medium">Descrição da oficina</label>
+
+            {/* Descrição */}
             <textarea
               name="descricao"
               value={form.descricao}
               onChange={handleChange}
-              className="rounded-lg border border-gray-300 px-4 py-3"
-              rows={3}
+              rows={4}
+              className="w-full resize-none rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Descrição da Oficina"
             />
+
+            <div className="flex items-start gap-3 rounded-2xl border border-blue-200/50 bg-blue-50/50 p-4">
+              <span className="material-icons-outlined mt-0.5 text-lg text-blue-600">
+                lightbulb
+              </span>
+              <p className="text-xs leading-relaxed text-blue-700">
+                <strong>Dica:</strong> Uma boa descrição ajuda os clientes a conhecerem melhor sua
+                oficina e aumenta suas chances de agendamento.
+              </p>
+            </div>
           </div>
         )
       case 1:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-            <label>CEP *</label>
-            <input
-              name="cep"
-              value={form.cep}
-              onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.cep && !form.cep ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            />
-            <label>Rua *</label>
-            <input
-              name="rua"
-              value={form.rua}
-              onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.rua && !form.rua ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            />
-            <label>Número *</label>
-            <input
-              name="numero"
-              value={form.numero}
-              onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.numero && !form.numero ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            />
-            <label>Complemento</label>
-            <input
-              name="complemento"
-              value={form.complemento}
-              onChange={handleChange}
-              className="rounded-lg border border-gray-300 px-4 py-3"
-            />
-            <label>Bairro *</label>
-            <input
-              name="bairro"
-              value={form.bairro}
-              onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.bairro && !form.bairro ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            />
-            <label>Cidade *</label>
-            <input
-              name="cidade"
-              value={form.cidade}
-              onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.cidade && !form.cidade ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            />
-            <label>Estado *</label>
-            <select
-              name="estado"
-              value={form.estado}
-              onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.estado && !form.estado ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            >
-              <option value="">Selecione</option>
-              {estados.map(uf => (
-                <option key={uf} value={uf}>
-                  {uf}
-                </option>
-              ))}
-            </select>
+          <div className="fixed inset-0 z-50 flex">
+            {/* Mapa de Fundo */}
+            <div className="absolute inset-0 z-0 overflow-hidden bg-gray-200">
+              <img
+                alt="Mapa interativo da região"
+                className="h-full w-full scale-110 object-cover opacity-90"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3x2zWmy5vgxFPyIki4LdbMpfjCjIaTlDcU238IzRdn_e7anmhsv_BAZfHUA2VeuDowzks0-7pJ8lOX5dI9nNzw61C8p128uFA2PwPLGzAPIht6uuceTvWA3pJVXOBUTbM9ciogg2uc6UKrv2gs11tg27l2SbozFjBgCR1wBHklJry1l3CNN3c3ALsrJWfm5TvisTV_nk1m3HekZkvaSho8Rjj1vrcRHouzJSQqQTOYqHluXPhCUc9hxlKpDxknHL_N6hWmVmtDu4"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent"></div>
+
+              {/* Marcador Central */}
+              <div className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 transform flex-col items-center drop-shadow-2xl">
+                <span className="material-icons relative top-2 pb-1 text-6xl text-primary drop-shadow-md filter">
+                  location_on
+                </span>
+                <div className="h-2 w-4 rounded-[100%] bg-black/30 blur-[2px]"></div>
+                <div className="mt-2 animate-bounce whitespace-nowrap rounded-full border border-gray-100 bg-white px-4 py-2 text-xs font-bold text-gray-800 shadow-xl">
+                  Arraste o mapa para ajustar
+                </div>
+              </div>
+
+              {/* Pins de preço decorativos */}
+              <div className="absolute left-[40%] top-1/3 flex cursor-pointer items-center gap-1 rounded-xl bg-white p-1.5 opacity-80 shadow-md transition hover:scale-110 hover:opacity-100">
+                <span className="px-1 text-[10px] font-bold text-gray-800">R$ 120</span>
+              </div>
+              <div className="absolute bottom-1/4 right-[20%] flex cursor-pointer items-center gap-1 rounded-xl bg-white p-1.5 opacity-80 shadow-md transition hover:scale-110 hover:opacity-100">
+                <span className="px-1 text-[10px] font-bold text-gray-800">R$ 180</span>
+              </div>
+              <div className="absolute right-[30%] top-[20%] flex cursor-pointer items-center gap-1 rounded-xl bg-white p-1.5 opacity-80 shadow-md transition hover:scale-110 hover:opacity-100">
+                <span className="px-1 text-[10px] font-bold text-gray-800">R$ 150</span>
+              </div>
+            </div>
+
+            {/* Painel do Formulário */}
+            <div className="pointer-events-none absolute left-0 top-0 z-30 flex h-full w-full flex-col justify-center p-4 md:w-[480px] md:p-6">
+              <div className="pointer-events-auto max-h-[calc(100vh-120px)] w-full overflow-hidden overflow-y-auto rounded-2xl border border-gray-200 bg-white shadow-2xl">
+                <div className="p-6 md:p-8">
+                  <div className="mb-6">
+                    <h1 className="mb-2 text-2xl font-bold text-gray-900">
+                      Onde fica sua oficina?
+                    </h1>
+                    <p className="text-sm text-gray-500">
+                      Confirme o endereço da sua oficina. Sua localização exata só será mostrada aos
+                      clientes após a confirmação do agendamento.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* CEP */}
+                    <div className="relative">
+                      <input
+                        name="cep"
+                        value={form.cep}
+                        onChange={handleChange}
+                        className="peer peer block w-full appearance-none rounded-xl border border-gray-300 bg-transparent px-4 pb-2.5 pt-5 text-sm text-gray-900 focus:border-primary focus:outline-none focus:ring-0"
+                        placeholder=" "
+                        type="text"
+                        maxLength={8}
+                      />
+                      <label
+                        htmlFor="cep"
+                        className="absolute left-4 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform bg-white px-1 text-sm font-medium text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-primary"
+                      >
+                        CEP
+                      </label>
+                      {form.cep && form.cep.length === 8 && (
+                        <div className="absolute right-3 top-4">
+                          <span className="material-icons text-lg text-green-500">
+                            check_circle
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Endereço */}
+                    <div className="relative">
+                      <input
+                        name="rua"
+                        value={form.rua}
+                        onChange={handleChange}
+                        className="peer peer block w-full appearance-none rounded-xl border border-gray-300 bg-transparent px-4 pb-2.5 pt-5 text-sm text-gray-900 focus:border-primary focus:outline-none focus:ring-0"
+                        placeholder=" "
+                        type="text"
+                      />
+                      <label
+                        htmlFor="rua"
+                        className="absolute left-4 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform bg-white px-1 text-sm font-medium text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-primary"
+                      >
+                        Endereço
+                      </label>
+                    </div>
+
+                    {/* Bairro e Número */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="relative">
+                        <input
+                          name="bairro"
+                          value={form.bairro}
+                          onChange={handleChange}
+                          className="peer peer block w-full appearance-none rounded-xl border border-gray-300 bg-transparent px-4 pb-2.5 pt-5 text-sm text-gray-900 focus:border-primary focus:outline-none focus:ring-0"
+                          placeholder=" "
+                          type="text"
+                        />
+                        <label
+                          htmlFor="bairro"
+                          className="absolute left-4 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform bg-white px-1 text-sm font-medium text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-primary"
+                        >
+                          Bairro
+                        </label>
+                      </div>
+                      <div className="relative">
+                        <input
+                          name="numero"
+                          value={form.numero}
+                          onChange={handleChange}
+                          className="peer peer block w-full appearance-none rounded-xl border border-gray-300 bg-transparent px-4 pb-2.5 pt-5 text-sm text-gray-900 focus:border-primary focus:outline-none focus:ring-0"
+                          placeholder=" "
+                          type="text"
+                        />
+                        <label
+                          htmlFor="numero"
+                          className="absolute left-4 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform bg-white px-1 text-sm font-medium text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-primary"
+                        >
+                          Número
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Cidade - Disabled */}
+                    <div className="relative">
+                      <input
+                        name="cidade"
+                        value={form.cidade ? `${form.cidade}, ${form.estado}` : 'São Luís, MA'}
+                        disabled
+                        className="peer peer block w-full cursor-not-allowed appearance-none rounded-xl border border-gray-300 bg-gray-50 px-4 pb-2.5 pt-5 text-sm text-gray-500 focus:outline-none focus:ring-0"
+                        placeholder=" "
+                        type="text"
+                      />
+                      <label
+                        htmlFor="cidade"
+                        className="absolute left-4 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform bg-transparent px-1 text-sm font-medium text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75"
+                      >
+                        Cidade
+                      </label>
+                      <div className="absolute right-3 top-4">
+                        <span className="material-icons text-lg text-gray-400">lock</span>
+                      </div>
+                    </div>
+
+                    {/* Complemento */}
+                    <div className="relative">
+                      <input
+                        name="complemento"
+                        value={form.complemento}
+                        onChange={handleChange}
+                        className="peer peer block w-full appearance-none rounded-xl border border-gray-300 bg-transparent px-4 pb-2.5 pt-5 text-sm text-gray-900 focus:border-primary focus:outline-none focus:ring-0"
+                        placeholder=" "
+                        type="text"
+                      />
+                      <label
+                        htmlFor="complemento"
+                        className="absolute left-4 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform bg-white px-1 text-sm font-medium text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-primary"
+                      >
+                        Complemento (opcional)
+                      </label>
+                    </div>
+
+                    {/* Campo oculto para estado */}
+                    <input type="hidden" name="estado" value={form.estado || 'MA'} />
+                  </div>
+
+                  <div className="mt-4 text-center">
+                    <button
+                      type="button"
+                      className="text-sm font-medium text-gray-500 transition hover:underline"
+                    >
+                      Não encontrei meu endereço
+                    </button>
+                  </div>
+
+                  {/* Botões de Navegação */}
+                  <div className="mt-6 flex items-center justify-between gap-4 border-t border-gray-200 pt-4">
+                    <button
+                      type="button"
+                      onClick={handlePrev}
+                      className="rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                    >
+                      Voltar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={!validateStep(step, form, userData)}
+                      className={`rounded-full px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition ${
+                        validateStep(step, form, userData)
+                          ? 'bg-blue-600 hover:bg-blue-700'
+                          : 'cursor-not-allowed bg-gray-300'
+                      }`}
+                    >
+                      Continuar
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 border-t border-gray-200 bg-gray-50 p-4">
+                  <span className="material-icons-outlined mt-0.5 text-lg text-gray-500">
+                    lightbulb
+                  </span>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    <strong>Dica:</strong> Oficinas com localização precisa recebem 30% mais
+                    agendamentos.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Controles do Mapa */}
+            <div className="absolute bottom-8 right-8 z-20 flex flex-col gap-2">
+              <button
+                type="button"
+                aria-label="Minha localização"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-100 bg-white text-gray-700 shadow-lg transition hover:bg-gray-50"
+              >
+                <span className="material-icons text-xl">my_location</span>
+              </button>
+              <div className="flex flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-lg">
+                <button
+                  type="button"
+                  aria-label="Zoom In"
+                  className="flex h-10 w-10 items-center justify-center border-b border-gray-100 text-gray-700 transition hover:bg-gray-50"
+                >
+                  <span className="material-icons text-xl">add</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label="Zoom Out"
+                  className="flex h-10 w-10 items-center justify-center text-gray-700 transition hover:bg-gray-50"
+                >
+                  <span className="material-icons text-xl">remove</span>
+                </button>
+              </div>
+            </div>
           </div>
         )
       case 2:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-            <label>Telefone fixo</label>
+          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4">
+            <div className="mb-2">
+              <h2 className="mb-1 text-2xl font-bold text-gray-800">Informações de Contato</h2>
+              <p className="text-sm text-gray-600">
+                Como os clientes podem entrar em contato com sua oficina?
+              </p>
+            </div>
+
+            {/* Telefone Fixo */}
             <input
               name="telefone_fixo"
               value={form.telefone_fixo}
               onChange={handleChange}
-              className="rounded-lg border border-gray-300 px-4 py-3"
+              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Telefone Fixo"
+              type="tel"
             />
-            <label>WhatsApp comercial *</label>
+
+            {/* WhatsApp */}
             <input
               name="whatsapp"
               value={form.whatsapp}
               onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.whatsapp && !form.whatsapp ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="WhatsApp Comercial *"
+              type="tel"
               required
             />
-            <label>E-mail *</label>
+
+            {/* E-mail */}
             <input
               name="email"
               type="email"
               value={form.email}
               onChange={handleChange}
-              className={`rounded-lg border px-4 py-3 ${
-                touched.email && !form.email ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="E-mail *"
               required
             />
-            <label>Site ou redes sociais</label>
+
+            {/* Site */}
             <input
               name="site"
               value={form.site}
               onChange={handleChange}
-              className="rounded-lg border border-gray-300 px-4 py-3"
+              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Site ou Redes Sociais"
+              type="url"
             />
+
+            <div className="flex items-start gap-3 rounded-2xl border border-blue-200/50 bg-blue-50/50 p-4">
+              <span className="material-icons-outlined mt-0.5 text-lg text-blue-600">
+                lightbulb
+              </span>
+              <p className="text-xs leading-relaxed text-blue-700">
+                <strong>Dica:</strong> Oficinas que respondem rápido no WhatsApp têm 2x mais
+                agendamentos confirmados.
+              </p>
+            </div>
           </div>
         )
       case 3:
@@ -909,7 +1114,7 @@ export default function MultiStepFullPageForm() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-gradient-to-br from-blue-100 to-white">
+    <div className="flex min-h-screen w-full flex-col bg-gray-100">
       <main className="flex w-full flex-1 flex-col items-center justify-center px-2 py-8">
         <form
           className="flex w-full flex-col items-center justify-center"
@@ -917,25 +1122,27 @@ export default function MultiStepFullPageForm() {
         >
           {renderStep()}
         </form>
-      </main>{' '}
-      {/* Indicador de passos na base - hide for confirmation step */}
-      {step !== 9 && (
-        <footer className="flex w-full flex-col gap-4 bg-white/80 py-6 shadow-inner">
+      </main>
+      {/* Indicador de passos na base - hide for confirmation step and map step */}
+      {step !== 9 && step !== 1 && (
+        <footer className="flex w-full flex-col gap-4 bg-white/90 py-6 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
           <div className="flex justify-center gap-2 md:gap-4">
             {steps.map((s, i) => (
               <div key={s.label} className="flex flex-col items-center">
                 <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-lg font-bold transition-all duration-200 ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold transition-all duration-200 ${
                     i === step
-                      ? 'border-blue-700 bg-blue-100 text-blue-900 shadow-lg'
-                      : 'border-gray-300 bg-gray-100 text-gray-400'
+                      ? 'border-blue-600 bg-blue-600 text-white shadow-md'
+                      : i < step
+                        ? 'border-blue-400 bg-blue-50 text-blue-600'
+                        : 'border-gray-300 bg-gray-100 text-gray-400'
                   }`}
                 >
                   {i + 1}
                 </div>
                 <span
-                  className={`mt-1 text-xs ${
-                    i === step ? 'font-semibold text-blue-800' : 'text-gray-400'
+                  className={`mt-1 hidden text-xs md:block ${
+                    i === step ? 'font-semibold text-gray-700' : 'text-gray-400'
                   }`}
                 >
                   {s.label}
@@ -943,12 +1150,12 @@ export default function MultiStepFullPageForm() {
               </div>
             ))}
           </div>
-          <div className="mx-auto mt-4 flex w-full max-w-2xl items-center justify-between px-2">
+          <div className="mx-auto mt-2 flex w-full max-w-2xl items-center justify-between px-4">
             {step > 0 ? (
               <button
                 type="button"
                 onClick={handlePrev}
-                className="rounded-full bg-gray-100 px-6 py-3 font-semibold text-blue-800 shadow transition hover:bg-gray-200"
+                className="rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
               >
                 Voltar
               </button>
@@ -959,13 +1166,13 @@ export default function MultiStepFullPageForm() {
               type="button"
               onClick={handleNext}
               disabled={!validateStep(step, form, userData)}
-              className={`rounded-full px-8 py-3 font-bold text-white shadow transition ${
+              className={`rounded-full px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition ${
                 validateStep(step, form, userData)
-                  ? 'bg-blue-700 hover:bg-blue-800'
-                  : 'cursor-not-allowed bg-blue-200'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'cursor-not-allowed bg-gray-300'
               }`}
             >
-              Avançar
+              Continuar
             </button>
           </div>
         </footer>
