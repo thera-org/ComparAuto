@@ -208,7 +208,7 @@ export default function MensagensPage() {
                 </span>
               </div>
 
-              {MESSAGES.map((msg, index) => (
+              {MESSAGES.map(msg => (
                 <div
                   key={msg.id}
                   className={`flex max-w-[80%] items-end gap-3 ${msg.isOwn ? 'flex-row-reverse self-end' : 'self-start'}`}

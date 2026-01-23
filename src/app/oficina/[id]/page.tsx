@@ -15,6 +15,7 @@ import {
   Award,
   Users,
   MessageCircle,
+  X,
 } from 'lucide-react'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
@@ -41,6 +42,7 @@ interface Oficina {
   descricao?: string
   horario_funcionamento?: string
   especialidades?: string[]
+  servicos_oferecidos?: string[]
   preco_medio?: number
   avaliacao?: number
   total_avaliacoes?: number
@@ -60,7 +62,22 @@ export default function OfficeDetailPage() {
   const [oficina, setOficina] = useState<Oficina | null>(null)
   const [loading, setLoading] = useState(true)
   const [isFavorite, setIsFavorite] = useState(false)
-  const { error: showError } = useAppNotifications()
+  const [showAgendamento, setShowAgendamento] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const { error: showError, success } = useAppNotifications()
+
+  const [agendamentoForm, setAgendamentoForm] = useState({
+    tipo_servico: '',
+    marca_veiculo: '',
+    modelo_veiculo: '',
+    ano_veiculo: '',
+    versao_veiculo: '',
+    data_preferencial: '',
+    periodo: '',
+    descricao: '',
+    nome_cliente: '',
+    telefone_cliente: '',
+  })
 
   useEffect(() => {
     const fetchOficina = async () => {
@@ -143,6 +160,64 @@ export default function OfficeDetailPage() {
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite)
+  }
+
+  const handleAgendamentoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        showError('Não autenticado', 'Você precisa estar logado para agendar um serviço')
+        router.push('/login')
+        return
+      }
+
+      const { error } = await supabase.from('agendamentos').insert({
+        user_id: user.id,
+        oficina_id: oficina?.id,
+        tipo_servico: agendamentoForm.tipo_servico,
+        marca_veiculo: agendamentoForm.marca_veiculo,
+        modelo_veiculo: agendamentoForm.modelo_veiculo,
+        ano_veiculo: agendamentoForm.ano_veiculo,
+        versao_veiculo: agendamentoForm.versao_veiculo,
+        data_preferencial: agendamentoForm.data_preferencial,
+        periodo: agendamentoForm.periodo,
+        descricao: agendamentoForm.descricao,
+        nome_cliente: agendamentoForm.nome_cliente,
+        telefone_cliente: agendamentoForm.telefone_cliente,
+        status: 'pendente',
+      })
+
+      if (error) throw error
+
+      success(
+        'Sucesso!',
+        'Agendamento solicitado com sucesso! A oficina entrará em contato em breve.'
+      )
+      setShowAgendamento(false)
+      setAgendamentoForm({
+        tipo_servico: '',
+        marca_veiculo: '',
+        modelo_veiculo: '',
+        ano_veiculo: '',
+        versao_veiculo: '',
+        data_preferencial: '',
+        periodo: '',
+        descricao: '',
+        nome_cliente: '',
+        telefone_cliente: '',
+      })
+    } catch (err) {
+      console.error('Erro ao criar agendamento:', err)
+      showError('Erro', 'Não foi possível solicitar o agendamento. Tente novamente.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (loading) {
@@ -275,11 +350,11 @@ export default function OfficeDetailPage() {
               {/* Quick Actions */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Button
-                  onClick={handleRouteClick}
+                  onClick={() => setShowAgendamento(true)}
                   className="h-14 rounded-xl bg-primary text-lg text-white shadow-lg transition-all duration-300 hover:bg-primary-hover hover:shadow-xl"
                 >
-                  <Navigation className="mr-2 h-5 w-5" />
-                  Como chegar
+                  <Calendar className="mr-2 h-5 w-5" />
+                  Agendar serviço
                 </Button>
 
                 <Button
@@ -321,24 +396,18 @@ export default function OfficeDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {(
-                      oficina.especialidades || [
-                        'Troca de óleo',
-                        'Revisão geral',
-                        'Alinhamento',
-                        'Balanceamento',
-                        'Freios',
-                        'Suspensão',
-                        'Ar-condicionado',
-                        'Elétrica',
-                        'Mecânica geral',
-                      ]
-                    ).map((servico, index) => (
-                      <div key={index} className="flex items-center rounded-lg bg-primary/5 p-3">
-                        <div className="mr-3 h-2 w-2 rounded-full bg-primary"></div>
-                        <span className="text-sm font-medium text-gray-700">{servico}</span>
+                    {oficina.servicos_oferecidos && oficina.servicos_oferecidos.length > 0 ? (
+                      oficina.servicos_oferecidos.map((servico, index) => (
+                        <div key={index} className="flex items-center rounded-lg bg-primary/5 p-3">
+                          <div className="mr-3 h-2 w-2 rounded-full bg-primary"></div>
+                          <span className="text-sm font-medium text-gray-700">{servico}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col-span-2 py-4 text-center text-gray-500 sm:col-span-3">
+                        <p className="text-sm">Nenhum serviço cadastrado</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -456,7 +525,10 @@ export default function OfficeDetailPage() {
                   <CardTitle className="text-lg">Ações rápidas</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full bg-primary text-white hover:bg-primary-hover">
+                  <Button
+                    onClick={() => setShowAgendamento(true)}
+                    className="w-full bg-primary text-white hover:bg-primary-hover"
+                  >
                     <Calendar className="mr-2 h-4 w-4" />
                     Agendar serviço
                   </Button>
@@ -499,6 +571,244 @@ export default function OfficeDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Modal de Agendamento */}
+      {showAgendamento && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            {/* Header do Modal */}
+            <div className="sticky top-0 z-10 border-b border-gray-200 bg-white px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Agendar Serviço</h2>
+                  <p className="text-sm text-gray-500">{oficina.nome}</p>
+                </div>
+                <button
+                  onClick={() => setShowAgendamento(false)}
+                  className="rounded-full p-2 transition-colors hover:bg-gray-100"
+                >
+                  <X className="h-6 w-6 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-6">
+              <form onSubmit={handleAgendamentoSubmit} className="space-y-6">
+                {/* Seleção de Serviço */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Tipo de Serviço *
+                  </label>
+                  <select
+                    required
+                    value={agendamentoForm.tipo_servico}
+                    onChange={e =>
+                      setAgendamentoForm({ ...agendamentoForm, tipo_servico: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">Selecione o serviço</option>
+                    <option value="troca-oleo">Troca de Óleo</option>
+                    <option value="revisao">Revisão Geral</option>
+                    <option value="diagnostico">Diagnóstico Completo</option>
+                    <option value="alinhamento">Alinhamento e Balanceamento</option>
+                    <option value="freios">Manutenção de Freios</option>
+                    <option value="suspensao">Suspensão</option>
+                    <option value="eletrica">Elétrica</option>
+                    <option value="ar-condicionado">Ar-condicionado</option>
+                    <option value="outros">Outros</option>
+                  </select>
+                </div>
+
+                {/* Informações do Veículo */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Marca do Veículo *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={agendamentoForm.marca_veiculo}
+                      onChange={e =>
+                        setAgendamentoForm({ ...agendamentoForm, marca_veiculo: e.target.value })
+                      }
+                      placeholder="Ex: Honda, Toyota, Fiat"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">Modelo *</label>
+                    <input
+                      type="text"
+                      required
+                      value={agendamentoForm.modelo_veiculo}
+                      onChange={e =>
+                        setAgendamentoForm({ ...agendamentoForm, modelo_veiculo: e.target.value })
+                      }
+                      placeholder="Ex: Civic, Corolla"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">Ano</label>
+                    <input
+                      type="text"
+                      value={agendamentoForm.ano_veiculo}
+                      onChange={e =>
+                        setAgendamentoForm({ ...agendamentoForm, ano_veiculo: e.target.value })
+                      }
+                      placeholder="Ex: 2020"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">Versão</label>
+                    <input
+                      type="text"
+                      value={agendamentoForm.versao_veiculo}
+                      onChange={e =>
+                        setAgendamentoForm({ ...agendamentoForm, versao_veiculo: e.target.value })
+                      }
+                      placeholder="Ex: LX, EX, Sport"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Data e Horário Preferencial */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Data Preferencial *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={agendamentoForm.data_preferencial}
+                      onChange={e =>
+                        setAgendamentoForm({
+                          ...agendamentoForm,
+                          data_preferencial: e.target.value,
+                        })
+                      }
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Período *
+                    </label>
+                    <select
+                      required
+                      value={agendamentoForm.periodo}
+                      onChange={e =>
+                        setAgendamentoForm({ ...agendamentoForm, periodo: e.target.value })
+                      }
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="">Selecione</option>
+                      <option value="manha">Manhã (8h - 12h)</option>
+                      <option value="tarde">Tarde (13h - 18h)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Descrição do Problema */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Descreva o problema ou serviço necessário
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={agendamentoForm.descricao}
+                    onChange={e =>
+                      setAgendamentoForm({ ...agendamentoForm, descricao: e.target.value })
+                    }
+                    placeholder="Conte-nos mais detalhes sobre o que precisa ser feito no veículo..."
+                    className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  ></textarea>
+                </div>
+
+                {/* Contato */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Seu Nome *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={agendamentoForm.nome_cliente}
+                      onChange={e =>
+                        setAgendamentoForm({ ...agendamentoForm, nome_cliente: e.target.value })
+                      }
+                      placeholder="Nome completo"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Telefone *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={agendamentoForm.telefone_cliente}
+                      onChange={e =>
+                        setAgendamentoForm({ ...agendamentoForm, telefone_cliente: e.target.value })
+                      }
+                      placeholder="(00) 00000-0000"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Informação Importante */}
+                <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                  <div className="flex gap-3">
+                    <span className="material-icons-outlined text-blue-600">info</span>
+                    <div>
+                      <h4 className="mb-1 text-sm font-bold text-gray-900">
+                        Confirmação do Agendamento
+                      </h4>
+                      <p className="text-xs leading-relaxed text-gray-600">
+                        A oficina entrará em contato para confirmar a disponibilidade e fornecer um
+                        orçamento detalhado antes da realização do serviço.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Botões de Ação */}
+                <div className="flex gap-4 border-t border-gray-200 pt-6">
+                  <Button
+                    type="button"
+                    onClick={() => setShowAgendamento(false)}
+                    variant="outline"
+                    disabled={submitting}
+                    className="flex-1 rounded-lg border-gray-300 py-3 font-medium"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 rounded-lg bg-primary py-3 font-semibold text-white shadow-sm shadow-primary/30 transition hover:brightness-90 disabled:opacity-50"
+                  >
+                    {submitting ? 'Enviando...' : 'Solicitar Agendamento'}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

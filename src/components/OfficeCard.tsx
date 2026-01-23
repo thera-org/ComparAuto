@@ -14,6 +14,7 @@ interface Oficina {
   status?: string
   category?: string
   servicos?: string[]
+  servicos_oferecidos?: string[]
   avaliacao?: number
   totalAvaliacoes?: number
   isVerified?: boolean
@@ -95,7 +96,9 @@ const OfficeCard = memo(function OfficeCard({
 
           {/* Services */}
           <p className="mt-1 line-clamp-1  text-sm text-gray-500">
-            {(oficina.servicos || ['Mecânica Geral', 'Elétrica']).slice(0, 2).join(' · ')}
+            {oficina.servicos_oferecidos && oficina.servicos_oferecidos.length > 0
+              ? oficina.servicos_oferecidos.slice(0, 2).join(' · ')
+              : 'Mecânica Geral'}
           </p>
 
           {/* Price */}

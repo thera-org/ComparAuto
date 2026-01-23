@@ -14,6 +14,7 @@ interface Oficina {
   status?: string
   category?: string
   servicos?: string[]
+  servicos_oferecidos?: string[]
   avaliacao?: number
   totalAvaliacoes?: number
   isVerified?: boolean
@@ -153,9 +154,9 @@ const OfficeCard = memo(function OfficeCard({
           </div>
 
           {/* Services */}
-          {oficina.servicos && oficina.servicos.length > 0 && (
+          {oficina.servicos_oferecidos && oficina.servicos_oferecidos.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-1">
-              {oficina.servicos.slice(0, 3).map((servico, index) => (
+              {oficina.servicos_oferecidos.slice(0, 3).map((servico, index) => (
                 <span
                   key={index}
                   className="rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700"
@@ -163,9 +164,9 @@ const OfficeCard = memo(function OfficeCard({
                   {servico}
                 </span>
               ))}
-              {oficina.servicos.length > 3 && (
+              {oficina.servicos_oferecidos.length > 3 && (
                 <span className="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                  +{oficina.servicos.length - 3} mais
+                  +{oficina.servicos_oferecidos.length - 3} mais
                 </span>
               )}
             </div>

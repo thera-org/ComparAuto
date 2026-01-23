@@ -1,7 +1,6 @@
 'use client'
 
-import { Search, X, Wrench, SlidersHorizontal } from 'lucide-react'
-import Image from 'next/image'
+import { Search, X, SlidersHorizontal } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 

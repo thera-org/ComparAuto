@@ -20,7 +20,7 @@ export default function AdminLayout({
   onSearch,
 }: AdminLayoutProps) {
   const pathname = usePathname()
-  const router = useRouter()
+  const _router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [adminName, setAdminName] = useState<string | null>(null)
