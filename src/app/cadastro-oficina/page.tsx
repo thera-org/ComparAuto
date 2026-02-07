@@ -85,6 +85,7 @@ export default function CadastroOficina() {
       data: { session },
     } = await supabase.auth.getSession()
     if (!session?.user) {
+      // Not logged in, redirect to login with redirect param
       router.push('/login?redirect=/cadastro-oficina/formulario')
     } else {
       router.push('/cadastro-oficina/formulario')
