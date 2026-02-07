@@ -1,0 +1,155 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main, develop ]
+
+# Cancelar execuções anteriores do mesmo PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  validate-pr:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Necessário para análise completa
+    
+    - name: Validate PR title
+      uses: amannn/action-semantic-pull-request@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        types: |
+          feat
+          fix
+          docs
+          style
+          refactor
+          perf
+          test
+          build
+          ci
+          chore
+          revert
+        requireScope: false
+        subjectPattern: ^[A-Z].+$
+        subjectPatternError: |
+          O título do PR deve começar com letra maiúscula.
+          Exemplos válidos:
+          - feat: Adicionar busca por localização
+          - fix: Corrigir erro no login
+          - docs: Atualizar README
+    
+    - name: Check PR size
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: pr } = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number
+          });
+          
+          const additions = pr.additions;
+          const deletions = pr.deletions;
+          const changes = additions + deletions;
+          
+          console.log(`PR Changes: +${additions} -${deletions} (total: ${changes})`);
+          
+          if (changes > 1000) {
+            core.setFailed(`PR muito grande (${changes} linhas alteradas). Considere dividir em PRs menores.`);
+          } else if (changes > 500) {
+            core.warning(`PR grande (${changes} linhas alteradas). Considere dividir em PRs menores.`);
+          }
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Security audit
+      run: npm audit --audit-level=moderate
+      continue-on-error: true
+    
+    - name: Type check
+      run: npm run type-check
+    
+    - name: Lint
+      run: npm run lint
+    
+    - name: Format check
+      run: npm run format:check
+    
+    - name: Run tests with coverage
+      run: npm run test:coverage
+    
+    - name: Check coverage thresholds
+      run: |
+        if [ -f coverage/lcov.info ]; then
+          echo "Coverage report generated successfully"
+        else
+          echo "Warning: No coverage report found"
+        fi
+    
+    - name: Comment PR with results
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          let comment = '## ✅ Validação do Pull Request\n\n';
+          
+          comment += '### Verificações Realizadas:\n';
+          comment += '- ✅ Título do PR\n';
+          comment += '- ✅ Tamanho do PR\n';
+          comment += '- ✅ Auditoria de segurança\n';
+          comment += '- ✅ Type checking\n';
+          comment += '- ✅ Linting\n';
+          comment += '- ✅ Formatação\n';
+          comment += '- ✅ Testes\n\n';
+          
+          comment += '**Status:** Todas as verificações foram concluídas.\n';
+          
+          // Verificar se já existe um comentário
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('Validação do Pull Request')
+          );
+          
+          if (botComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: comment
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+          }

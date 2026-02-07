@@ -1,5 +1,10 @@
 # ComparAuto 🚗
 
+[![CI/CD Pipeline](https://github.com/thera-org/ComparAuto/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/thera-org/ComparAuto/actions/workflows/ci-cd.yml)
+[![CodeQL](https://github.com/thera-org/ComparAuto/actions/workflows/codeql.yml/badge.svg)](https://github.com/thera-org/ComparAuto/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/thera-org/ComparAuto/branch/main/graph/badge.svg)](https://codecov.io/gh/thera-org/ComparAuto)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Uma plataforma moderna para comparar preços de serviços automotivos, conectando clientes a oficinas especializadas.
 
 ## ✨ Funcionalidades
@@ -80,6 +85,26 @@ Recomenda-se o deploy na [Vercel](https://vercel.com/). Basta importar o reposit
 - `npm run build` — gera build de produção
 - `npm run start` — inicia o servidor em produção
 - `npm run lint` — executa o linter
+- `npm run lint:fix` — corrige problemas de linting automaticamente
+- `npm run type-check` — verifica tipos TypeScript
+- `npm run format` — formata o código com Prettier
+- `npm run format:check` — verifica formatação do código
+- `npm run test` — executa os testes
+- `npm run test:coverage` — executa os testes com cobertura
+
+## 🔒 Qualidade e Segurança
+
+Este projeto implementa várias camadas de validação de código:
+
+- ✅ **Type checking** com TypeScript
+- ✅ **Linting** com ESLint
+- ✅ **Formatação** com Prettier
+- ✅ **Testes** com Jest e React Testing Library
+- ✅ **Análise de segurança** com CodeQL
+- ✅ **Auditoria de dependências** com npm audit
+- ✅ **Atualizações automáticas** com Dependabot
+
+Veja o [Guia de CI/CD](.github/CI_CD_GUIDE.md) para mais detalhes sobre a pipeline de aprovação de código.
 
 ## Contribuição
 Pull requests são bem-vindos!
