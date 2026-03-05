@@ -2,6 +2,7 @@
 
 import type { User } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { supabase } from '@/lib/supabase'
@@ -9,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { UserDropdown } from './UserDropdown'
 
 export default function Header() {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
 
@@ -45,12 +47,44 @@ export default function Header() {
 
         {/* Search Bar - Desktop */}
         <div className="hidden items-center gap-4 divide-x divide-gray-300 rounded-full border border-gray-300 bg-white px-4 py-2.5 shadow-sm transition-shadow hover:shadow-md md:flex">
-          <button className="truncate px-2 text-sm font-medium text-gray-900">
+          <button
+            onClick={() => {
+              router.push('/#oficinas')
+              setTimeout(
+                () => document.getElementById('oficinas')?.scrollIntoView({ behavior: 'smooth' }),
+                100
+              )
+            }}
+            className="truncate px-2 text-sm font-medium text-gray-900 transition hover:text-primary"
+          >
             Qualquer serviço
           </button>
-          <button className="truncate px-2 text-sm font-medium text-gray-900">Localização</button>
-          <button className="flex items-center gap-2 px-2 text-sm text-gray-500">
-            Filtros
+          <button
+            onClick={() => {
+              router.push('/?view=map#oficinas')
+              setTimeout(
+                () => document.getElementById('oficinas')?.scrollIntoView({ behavior: 'smooth' }),
+                100
+              )
+            }}
+            className="truncate px-2 text-sm font-medium text-gray-900 transition hover:text-primary"
+          >
+            <span className="flex items-center gap-1">
+              <span className="material-icons text-sm">location_on</span>
+              Localização
+            </span>
+          </button>
+          <button
+            onClick={() => {
+              router.push('/?view=map#oficinas')
+              setTimeout(
+                () => document.getElementById('oficinas')?.scrollIntoView({ behavior: 'smooth' }),
+                100
+              )
+            }}
+            className="flex items-center gap-2 px-2 text-sm text-gray-500 transition hover:text-primary"
+          >
+            Buscar
             <div className="flex items-center justify-center rounded-full bg-primary p-2 text-white">
               <span className="material-icons text-sm">search</span>
             </div>
@@ -124,7 +158,16 @@ export default function Header() {
 
       {/* Mobile Search Section */}
       <div className="mt-4 md:hidden">
-        <button className="flex w-full items-center justify-between rounded-full border border-gray-300 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md">
+        <button
+          onClick={() => {
+            router.push('/?view=map#oficinas')
+            setTimeout(
+              () => document.getElementById('oficinas')?.scrollIntoView({ behavior: 'smooth' }),
+              100
+            )
+          }}
+          className="flex w-full items-center justify-between rounded-full border border-gray-300 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md"
+        >
           <div className="flex items-center gap-3">
             <span className="material-icons text-primary">search</span>
             <div className="text-left">

@@ -23,6 +23,7 @@ import { useEffect, useState } from 'react'
 
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
+import OfficeDetailMap from '@/components/OfficeDetailMap'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -422,18 +423,24 @@ export default function OfficeDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    {/* Mapa interativo */}
+                    {oficina.latitude && oficina.longitude && (
+                      <div className="overflow-hidden rounded-lg">
+                        <OfficeDetailMap
+                          latitude={oficina.latitude}
+                          longitude={oficina.longitude}
+                          nome={oficina.nome}
+                          endereco={oficina.endereco}
+                        />
+                      </div>
+                    )}
+
                     {/* Endereço */}
                     <div className="flex items-start rounded-lg bg-primary/5 p-4">
                       <MapPin className="mr-3 h-5 w-5 flex-shrink-0 text-primary" />
                       <div>
                         <p className="font-medium text-gray-900">{oficina.nome}</p>
                         <p className="mt-1 text-sm text-gray-600">{oficina.endereco}</p>
-                        {oficina.latitude && oficina.longitude && (
-                          <p className="mt-1 text-xs text-gray-500">
-                            Coordenadas: {oficina.latitude.toFixed(6)},{' '}
-                            {oficina.longitude.toFixed(6)}
-                          </p>
-                        )}
                       </div>
                     </div>
 
@@ -443,7 +450,7 @@ export default function OfficeDetailPage() {
                       className="w-full bg-primary text-white hover:bg-primary-hover"
                     >
                       <Navigation className="mr-2 h-4 w-4" />
-                      Ver no Google Maps
+                      Ver rota no Google Maps
                     </Button>
                   </div>
                 </CardContent>

@@ -1,13 +1,17 @@
 'use client'
 
-import { Search, X, SlidersHorizontal } from 'lucide-react'
+import { Search, X, SlidersHorizontal, Map, LayoutGrid } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import OfficeCard from '@/components/OfficeCard'
 import { Button } from '@/components/ui/button'
+
+const WorkshopMap = dynamic(() => import('@/components/WorkshopMap'), { ssr: false })
 import { supabase } from '@/lib/supabase'
 
 interface Oficina {
@@ -20,6 +24,8 @@ interface Oficina {
   servicos_oferecidos?: string[]
   cidade?: string
   estado?: string
+  latitude?: number
+  longitude?: number
 }
 
 const removeAccents = (str: string): string => {
@@ -30,12 +36,37 @@ const removeAccents = (str: string): string => {
 }
 
 export default function Home() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+        </div>
+      }
+    >
+      <HomeContent />
+    </Suspense>
+  )
+}
+
+function HomeContent() {
+  const searchParams = useSearchParams()
   const [oficinas, setOficinas] = useState<Oficina[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [filteredOficinas, setFilteredOficinas] = useState<Oficina[]>([])
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>(
+    searchParams.get('view') === 'map' ? 'map' : 'grid'
+  )
+
+  // Atualizar viewMode quando a URL muda (ex: clicando no botão Localização do Header)
+  useEffect(() => {
+    if (searchParams.get('view') === 'map') {
+      setViewMode('map')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     async function fetchOficinas() {
@@ -276,17 +307,65 @@ export default function Home() {
                         : 'Todas as oficinas disponíveis na sua região'}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    className="gap-2 rounded-xl border-gray-300 text-gray-700"
-                  >
-                    <SlidersHorizontal className="h-4 w-4" />
-                    Ordenar
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <div className="flex overflow-hidden rounded-xl border border-gray-300">
+                      <button
+                        onClick={() => setViewMode('grid')}
+                        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition ${
+                          viewMode === 'grid'
+                            ? 'bg-gray-900 text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        <LayoutGrid className="h-4 w-4" />
+                        Lista
+                      </button>
+                      <button
+                        onClick={() => setViewMode('map')}
+                        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition ${
+                          viewMode === 'map'
+                            ? 'bg-gray-900 text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        <Map className="h-4 w-4" />
+                        Mapa
+                      </button>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="gap-2 rounded-xl border-gray-300 text-gray-700"
+                    >
+                      <SlidersHorizontal className="h-4 w-4" />
+                      Ordenar
+                    </Button>
+                  </div>
                 </div>
               )}
 
-              {filteredOficinas.length > 0 && (
+              {filteredOficinas.length > 0 && viewMode === 'map' && (
+                <div className="overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+                  <WorkshopMap
+                    workshops={filteredOficinas
+                      .filter(
+                        (o): o is Oficina & { latitude: number; longitude: number } =>
+                          !!(o.latitude && o.longitude)
+                      )
+                      .map(o => ({
+                        id: o.id,
+                        nome: o.nome,
+                        endereco: o.endereco,
+                        latitude: o.latitude,
+                        longitude: o.longitude,
+                        foto_url: o.foto_url,
+                        telefone: o.telefone,
+                      }))}
+                    height="500px"
+                  />
+                </div>
+              )}
+
+              {filteredOficinas.length > 0 && viewMode === 'grid' && (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filteredOficinas.map((oficina, index) => (
                     <div
@@ -336,6 +415,20 @@ export default function Home() {
       </main>
 
       <Footer />
+
+      {/* Botão flutuante para ver no mapa (mobile) */}
+      {!loading && filteredOficinas.length > 0 && viewMode === 'grid' && (
+        <button
+          onClick={() => {
+            setViewMode('map')
+            document.getElementById('oficinas')?.scrollIntoView({ behavior: 'smooth' })
+          }}
+          className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-gray-900 px-5 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-gray-800 md:hidden"
+        >
+          <Map className="h-4 w-4" />
+          Ver no mapa
+        </button>
+      )}
     </div>
   )
 }

@@ -1,10 +1,25 @@
 'use client'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import React, { useState, ChangeEvent, useEffect, useRef } from 'react'
+import React, { useState, ChangeEvent, useEffect, useRef, useCallback } from 'react'
 
 import { uploadMultipleImages } from '@/lib/storage'
 import { supabase } from '@/lib/supabase'
+
+import type { LocationPickerResult } from '@/components/maps/LocationPicker'
+
+const LocationPicker = dynamic(() => import('@/components/maps/LocationPicker'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center bg-gray-100">
+      <div className="text-center">
+        <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-primary"></div>
+        <p className="text-sm text-gray-500">Carregando mapa...</p>
+      </div>
+    </div>
+  ),
+})
 
 interface FormType {
   // Passo 0: Oficina
@@ -20,6 +35,8 @@ interface FormType {
   bairro: string
   cidade: string
   estado: string
+  latitude: number | null
+  longitude: number | null
   // Passo 2: Contato
   telefone_fixo: string
   whatsapp: string
@@ -73,6 +90,8 @@ const initialForm: FormType = {
   bairro: '',
   cidade: 'São Luís',
   estado: 'MA',
+  latitude: null,
+  longitude: null,
   telefone_fixo: '',
   whatsapp: '',
   email: '',
@@ -264,6 +283,8 @@ export default function MultiStepFullPageForm() {
         dias_funcionamento: form.diasSelecionados,
         horario_abertura: form.horario_abertura,
         horario_fechamento: form.horario_fechamento,
+        latitude: form.latitude,
+        longitude: form.longitude,
       }
 
       const { data: oficinaData, error: oficinaError } = await supabase
@@ -399,6 +420,22 @@ export default function MultiStepFullPageForm() {
     })
   }
 
+  // Handler para seleção de localização no mapa
+  const handleLocationSelect = useCallback((result: LocationPickerResult) => {
+    setForm(f => ({
+      ...f,
+      latitude: result.lat,
+      longitude: result.lng,
+      // Preenche campos de endereço automaticamente se disponíveis
+      ...(result.road && !f.rua ? { rua: result.road } : {}),
+      ...(result.number && !f.numero ? { numero: result.number } : {}),
+      ...(result.suburb && !f.bairro ? { bairro: result.suburb } : {}),
+      ...(result.city ? { cidade: result.city } : {}),
+      ...(result.state ? { estado: result.state } : {}),
+      ...(result.postcode && !f.cep ? { cep: result.postcode.replace(/\D/g, '') } : {}),
+    }))
+  }, [])
+
   // Estados não usado - cidade fixa em São Luís, MA
   // const estados = [
   //   'AC',
@@ -435,100 +472,124 @@ export default function MultiStepFullPageForm() {
     switch (step) {
       case 0:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4">
-            <div className="mb-2">
-              <h2 className="mb-1 text-2xl font-bold text-gray-800">Informações da Oficina</h2>
-              <p className="text-sm text-gray-600">Preencha os dados básicos da sua oficina</p>
-            </div>
+          <div className="mx-auto flex w-full max-w-xl flex-col px-4">
+            {/* Card principal */}
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+              {/* Header do card */}
+              <div className="border-b border-gray-100 bg-gradient-to-r from-primary/5 to-transparent px-6 py-6 md:px-8">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                    <span className="material-icons text-xl text-primary">store</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Informações da Oficina</h2>
+                    <p className="text-sm text-gray-500">
+                      Preencha os dados básicos da sua oficina
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-            {/* Nome da Oficina */}
-            <input
-              name="nome_oficina"
-              value={form.nome_oficina}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="Nome da Oficina *"
-              required
-            />
+              {/* Corpo do formulário */}
+              <div className="space-y-5 p-6 md:p-8">
+                {/* Nome da Oficina */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="material-icons-outlined text-lg text-gray-400">badge</span>
+                  </div>
+                  <input
+                    name="nome_oficina"
+                    value={form.nome_oficina}
+                    onChange={handleChange}
+                    className="peer w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="Nome da Oficina *"
+                    required
+                  />
+                </div>
 
-            {/* CNPJ/CPF */}
-            <input
-              name="cnpj_cpf"
-              value={form.cnpj_cpf}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="CNPJ ou CPF"
-            />
+                {/* CNPJ/CPF */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="material-icons-outlined text-lg text-gray-400">
+                      description
+                    </span>
+                  </div>
+                  <input
+                    name="cnpj_cpf"
+                    value={form.cnpj_cpf}
+                    onChange={handleChange}
+                    className="peer w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="CNPJ ou CPF"
+                  />
+                </div>
 
-            {/* Razão Social */}
-            <input
-              name="razao_social"
-              value={form.razao_social}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="Razão Social"
-            />
+                {/* Razão Social */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="material-icons-outlined text-lg text-gray-400">business</span>
+                  </div>
+                  <input
+                    name="razao_social"
+                    value={form.razao_social}
+                    onChange={handleChange}
+                    className="peer w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="Razão Social"
+                  />
+                </div>
 
-            {/* Descrição */}
-            <textarea
-              name="descricao"
-              value={form.descricao}
-              onChange={handleChange}
-              rows={4}
-              className="w-full resize-none rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="Descrição da Oficina"
-            />
+                {/* Descrição */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-3.5">
+                    <span className="material-icons-outlined text-lg text-gray-400">edit_note</span>
+                  </div>
+                  <textarea
+                    name="descricao"
+                    value={form.descricao}
+                    onChange={handleChange}
+                    rows={4}
+                    className="w-full resize-none rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="Descreva sua oficina, especialidades, diferenciais..."
+                  />
+                </div>
+              </div>
 
-            <div className="flex items-start gap-3 rounded-2xl border border-blue-200/50 bg-blue-50/50 p-4">
-              <span className="material-icons-outlined mt-0.5 text-lg text-blue-600">
-                lightbulb
-              </span>
-              <p className="text-xs leading-relaxed text-blue-700">
-                <strong>Dica:</strong> Uma boa descrição ajuda os clientes a conhecerem melhor sua
-                oficina e aumenta suas chances de agendamento.
-              </p>
+              {/* Dica no rodapé do card */}
+              <div className="border-t border-gray-100 bg-amber-50/60 px-6 py-4 md:px-8">
+                <div className="flex items-start gap-3">
+                  <span className="material-icons-outlined mt-0.5 text-lg text-amber-600">
+                    lightbulb
+                  </span>
+                  <p className="text-xs leading-relaxed text-amber-700">
+                    <strong>Dica:</strong> Uma boa descrição ajuda os clientes a conhecerem melhor
+                    sua oficina e aumenta suas chances de agendamento.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )
       case 1:
         return (
           <div className="fixed inset-0 z-50 flex">
-            {/* Mapa de Fundo */}
-            <div className="absolute inset-0 z-0 overflow-hidden bg-gray-200">
-              <Image
-                alt="Mapa interativo da região"
-                className="h-full w-full scale-110 object-cover opacity-90"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3x2zWmy5vgxFPyIki4LdbMpfjCjIaTlDcU238IzRdn_e7anmhsv_BAZfHUA2VeuDowzks0-7pJ8lOX5dI9nNzw61C8p128uFA2PwPLGzAPIht6uuceTvWA3pJVXOBUTbM9ciogg2uc6UKrv2gs11tg27l2SbozFjBgCR1wBHklJry1l3CNN3c3ALsrJWfm5TvisTV_nk1m3HekZkvaSho8Rjj1vrcRHouzJSQqQTOYqHluXPhCUc9hxlKpDxknHL_N6hWmVmtDu4"
-                fill
-                unoptimized
+            {/* Mapa interativo de fundo */}
+            <div className="absolute inset-0 z-0">
+              <LocationPicker
+                initialPosition={
+                  form.latitude && form.longitude
+                    ? { lat: form.latitude, lng: form.longitude }
+                    : null
+                }
+                onLocationSelect={handleLocationSelect}
+                height="100%"
+                zoom={15}
+                showSearch={true}
+                showGeolocation={true}
+                searchPlaceholder="Buscar endereço da oficina..."
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent"></div>
-
-              {/* Marcador Central */}
-              <div className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 transform flex-col items-center drop-shadow-2xl">
-                <span className="material-icons relative top-2 pb-1 text-6xl text-primary drop-shadow-md filter">
-                  location_on
-                </span>
-                <div className="h-2 w-4 rounded-[100%] bg-black/30 blur-[2px]"></div>
-                <div className="mt-2 animate-bounce whitespace-nowrap rounded-full border border-gray-100 bg-white px-4 py-2 text-xs font-bold text-gray-800 shadow-xl">
-                  Arraste o mapa para ajustar
-                </div>
-              </div>
-
-              {/* Pins de preço decorativos */}
-              <div className="absolute left-[40%] top-1/3 flex cursor-pointer items-center gap-1 rounded-xl bg-white p-1.5 opacity-80 shadow-md transition hover:scale-110 hover:opacity-100">
-                <span className="px-1 text-[10px] font-bold text-gray-800">R$ 120</span>
-              </div>
-              <div className="absolute bottom-1/4 right-[20%] flex cursor-pointer items-center gap-1 rounded-xl bg-white p-1.5 opacity-80 shadow-md transition hover:scale-110 hover:opacity-100">
-                <span className="px-1 text-[10px] font-bold text-gray-800">R$ 180</span>
-              </div>
-              <div className="absolute right-[30%] top-[20%] flex cursor-pointer items-center gap-1 rounded-xl bg-white p-1.5 opacity-80 shadow-md transition hover:scale-110 hover:opacity-100">
-                <span className="px-1 text-[10px] font-bold text-gray-800">R$ 150</span>
-              </div>
             </div>
 
             {/* Painel do Formulário */}
-            <div className="pointer-events-none absolute left-0 top-0 z-30 flex h-full w-full flex-col justify-center p-4 md:w-[480px] md:p-6">
+            <div className="pointer-events-none absolute left-0 top-0 z-[1001] flex h-full w-full flex-col justify-center p-4 md:w-[480px] md:p-6">
               <div className="pointer-events-auto max-h-[calc(100vh-120px)] w-full overflow-hidden overflow-y-auto rounded-2xl border border-gray-200 bg-white shadow-2xl">
                 <div className="p-6 md:p-8">
                   <div className="mb-6">
@@ -536,10 +597,25 @@ export default function MultiStepFullPageForm() {
                       Onde fica sua oficina?
                     </h1>
                     <p className="text-sm text-gray-500">
-                      Confirme o endereço da sua oficina. Sua localização exata só será mostrada aos
-                      clientes após a confirmação do agendamento.
+                      Clique no mapa ou busque o endereço para marcar a localização. Você também
+                      pode arrastar o marcador para ajustar.
                     </p>
                   </div>
+
+                  {/* Indicador de localização selecionada */}
+                  {form.latitude && form.longitude && (
+                    <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+                      <span className="material-icons text-lg text-green-600">check_circle</span>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-green-800">
+                          Localização marcada no mapa
+                        </p>
+                        <p className="text-[10px] text-green-600">
+                          {form.latitude.toFixed(6)}, {form.longitude.toFixed(6)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-4">
                     {/* CEP */}
@@ -665,152 +741,151 @@ export default function MultiStepFullPageForm() {
                     <input type="hidden" name="estado" value={form.estado || 'MA'} />
                   </div>
 
-                  <div className="mt-4 text-center">
-                    <button
-                      type="button"
-                      className="text-sm font-medium text-gray-500 transition hover:underline"
-                    >
-                      Não encontrei meu endereço
-                    </button>
-                  </div>
-
-                  {/* Botões de Navegação */}
+                  {/* Bot\u00f5es de Navega\u00e7\u00e3o */}
                   <div className="mt-6 flex items-center justify-between gap-4 border-t border-gray-200 pt-4">
                     <button
                       type="button"
                       onClick={handlePrev}
-                      className="rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                      className="flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
                     >
+                      <span className="material-icons text-base">arrow_back</span>
                       Voltar
                     </button>
                     <button
                       type="button"
                       onClick={handleNext}
                       disabled={!validateStep(step, form, userData)}
-                      className={`rounded-full px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition ${
+                      className={`flex items-center gap-1.5 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all ${
                         validateStep(step, form, userData)
-                          ? 'bg-blue-600 hover:bg-blue-700'
-                          : 'cursor-not-allowed bg-gray-300'
+                          ? 'bg-primary shadow-primary/25 hover:bg-primary-hover'
+                          : 'cursor-not-allowed bg-gray-300 shadow-none'
                       }`}
                     >
                       Continuar
+                      <span className="material-icons text-base">arrow_forward</span>
                     </button>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 border-t border-gray-200 bg-gray-50 p-4">
-                  <span className="material-icons-outlined mt-0.5 text-lg text-gray-500">
+                <div className="flex items-start gap-3 border-t border-gray-200 bg-amber-50/60 p-4">
+                  <span className="material-icons-outlined mt-0.5 text-lg text-amber-600">
                     lightbulb
                   </span>
-                  <p className="text-xs leading-relaxed text-gray-500">
-                    <strong>Dica:</strong> Oficinas com localização precisa recebem 30% mais
-                    agendamentos.
+                  <p className="text-xs leading-relaxed text-amber-700">
+                    <strong>Dica:</strong> Oficinas com localiza\u00e7\u00e3o precisa no mapa
+                    recebem 30% mais agendamentos. Clique no mapa para marcar!
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Controles do Mapa */}
-            <div className="absolute bottom-8 right-8 z-20 flex flex-col gap-2">
-              <button
-                type="button"
-                aria-label="Minha localização"
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-100 bg-white text-gray-700 shadow-lg transition hover:bg-gray-50"
-              >
-                <span className="material-icons text-xl">my_location</span>
-              </button>
-              <div className="flex flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-lg">
-                <button
-                  type="button"
-                  aria-label="Zoom In"
-                  className="flex h-10 w-10 items-center justify-center border-b border-gray-100 text-gray-700 transition hover:bg-gray-50"
-                >
-                  <span className="material-icons text-xl">add</span>
-                </button>
-                <button
-                  type="button"
-                  aria-label="Zoom Out"
-                  className="flex h-10 w-10 items-center justify-center text-gray-700 transition hover:bg-gray-50"
-                >
-                  <span className="material-icons text-xl">remove</span>
-                </button>
               </div>
             </div>
           </div>
         )
       case 2:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4">
-            <div className="mb-2">
-              <h2 className="mb-1 text-2xl font-bold text-gray-800">Informações de Contato</h2>
-              <p className="text-sm text-gray-600">
-                Como os clientes podem entrar em contato com sua oficina?
-              </p>
-            </div>
+          <div className="mx-auto flex w-full max-w-xl flex-col px-4">
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+              {/* Header */}
+              <div className="border-b border-gray-100 bg-gradient-to-r from-primary/5 to-transparent px-6 py-6 md:px-8">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                    <span className="material-icons text-xl text-primary">contact_phone</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Informações de Contato</h2>
+                    <p className="text-sm text-gray-500">Como os clientes podem falar com você?</p>
+                  </div>
+                </div>
+              </div>
 
-            {/* Telefone Fixo */}
-            <input
-              name="telefone_fixo"
-              value={form.telefone_fixo}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="Telefone Fixo"
-              type="tel"
-            />
+              <div className="space-y-5 p-6 md:p-8">
+                {/* Telefone Fixo */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="material-icons-outlined text-lg text-gray-400">phone</span>
+                  </div>
+                  <input
+                    name="telefone_fixo"
+                    value={form.telefone_fixo}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="Telefone Fixo"
+                    type="tel"
+                  />
+                </div>
 
-            {/* WhatsApp */}
-            <input
-              name="whatsapp"
-              value={form.whatsapp}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="WhatsApp Comercial *"
-              type="tel"
-              required
-            />
+                {/* WhatsApp */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="material-icons text-lg text-green-500">chat</span>
+                  </div>
+                  <input
+                    name="whatsapp"
+                    value={form.whatsapp}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="WhatsApp Comercial *"
+                    type="tel"
+                    required
+                  />
+                </div>
 
-            {/* E-mail */}
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="E-mail *"
-              required
-            />
+                {/* E-mail */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="material-icons-outlined text-lg text-gray-400">email</span>
+                  </div>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="E-mail *"
+                    required
+                  />
+                </div>
 
-            {/* Site */}
-            <input
-              name="site"
-              value={form.site}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-800 placeholder-gray-500 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="Site ou Redes Sociais"
-              type="url"
-            />
+                {/* Site */}
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="material-icons-outlined text-lg text-gray-400">language</span>
+                  </div>
+                  <input
+                    name="site"
+                    value={form.site}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="Site ou Redes Sociais"
+                    type="url"
+                  />
+                </div>
+              </div>
 
-            <div className="flex items-start gap-3 rounded-2xl border border-blue-200/50 bg-blue-50/50 p-4">
-              <span className="material-icons-outlined mt-0.5 text-lg text-blue-600">
-                lightbulb
-              </span>
-              <p className="text-xs leading-relaxed text-blue-700">
-                <strong>Dica:</strong> Oficinas que respondem rápido no WhatsApp têm 2x mais
-                agendamentos confirmados.
-              </p>
+              <div className="border-t border-gray-100 bg-amber-50/60 px-6 py-4 md:px-8">
+                <div className="flex items-start gap-3">
+                  <span className="material-icons-outlined mt-0.5 text-lg text-amber-600">
+                    lightbulb
+                  </span>
+                  <p className="text-xs leading-relaxed text-amber-700">
+                    <strong>Dica:</strong> Oficinas que respondem rápido no WhatsApp têm 2x mais
+                    agendamentos confirmados.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )
       case 3:
         return (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-            <div>
-              <label className="mb-2 block text-lg font-medium">
-                Selecione os serviços oferecidos *
-              </label>
-              <p className="mb-4 text-sm text-gray-600">
-                Escolha os serviços e informe o valor médio cobrado
-              </p>
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                <span className="material-icons text-xl text-primary">build</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Serviços Oferecidos</h2>
+                <p className="text-sm text-gray-500">Escolha os serviços e informe o valor médio</p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -821,10 +896,10 @@ export default function MultiStepFullPageForm() {
                 return (
                   <div
                     key={servico.nome}
-                    className={`flex flex-col gap-3 rounded-xl border-2 bg-white p-4 shadow-md transition-all duration-200 ${
+                    className={`flex flex-col gap-3 rounded-xl border-2 bg-white p-4 shadow-sm transition-all duration-200 ${
                       checked
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
+                        ? 'border-primary/50 bg-primary/5'
+                        : 'border-gray-200 hover:border-primary/30 hover:shadow-md'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -832,7 +907,7 @@ export default function MultiStepFullPageForm() {
                         type="checkbox"
                         checked={checked}
                         onChange={() => handleServicoCheck(servico.nome)}
-                        className="h-5 w-5 accent-blue-600"
+                        className="h-5 w-5 accent-primary"
                       />
                       <Image
                         src={servico.icon}
@@ -852,7 +927,7 @@ export default function MultiStepFullPageForm() {
                           placeholder="Digite o valor"
                           value={servicoData?.valor || ''}
                           onChange={e => handleServicoValor(servico.nome, e.target.value)}
-                          className="w-full rounded-lg border-2 border-gray-300 px-3 py-2 font-semibold text-green-700 focus:border-blue-500 focus:outline-none"
+                          className="w-full rounded-lg border-2 border-gray-300 px-3 py-2 font-semibold text-green-700 focus:border-primary focus:outline-none"
                         />
                         <p className="mt-1 text-xs text-gray-500">
                           Ex: Digite "10000" para R$ 100,00
@@ -878,19 +953,28 @@ export default function MultiStepFullPageForm() {
         )
       case 4:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-            <label className="font-medium">Selecione os dias de atendimento *</label>
+          <div className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                <span className="material-icons text-xl text-primary">schedule</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Horário de Funcionamento</h2>
+                <p className="text-sm text-gray-500">Quando sua oficina está aberta?</p>
+              </div>
+            </div>
+            <label className="font-medium text-gray-700">Dias de atendimento *</label>
             <div className="flex flex-wrap gap-2">
               {diasSemana.map(dia => (
                 <label
                   key={dia}
-                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${form.diasSelecionados.includes(dia) ? 'border-blue-600 bg-blue-50' : 'border-gray-300 bg-white'}`}
+                  className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm transition-all ${form.diasSelecionados.includes(dia) ? 'border-primary bg-primary/5 font-medium text-primary' : 'border-gray-300 bg-white text-gray-700 hover:border-primary/30'}`}
                 >
                   <input
                     type="checkbox"
                     checked={form.diasSelecionados.includes(dia)}
                     onChange={() => handleDiaCheck(dia)}
-                    className="accent-blue-600"
+                    className="accent-primary"
                   />
                   {dia}
                 </label>
@@ -899,24 +983,26 @@ export default function MultiStepFullPageForm() {
 
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div>
-                <label className="font-medium">Horário de abertura *</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Abertura *</label>
                 <input
                   name="horario_abertura"
                   type="time"
                   value={form.horario_abertura}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3"
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   required
                 />
               </div>
               <div>
-                <label className="font-medium">Horário de fechamento *</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                  Fechamento *
+                </label>
                 <input
                   name="horario_fechamento"
                   type="time"
                   value={form.horario_fechamento}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3"
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   required
                 />
               </div>
@@ -925,23 +1011,32 @@ export default function MultiStepFullPageForm() {
         )
       case 5:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-            <label className="text-lg font-medium">Formas de pagamento aceitas *</label>
+          <div className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                <span className="material-icons text-xl text-primary">payments</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Formas de Pagamento</h2>
+                <p className="text-sm text-gray-500">Quais formas de pagamento você aceita?</p>
+              </div>
+            </div>
+            <label className="font-medium text-gray-700">Selecione as formas aceitas *</label>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {pagamentosList.map(pag => (
                 <label
                   key={pag.nome}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 transition-all duration-200 ${
                     form.pagamentosSelecionados.includes(pag.nome)
-                      ? 'border-blue-600 bg-blue-50 shadow-md'
-                      : 'border-gray-300 bg-white hover:border-blue-300 hover:shadow-sm'
+                      ? 'border-primary/50 bg-primary/5 shadow-md'
+                      : 'border-gray-200 bg-white hover:border-primary/30 hover:shadow-sm'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={form.pagamentosSelecionados.includes(pag.nome)}
                     onChange={() => handlePagamentoCheck(pag.nome)}
-                    className="h-5 w-5 accent-blue-600"
+                    className="h-5 w-5 accent-primary"
                   />
                   <span className="text-2xl">{pag.icon}</span>
                   <span className="font-medium">{pag.nome}</span>
@@ -952,9 +1047,17 @@ export default function MultiStepFullPageForm() {
         )
       case 6:
         return (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+          <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                <span className="material-icons text-xl text-primary">photo_library</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Imagens da Oficina</h2>
+                <p className="text-sm text-gray-500">Mostre seu espaço para os clientes</p>
+              </div>
+            </div>
             <div>
-              <label className="mb-3 block text-lg font-medium">Imagens da oficina *</label>
               <div className="relative">
                 <input
                   name="imagens"
@@ -971,7 +1074,7 @@ export default function MultiStepFullPageForm() {
                   className={`flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-200 ${
                     touched.imagens && (!form.imagens || form.imagens.length === 0)
                       ? 'border-red-500 bg-red-50 hover:bg-red-100'
-                      : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-gray-100'
+                      : 'border-gray-300 bg-gray-50 hover:border-primary/40 hover:bg-gray-100'
                   }`}
                 >
                   <div className="flex flex-col items-center justify-center pb-6 pt-5">
@@ -1029,24 +1132,45 @@ export default function MultiStepFullPageForm() {
         )
       case 7:
         return (
-          <div className="flex min-h-[40vh] w-full flex-col items-center justify-center">
-            <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-xl bg-white p-8 shadow-lg">
-              <span className="text-lg font-semibold text-blue-800">
-                A oficina será vinculada à sua conta:
-              </span>
-              {userData && (
-                <>
-                  <Image
-                    src={userData.avatar_url}
-                    alt="Avatar"
-                    width={80}
-                    height={80}
-                    className="rounded-full"
-                  />
-                  <div className="text-xl font-bold text-blue-900">{userData.nome}</div>
-                  <div className="text-blue-700">{userData.email}</div>
-                </>
-              )}
+          <div className="mx-auto flex w-full max-w-xl flex-col px-4">
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+              <div className="border-b border-gray-100 bg-gradient-to-r from-primary/5 to-transparent px-6 py-6 md:px-8">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                    <span className="material-icons text-xl text-primary">person</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Conta Vinculada</h2>
+                    <p className="text-sm text-gray-500">A oficina será vinculada à sua conta</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-4 p-8">
+                {userData && (
+                  <>
+                    <div className="relative">
+                      <Image
+                        src={userData.avatar_url}
+                        alt="Avatar"
+                        width={80}
+                        height={80}
+                        className="rounded-full ring-4 ring-primary/10"
+                      />
+                      <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-green-500 text-white ring-2 ring-white">
+                        <span className="material-icons text-sm">check</span>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-gray-900">{userData.nome}</div>
+                      <div className="text-sm text-gray-500">{userData.email}</div>
+                    </div>
+                    <div className="mt-2 flex items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-green-700">
+                      <span className="material-icons text-base">verified</span>
+                      Conta verificada
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )
@@ -1092,13 +1216,13 @@ export default function MultiStepFullPageForm() {
               <div className="w-full space-y-3">
                 <button
                   onClick={() => router.push('/conta')}
-                  className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+                  className="w-full rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-hover"
                 >
                   Ir para Minha Conta
                 </button>
                 <button
                   onClick={() => router.push('/')}
-                  className="w-full rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-200"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
                 >
                   Voltar ao Início
                 </button>
@@ -1111,9 +1235,39 @@ export default function MultiStepFullPageForm() {
     }
   }
 
+  // Calcular progresso
+  const progress = ((step + 1) / steps.length) * 100
+
   return (
-    <div className="flex min-h-screen w-full flex-col bg-gray-100">
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-2 py-8">
+    <div className="flex min-h-screen w-full flex-col bg-[#F7F7F7]">
+      {/* Header fixo */}
+      {step !== 1 && (
+        <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 md:px-6">
+            <button
+              onClick={() => router.push('/')}
+              className="flex items-center gap-2 transition hover:opacity-80"
+            >
+              <span className="material-icons text-2xl text-primary">build_circle</span>
+              <span className="text-lg font-bold text-gray-900">ComparAuto</span>
+            </button>
+            <div className="flex items-center gap-3">
+              <span className="hidden text-sm text-gray-500 sm:block">Cadastro de Oficina</span>
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                Passo {step + 1} de {steps.length}
+              </span>
+            </div>
+          </div>
+          {/* Barra de progresso */}
+          <div className="h-1 w-full bg-gray-100">
+            <div
+              className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </header>
+      )}
+      <main className="flex w-full flex-1 flex-col items-center justify-center px-2 py-8 md:py-12">
         <form
           className="flex w-full flex-col items-center justify-center"
           onSubmit={e => e.preventDefault()}
@@ -1121,40 +1275,17 @@ export default function MultiStepFullPageForm() {
           {renderStep()}
         </form>
       </main>
-      {/* Indicador de passos na base - hide for confirmation step and map step */}
+      {/* Footer de navegação - hide for confirmation step and map step */}
       {step !== 9 && step !== 1 && (
-        <footer className="flex w-full flex-col gap-4 bg-white/90 py-6 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-          <div className="flex justify-center gap-2 md:gap-4">
-            {steps.map((s, i) => (
-              <div key={s.label} className="flex flex-col items-center">
-                <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold transition-all duration-200 ${
-                    i === step
-                      ? 'border-blue-600 bg-blue-600 text-white shadow-md'
-                      : i < step
-                        ? 'border-blue-400 bg-blue-50 text-blue-600'
-                        : 'border-gray-300 bg-gray-100 text-gray-400'
-                  }`}
-                >
-                  {i + 1}
-                </div>
-                <span
-                  className={`mt-1 hidden text-xs md:block ${
-                    i === step ? 'font-semibold text-gray-700' : 'text-gray-400'
-                  }`}
-                >
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="mx-auto mt-2 flex w-full max-w-2xl items-center justify-between px-4">
+        <footer className="sticky bottom-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-4 md:px-6">
             {step > 0 ? (
               <button
                 type="button"
                 onClick={handlePrev}
-                className="rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                className="flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 hover:shadow-md"
               >
+                <span className="material-icons text-base">arrow_back</span>
                 Voltar
               </button>
             ) : (
@@ -1164,13 +1295,14 @@ export default function MultiStepFullPageForm() {
               type="button"
               onClick={handleNext}
               disabled={!validateStep(step, form, userData)}
-              className={`rounded-full px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition ${
+              className={`flex items-center gap-1.5 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all ${
                 validateStep(step, form, userData)
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'cursor-not-allowed bg-gray-300'
+                  ? 'bg-primary shadow-primary/25 hover:bg-primary-hover hover:shadow-xl'
+                  : 'cursor-not-allowed bg-gray-300 shadow-none'
               }`}
             >
               Continuar
+              <span className="material-icons text-base">arrow_forward</span>
             </button>
           </div>
         </footer>
@@ -1246,7 +1378,7 @@ function TermosScrollStep({
         type="button"
         disabled={!scrolled || submitting}
         onClick={onAvancar}
-        className={`rounded-full px-8 py-3 font-bold text-white shadow transition ${scrolled ? 'bg-blue-700 hover:bg-blue-800' : 'cursor-not-allowed bg-blue-200'}`}
+        className={`rounded-xl px-8 py-3 font-bold text-white shadow-lg transition ${scrolled ? 'bg-primary shadow-primary/25 hover:bg-primary-hover' : 'cursor-not-allowed bg-gray-300 shadow-none'}`}
       >
         {submitting ? 'Enviando...' : 'Avançar'}
       </button>
