@@ -47,7 +47,7 @@ ComparAuto é uma plataforma moderna para comparação de preços de serviços a
 | **TypeScript** | 5+ | Type safety, melhor DX |
 | **Tailwind CSS** | 4+ | Utility-first CSS, rapid development |
 | **Radix UI** | Última | Accessible components |
-| **Leaflet** | 1.9+ | Mapas interativos |
+| **MapLibre GL** | 4+ | Mapas interativos |
 
 ### Backend
 

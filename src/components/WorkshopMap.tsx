@@ -1,8 +1,7 @@
 'use client'
 
 /**
- * WorkshopMap - Wrapper que usa Leaflet/OpenStreetMap (100% gratuito)
- * Mantém a mesma interface do componente anterior que usava Google Maps
+ * WorkshopMap - Wrapper que usa MapLibre GL + OpenStreetMap (100% gratuito)
  */
 
 import dynamic from 'next/dynamic'

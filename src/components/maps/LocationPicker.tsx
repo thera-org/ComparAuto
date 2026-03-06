@@ -1,18 +1,10 @@
 'use client'
 
-import L from 'leaflet'
-import { Marker } from 'react-leaflet'
 import { useState, useCallback, useRef } from 'react'
+import { Marker, MapRef } from 'react-map-gl/maplibre'
 import { MapPin, Search, Navigation, Loader2, X } from 'lucide-react'
 
-import BaseMap, {
-  MapPosition,
-  ChangeView,
-  selectionIcon,
-  reverseGeocode,
-  geocodeAddress,
-  GeocodingResult,
-} from './BaseMap'
+import BaseMap, { MapPosition, reverseGeocode, geocodeAddress, GeocodingResult } from './BaseMap'
 
 // ===== Tipos =====
 
@@ -47,38 +39,6 @@ interface LocationPickerProps {
   className?: string
 }
 
-// ===== Componente interno: Marcador arrastável =====
-
-function DraggableMarker({
-  position,
-  onDragEnd,
-}: {
-  position: MapPosition
-  onDragEnd: (pos: MapPosition) => void
-}) {
-  const markerRef = useRef<L.Marker | null>(null)
-
-  const eventHandlers = {
-    dragend() {
-      const marker = markerRef.current
-      if (marker) {
-        const latlng = marker.getLatLng()
-        onDragEnd({ lat: latlng.lat, lng: latlng.lng })
-      }
-    },
-  }
-
-  return (
-    <Marker
-      position={[position.lat, position.lng]}
-      icon={selectionIcon}
-      draggable={true}
-      eventHandlers={eventHandlers}
-      ref={markerRef}
-    />
-  )
-}
-
 // ===== Componente principal: LocationPicker =====
 
 /**
@@ -103,9 +63,6 @@ export default function LocationPicker({
   className = '',
 }: LocationPickerProps) {
   const [markerPosition, setMarkerPosition] = useState<MapPosition | null>(initialPosition || null)
-  const [mapCenter, setMapCenter] = useState<MapPosition>(
-    initialPosition || { lat: -2.5307, lng: -44.3068 }
-  )
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<GeocodingResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -113,14 +70,29 @@ export default function LocationPicker({
   const [showResults, setShowResults] = useState(false)
   const [addressLabel, setAddressLabel] = useState('')
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const mapRef = useRef<L.Map | null>(null)
+  const mapRef = useRef<MapRef | null>(null)
+  const geocodeRequestRef = useRef<number>(0)
 
   // Geocoding reverso quando o marcador é posicionado
+  // Usa um contador de requisições para cancelar resultados stale
+  // quando o usuário clica rapidamente em múltiplos locais
   const handlePositionChange = useCallback(
     async (pos: MapPosition) => {
+      // Move o marcador imediatamente (feedback visual instantâneo)
       setMarkerPosition(pos)
+      setAddressLabel('')
+
+      // Notifica a posição imediatamente (sem esperar geocoding)
+      onLocationSelect({ lat: pos.lat, lng: pos.lng })
+
+      // Incrementa o contador para invalidar requisições anteriores
+      const requestId = ++geocodeRequestRef.current
 
       const result = await reverseGeocode(pos.lat, pos.lng)
+
+      // Se houve outro clique enquanto aguardava, ignora este resultado
+      if (requestId !== geocodeRequestRef.current) return
+
       const locationResult: LocationPickerResult = {
         lat: pos.lat,
         lng: pos.lng,
@@ -151,8 +123,9 @@ export default function LocationPicker({
   )
 
   // Arrastar marcador
-  const handleMarkerDrag = useCallback(
-    (pos: MapPosition) => {
+  const handleMarkerDragEnd = useCallback(
+    (e: { lngLat: { lat: number; lng: number } }) => {
+      const pos = { lat: e.lngLat.lat, lng: e.lngLat.lng }
       handlePositionChange(pos)
     },
     [handlePositionChange]
@@ -186,10 +159,16 @@ export default function LocationPicker({
   const handleSelectResult = useCallback(
     (result: GeocodingResult) => {
       const pos = { lat: result.lat, lng: result.lng }
-      setMapCenter(pos)
       setMarkerPosition(pos)
       setSearchQuery(result.display_name.split(',')[0])
       setShowResults(false)
+
+      // Fly to the selected location
+      mapRef.current?.flyTo({
+        center: [pos.lng, pos.lat],
+        zoom: zoom,
+        duration: 1500,
+      })
 
       const locationResult: LocationPickerResult = {
         lat: result.lat,
@@ -205,7 +184,7 @@ export default function LocationPicker({
 
       onLocationSelect(locationResult)
     },
-    [onLocationSelect]
+    [onLocationSelect, zoom]
   )
 
   // Geolocalização do navegador
@@ -219,8 +198,15 @@ export default function LocationPicker({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         }
-        setMapCenter(pos)
         handlePositionChange(pos)
+
+        // Fly to the user's location
+        mapRef.current?.flyTo({
+          center: [pos.lng, pos.lat],
+          zoom: zoom,
+          duration: 1500,
+        })
+
         setIsLocating(false)
       },
       error => {
@@ -229,13 +215,13 @@ export default function LocationPicker({
       },
       { enableHighAccuracy: true, timeout: 10000 }
     )
-  }, [handlePositionChange])
+  }, [handlePositionChange, zoom])
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
       {/* Campo de busca */}
       {showSearch && (
-        <div className="absolute left-3 right-3 top-3 z-[1000]">
+        <div className="absolute left-3 right-3 top-3 z-[10]">
           <div className="relative">
             <div className="flex items-center overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
               <Search className="ml-3 h-4 w-4 flex-shrink-0 text-gray-400" />
@@ -285,15 +271,22 @@ export default function LocationPicker({
 
       {/* Mapa */}
       <BaseMap
-        center={mapCenter}
+        center={markerPosition || { lat: -2.5307, lng: -44.3068 }}
         zoom={markerPosition ? zoom : 13}
         height={height}
         onClick={handleMapClick}
         mapRef={mapRef}
       >
-        <ChangeView center={mapCenter} zoom={markerPosition ? zoom : undefined} />
         {markerPosition && (
-          <DraggableMarker position={markerPosition} onDragEnd={handleMarkerDrag} />
+          <Marker
+            longitude={markerPosition.lng}
+            latitude={markerPosition.lat}
+            draggable={true}
+            onDragEnd={handleMarkerDragEnd}
+            anchor="bottom"
+          >
+            <div className="selection-marker" />
+          </Marker>
         )}
       </BaseMap>
 
@@ -302,7 +295,7 @@ export default function LocationPicker({
         <button
           onClick={handleGetLocation}
           disabled={isLocating}
-          className="absolute bottom-4 right-4 z-[1000] flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-lg transition hover:bg-gray-50 disabled:opacity-50"
+          className="absolute bottom-4 right-4 z-[10] flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-lg transition hover:bg-gray-50 disabled:opacity-50"
           title="Usar minha localização"
         >
           {isLocating ? (
@@ -316,7 +309,7 @@ export default function LocationPicker({
 
       {/* Label do endereço selecionado */}
       {markerPosition && addressLabel && (
-        <div className="absolute bottom-4 left-4 z-[1000] max-w-[60%] rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-lg">
+        <div className="absolute bottom-4 left-4 z-[10] max-w-[60%] rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-lg">
           <div className="flex items-start gap-2">
             <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
             <p className="line-clamp-2 text-xs text-gray-600">{addressLabel}</p>
@@ -326,7 +319,7 @@ export default function LocationPicker({
 
       {/* Instrução se não há marcador */}
       {!markerPosition && (
-        <div className="pointer-events-none absolute inset-0 z-[999] flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 z-[9] flex items-center justify-center">
           <div className="rounded-full border border-gray-100 bg-white/90 px-4 py-2 shadow-lg backdrop-blur-sm">
             <p className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <MapPin className="h-4 w-4 text-primary" />

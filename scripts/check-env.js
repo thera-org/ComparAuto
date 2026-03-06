@@ -12,7 +12,6 @@ const requiredVars = [
 ]
 
 const optionalVars = [
-  'NEXT_PUBLIC_GOOGLE_MAPS_API_KEY',
   'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'
 ]
 

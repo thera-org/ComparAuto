@@ -1,53 +1,16 @@
 'use client'
 
-import L from 'leaflet'
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
-import { useEffect, useRef } from 'react'
+import { useRef, useCallback } from 'react'
+import Map, {
+  Marker,
+  Popup,
+  NavigationControl,
+  AttributionControl,
+  MapRef,
+} from 'react-map-gl/maplibre'
+import type { MapLayerMouseEvent } from 'react-map-gl/maplibre'
 
-import LeafletCSS from './LeafletCSS'
-
-// ===== Ícones customizados =====
-
-/** Ícone padrão vermelho para marcadores */
-export const defaultIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
-
-/** Ícone azul para localização do usuário */
-export const userLocationIcon = new L.DivIcon({
-  className: 'location-picker-marker',
-  html: '<div class="location-pulse"></div>',
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
-})
-
-/** Ícone vermelho customizado para seleção de localização */
-export const selectionIcon = new L.Icon({
-  iconUrl:
-    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
-
-/** Ícone azul para oficinas */
-export const workshopIcon = new L.Icon({
-  iconUrl:
-    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
+import MapLibreCSS from './MapLibreCSS'
 
 // ===== Tipos =====
 
@@ -123,36 +86,28 @@ export async function geocodeAddress(address: string): Promise<GeocodingResult[]
   }
 }
 
-// ===== Componentes auxiliares internos =====
+// ===== Estilo de mapa OpenStreetMap raster =====
 
-/** Componente que centraliza o mapa quando a posição muda */
-function ChangeView({ center, zoom }: { center: MapPosition; zoom?: number }) {
-  const map = useMap()
-  useEffect(() => {
-    if (center) {
-      map.setView([center.lat, center.lng], zoom || map.getZoom(), { animate: true })
-    }
-  }, [center, zoom, map])
-  return null
-}
-
-/** Componente que captura cliques no mapa */
-function MapClickHandler({ onMapClick }: { onMapClick: (pos: MapPosition) => void }) {
-  useMapEvents({
-    click(e) {
-      onMapClick({ lat: e.latlng.lat, lng: e.latlng.lng })
+export const OSM_STYLE = {
+  version: 8 as const,
+  sources: {
+    osm: {
+      type: 'raster' as const,
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     },
-  })
-  return null
-}
-
-/** Componente que expõe a instância do mapa */
-function MapRefHandler({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null> }) {
-  const map = useMap()
-  useEffect(() => {
-    mapRef.current = map
-  }, [map, mapRef])
-  return null
+  },
+  layers: [
+    {
+      id: 'osm',
+      type: 'raster' as const,
+      source: 'osm',
+      minzoom: 0,
+      maxzoom: 19,
+    },
+  ],
 }
 
 // ===== Componente BaseMap =====
@@ -164,11 +119,11 @@ interface BaseMapProps {
   children?: React.ReactNode
   onClick?: (pos: MapPosition) => void
   className?: string
-  mapRef?: React.MutableRefObject<L.Map | null>
+  mapRef?: React.MutableRefObject<MapRef | null>
 }
 
 /**
- * Componente base de mapa usando Leaflet + OpenStreetMap (100% gratuito).
+ * Componente base de mapa usando MapLibre GL + OpenStreetMap (100% gratuito).
  * Serve como base para todos os outros componentes de mapa.
  */
 export default function BaseMap({
@@ -180,32 +135,46 @@ export default function BaseMap({
   className = '',
   mapRef: externalMapRef,
 }: BaseMapProps) {
-  const internalMapRef = useRef<L.Map | null>(null)
+  const internalMapRef = useRef<MapRef | null>(null)
   const mapRef = externalMapRef || internalMapRef
+
+  const handleClick = useCallback(
+    (e: MapLayerMouseEvent) => {
+      if (onClick) {
+        onClick({ lat: e.lngLat.lat, lng: e.lngLat.lng })
+      }
+    },
+    [onClick]
+  )
 
   return (
     <>
-      <LeafletCSS />
+      <MapLibreCSS />
       <div className={`relative overflow-hidden rounded-lg ${className}`} style={{ height }}>
-        <MapContainer
-          center={[center.lat, center.lng]}
-          zoom={zoom}
-          style={{ height: '100%', width: '100%' }}
-          zoomControl={true}
-          attributionControl={true}
+        <Map
+          ref={mapRef}
+          initialViewState={{
+            longitude: center.lng,
+            latitude: center.lat,
+            zoom: zoom,
+          }}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle={OSM_STYLE}
+          onClick={handleClick}
+          attributionControl={false}
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          <NavigationControl position="top-right" />
+          <AttributionControl
+            compact={true}
+            customAttribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           />
-          <MapRefHandler mapRef={mapRef} />
-          {onClick && <MapClickHandler onMapClick={onClick} />}
           {children}
-        </MapContainer>
+        </Map>
       </div>
     </>
   )
 }
 
-// Re-exportar componentes do react-leaflet para uso externo
-export { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents, ChangeView }
+// Re-exportar componentes do react-map-gl para uso externo
+export { Marker, Popup, Map }
+export type { MapRef }

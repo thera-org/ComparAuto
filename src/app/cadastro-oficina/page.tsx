@@ -98,7 +98,7 @@ export default function CadastroOficina() {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative overflow-hidden px-6 pb-24 pt-20">
+        <section className="relative overflow-hidden px-6 pb-24 pt-16">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10"></div>
           <div className="relative z-10 mx-auto max-w-6xl">
             <div className="grid items-center gap-12 md:grid-cols-2">

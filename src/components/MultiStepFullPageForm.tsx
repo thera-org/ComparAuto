@@ -421,18 +421,20 @@ export default function MultiStepFullPageForm() {
   }
 
   // Handler para seleção de localização no mapa
+  // Sempre atualiza os campos com os dados do geocoding reverso,
+  // permitindo que o usuário clique em múltiplos locais e o endereço acompanhe.
   const handleLocationSelect = useCallback((result: LocationPickerResult) => {
     setForm(f => ({
       ...f,
       latitude: result.lat,
       longitude: result.lng,
-      // Preenche campos de endereço automaticamente se disponíveis
-      ...(result.road && !f.rua ? { rua: result.road } : {}),
-      ...(result.number && !f.numero ? { numero: result.number } : {}),
-      ...(result.suburb && !f.bairro ? { bairro: result.suburb } : {}),
+      // Sempre sobrescreve com os dados do geocoding quando disponíveis
+      ...(result.road ? { rua: result.road } : {}),
+      ...(result.number ? { numero: result.number } : { numero: '' }),
+      ...(result.suburb ? { bairro: result.suburb } : {}),
       ...(result.city ? { cidade: result.city } : {}),
       ...(result.state ? { estado: result.state } : {}),
-      ...(result.postcode && !f.cep ? { cep: result.postcode.replace(/\D/g, '') } : {}),
+      ...(result.postcode ? { cep: result.postcode.replace(/\D/g, '') } : {}),
     }))
   }, [])
 
@@ -572,7 +574,7 @@ export default function MultiStepFullPageForm() {
         return (
           <div className="fixed inset-0 z-50 flex">
             {/* Mapa interativo de fundo */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0">
               <LocationPicker
                 initialPosition={
                   form.latitude && form.longitude
@@ -589,7 +591,7 @@ export default function MultiStepFullPageForm() {
             </div>
 
             {/* Painel do Formulário */}
-            <div className="pointer-events-none absolute left-0 top-0 z-[1001] flex h-full w-full flex-col justify-center p-4 md:w-[480px] md:p-6">
+            <div className="pointer-events-none absolute left-0 top-0 z-[5] flex h-full w-full flex-col justify-center p-4 md:w-[480px] md:p-6">
               <div className="pointer-events-auto max-h-[calc(100vh-120px)] w-full overflow-hidden overflow-y-auto rounded-2xl border border-gray-200 bg-white shadow-2xl">
                 <div className="p-6 md:p-8">
                   <div className="mb-6">
@@ -741,7 +743,7 @@ export default function MultiStepFullPageForm() {
                     <input type="hidden" name="estado" value={form.estado || 'MA'} />
                   </div>
 
-                  {/* Bot\u00f5es de Navega\u00e7\u00e3o */}
+                  {/* Botões de Navegação */}
                   <div className="mt-6 flex items-center justify-between gap-4 border-t border-gray-200 pt-4">
                     <button
                       type="button"
@@ -772,8 +774,8 @@ export default function MultiStepFullPageForm() {
                     lightbulb
                   </span>
                   <p className="text-xs leading-relaxed text-amber-700">
-                    <strong>Dica:</strong> Oficinas com localiza\u00e7\u00e3o precisa no mapa
-                    recebem 30% mais agendamentos. Clique no mapa para marcar!
+                    <strong>Dica:</strong> Oficinas com localização precisa no mapa recebem 30% mais
+                    agendamentos. Clique no mapa para marcar!
                   </p>
                 </div>
               </div>

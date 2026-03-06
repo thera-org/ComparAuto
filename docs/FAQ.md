@@ -438,14 +438,9 @@ npm ci
 
 **R:**
 
-1. `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` está configurada?
-2. Chave é válida? (teste em console)
-3. Leaflet está instalado? `npm install leaflet @react-leaflet/core`
-4. CSS do Leaflet está importado?
-
-```typescript
-import 'leaflet/dist/leaflet.css';  // Importante!
-```
+1. MapLibre GL está instalado? `npm install maplibre-gl react-map-gl`
+2. O CSS do MapLibre está sendo importado? (MapLibreCSS.tsx faz isso automaticamente)
+3. Verifique se o componente é carregado com `dynamic(() => import(...), { ssr: false })`
 
 ### P: Autenticação não funciona
 
