@@ -106,30 +106,27 @@ export default function WorkshopMapLeaflet({
   }, [])
 
   // Aplica a localização obtida no mapa (só atualiza se for mais precisa)
-  const applyUserLocation = useCallback(
-    (position: GeolocationPosition, shouldFly = false) => {
-      const newAccuracy = position.coords.accuracy
-      const location: MapPosition = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      }
+  const applyUserLocation = useCallback((position: GeolocationPosition, shouldFly = false) => {
+    const newAccuracy = position.coords.accuracy
+    const location: MapPosition = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+    }
 
-      setUserLocation(location)
-      setLocationAccuracy(newAccuracy)
-      setLocationError(null)
-      setIsLocating(false)
+    setUserLocation(location)
+    setLocationAccuracy(newAccuracy)
+    setLocationError(null)
+    setIsLocating(false)
 
-      if (shouldFly) {
-        const zoomLevel = newAccuracy < 100 ? 16 : newAccuracy < 500 ? 15 : 14
-        mapRef.current?.flyTo({
-          center: [location.lng, location.lat],
-          zoom: zoomLevel,
-          duration: 1500,
-        })
-      }
-    },
-    []
-  )
+    if (shouldFly) {
+      const zoomLevel = newAccuracy < 100 ? 16 : newAccuracy < 500 ? 15 : 14
+      mapRef.current?.flyTo({
+        center: [location.lng, location.lat],
+        zoom: zoomLevel,
+        duration: 1500,
+      })
+    }
+  }, [])
 
   // Trata erros de geolocalização com mensagens claras
   const handleGeolocationError = useCallback((error: GeolocationPositionError) => {
@@ -195,15 +192,17 @@ export default function WorkshopMapLeaflet({
 
     // Passo 1: posição rápida (cache ou rede) para feedback imediato
     navigator.geolocation.getCurrentPosition(
-      (pos) => applyUserLocation(pos, true),
-      () => { /* ignora erro, o watch abaixo vai tentar */ },
+      pos => applyUserLocation(pos, true),
+      () => {
+        /* ignora erro, o watch abaixo vai tentar */
+      },
       { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     )
 
     // Passo 2: watch com alta precisão para refinar continuamente
     let refinementCount = 0
     const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
+      pos => {
         refinementCount++
         const isFirstResult = !userLocation
         applyUserLocation(pos, isFirstResult)
@@ -214,7 +213,7 @@ export default function WorkshopMapLeaflet({
           watchIdRef.current = null
         }
       },
-      (error) => {
+      error => {
         // Só mostra erro se não temos nenhuma localização ainda
         if (!userLocation) {
           handleGeolocationError(error)

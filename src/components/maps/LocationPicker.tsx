@@ -286,15 +286,17 @@ export default function LocationPicker({
 
     // Passo 1: posição rápida para feedback imediato
     navigator.geolocation.getCurrentPosition(
-      (pos) => applyLocation(pos, true),
-      () => { /* ignora, o watch vai tentar */ },
+      pos => applyLocation(pos, true),
+      () => {
+        /* ignora, o watch vai tentar */
+      },
       { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     )
 
     // Passo 2: watch com alta precisão para refinar
     let refinementCount = 0
     const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
+      pos => {
         refinementCount++
         const isFirst = refinementCount === 1
         applyLocation(pos, isFirst)
@@ -304,7 +306,7 @@ export default function LocationPicker({
           watchIdRef.current = null
         }
       },
-      (error) => {
+      error => {
         if (!markerPosition) {
           handleGeolocationError(error)
         }
@@ -396,7 +398,6 @@ export default function LocationPicker({
             <div className="selection-marker" />
           </Marker>
         )}
-
       </BaseMap>
 
       {/* Botão de geolocalização */}
