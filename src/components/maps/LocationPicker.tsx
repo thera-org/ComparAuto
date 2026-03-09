@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Marker, MapRef } from 'react-map-gl/maplibre'
-import { MapPin, Search, Navigation, Loader2, X } from 'lucide-react'
+import { MapPin, Search, Navigation, Loader2, X, AlertCircle } from 'lucide-react'
 
 import BaseMap, { MapPosition, reverseGeocode, geocodeAddress, GeocodingResult } from './BaseMap'
 
@@ -67,6 +67,7 @@ export default function LocationPicker({
   const [searchResults, setSearchResults] = useState<GeocodingResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isLocating, setIsLocating] = useState(false)
+  const [locationError, setLocationError] = useState<string | null>(null)
   const [showResults, setShowResults] = useState(false)
   const [addressLabel, setAddressLabel] = useState('')
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -187,35 +188,142 @@ export default function LocationPicker({
     [onLocationSelect, zoom]
   )
 
-  // Geolocalização do navegador
-  const handleGetLocation = useCallback(() => {
-    if (!navigator.geolocation) return
+  const watchIdRef = useRef<number | null>(null)
 
-    setIsLocating(true)
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        }
-        handlePositionChange(pos)
+  // Para o watch de localização ao desmontar
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current)
+        watchIdRef.current = null
+      }
+    }
+  }, [])
 
-        // Fly to the user's location
+  // Aplica a localização obtida
+  const applyLocation = useCallback(
+    (position: GeolocationPosition, shouldFly = false) => {
+      const pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      }
+      handlePositionChange(pos)
+
+      if (shouldFly) {
+        const accuracy = position.coords.accuracy
+        const zoomLevel = accuracy < 100 ? zoom : accuracy < 500 ? Math.min(zoom, 15) : 14
         mapRef.current?.flyTo({
           center: [pos.lng, pos.lat],
-          zoom: zoom,
+          zoom: zoomLevel,
           duration: 1500,
         })
+      }
 
-        setIsLocating(false)
-      },
-      error => {
-        console.error('Erro ao obter localização:', error)
-        setIsLocating(false)
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
+      setLocationError(null)
+      setIsLocating(false)
+    },
+    [handlePositionChange, zoom]
+  )
+
+  // Trata erros de geolocalização
+  const handleGeolocationError = useCallback((error: GeolocationPositionError) => {
+    setIsLocating(false)
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        setLocationError(
+          'Permissão de localização bloqueada. Clique no ícone de cadeado (🔒) na barra de endereço do navegador, permita "Localização" e tente novamente.'
+        )
+        break
+      case error.POSITION_UNAVAILABLE:
+        setLocationError(
+          'Não foi possível determinar sua localização. Verifique se os serviços de localização estão ativados no sistema.'
+        )
+        break
+      case error.TIMEOUT:
+        setLocationError('Tempo esgotado ao buscar localização. Tente novamente.')
+        break
+      default:
+        setLocationError('Não foi possível obter sua localização.')
+    }
+  }, [])
+
+  // Geolocalização: refinamento progressivo
+  const handleGetLocation = useCallback(async () => {
+    setLocationError(null)
+
+    if (!navigator.geolocation) {
+      setLocationError('Geolocalização não é suportada pelo seu navegador.')
+      return
+    }
+
+    if (typeof window !== 'undefined' && window.isSecureContext === false) {
+      setLocationError('Geolocalização requer conexão segura (HTTPS).')
+      return
+    }
+
+    // Checa o estado da permissão via Permissions API
+    if (navigator.permissions) {
+      try {
+        const permStatus = await navigator.permissions.query({ name: 'geolocation' })
+        if (permStatus.state === 'denied') {
+          setLocationError(
+            'Localização bloqueada pelo navegador. Clique no ícone de cadeado (🔒) na barra de endereço, mude "Localização" para "Permitir" e recarregue a página.'
+          )
+          return
+        }
+      } catch {
+        // Permissions API pode não suportar geolocation query em alguns browsers
+      }
+    }
+
+    // Limpa watch anterior
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current)
+      watchIdRef.current = null
+    }
+
+    setIsLocating(true)
+
+    // Passo 1: posição rápida para feedback imediato
+    navigator.geolocation.getCurrentPosition(
+      (pos) => applyLocation(pos, true),
+      () => { /* ignora, o watch vai tentar */ },
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     )
-  }, [handlePositionChange, zoom])
+
+    // Passo 2: watch com alta precisão para refinar
+    let refinementCount = 0
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        refinementCount++
+        const isFirst = refinementCount === 1
+        applyLocation(pos, isFirst)
+
+        if (pos.coords.accuracy < 50 || refinementCount >= 5) {
+          navigator.geolocation.clearWatch(watchId)
+          watchIdRef.current = null
+        }
+      },
+      (error) => {
+        if (!markerPosition) {
+          handleGeolocationError(error)
+        }
+        navigator.geolocation.clearWatch(watchId)
+        watchIdRef.current = null
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    )
+    watchIdRef.current = watchId
+
+    // Timeout de segurança: para o watch após 20s
+    setTimeout(() => {
+      if (watchIdRef.current === watchId) {
+        navigator.geolocation.clearWatch(watchId)
+        watchIdRef.current = null
+        setIsLocating(false)
+      }
+    }, 20000)
+  }, [applyLocation, handleGeolocationError, markerPosition])
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
@@ -288,6 +396,7 @@ export default function LocationPicker({
             <div className="selection-marker" />
           </Marker>
         )}
+
       </BaseMap>
 
       {/* Botão de geolocalização */}
@@ -305,6 +414,20 @@ export default function LocationPicker({
           )}
           <span className="hidden sm:inline">Minha localização</span>
         </button>
+      )}
+
+      {/* Mensagem de erro de localização */}
+      {locationError && (
+        <div className="absolute bottom-16 right-4 z-[10] flex max-w-[280px] items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 shadow-lg">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
+          <p className="text-xs leading-relaxed text-red-700">{locationError}</p>
+          <button
+            onClick={() => setLocationError(null)}
+            className="ml-auto flex-shrink-0 rounded p-0.5 hover:bg-red-100"
+          >
+            <X className="h-3.5 w-3.5 text-red-400" />
+          </button>
+        </div>
       )}
 
       {/* Label do endereço selecionado */}
