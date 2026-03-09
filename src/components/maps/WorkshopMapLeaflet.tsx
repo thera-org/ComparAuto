@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Navigation, Star, Phone, MapPin, Loader2, AlertCircle, X } from 'lucide-react'
 import Link from 'next/link'
 
-import BaseMap, { MapPosition } from './BaseMap'
+import BaseMap, { MapPosition, getUserLocation } from './BaseMap'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 
@@ -67,7 +67,6 @@ export default function WorkshopMapLeaflet({
   const [locationError, setLocationError] = useState<string | null>(null)
   const [popupWorkshop, setPopupWorkshop] = useState<Workshop | null>(null)
   const mapRef = useRef<MapRef | null>(null)
-  const watchIdRef = useRef<number | null>(null)
 
   // Buscar oficinas do Supabase se não fornecidas
   const fetchWorkshops = useCallback(async () => {
@@ -95,145 +94,47 @@ export default function WorkshopMapLeaflet({
     }
   }, [initialWorkshops, fetchWorkshops])
 
-  // Para o watch de localização ao desmontar
-  useEffect(() => {
-    return () => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current)
-        watchIdRef.current = null
-      }
-    }
-  }, [])
-
-  // Aplica a localização obtida no mapa (só atualiza se for mais precisa)
-  const applyUserLocation = useCallback((position: GeolocationPosition, shouldFly = false) => {
-    const newAccuracy = position.coords.accuracy
-    const location: MapPosition = {
-      lat: position.coords.latitude,
-      lng: position.coords.longitude,
-    }
-
-    setUserLocation(location)
-    setLocationAccuracy(newAccuracy)
+  // Obter localização do usuário via geolocalização nativa
+  const handleGetLocation = useCallback(async () => {
     setLocationError(null)
-    setIsLocating(false)
+    setIsLocating(true)
 
-    if (shouldFly) {
-      const zoomLevel = newAccuracy < 100 ? 16 : newAccuracy < 500 ? 15 : 14
+    try {
+      const result = await getUserLocation()
+
+      const location: MapPosition = { lat: result.lat, lng: result.lng }
+      setUserLocation(location)
+      setLocationAccuracy(result.accuracy)
+
+      const zoomLevel = result.accuracy < 100 ? 16 : result.accuracy < 1000 ? 15 : 13
       mapRef.current?.flyTo({
         center: [location.lng, location.lat],
         zoom: zoomLevel,
         duration: 1500,
       })
-    }
-  }, [])
-
-  // Trata erros de geolocalização com mensagens claras
-  const handleGeolocationError = useCallback((error: GeolocationPositionError) => {
-    setIsLocating(false)
-    switch (error.code) {
-      case error.PERMISSION_DENIED:
-        setLocationError(
-          'Permissão de localização bloqueada. Clique no ícone de cadeado/site (🔒) na barra de endereço do navegador, permita "Localização" e tente novamente.'
-        )
-        break
-      case error.POSITION_UNAVAILABLE:
-        setLocationError(
-          'Não foi possível determinar sua localização. Verifique se os serviços de localização estão ativados no sistema.'
-        )
-        break
-      case error.TIMEOUT:
-        setLocationError('Tempo esgotado ao buscar localização. Tente novamente.')
-        break
-      default:
-        setLocationError('Não foi possível obter sua localização.')
-    }
-  }, [])
-
-  // Obter localização do usuário: refinamento progressivo
-  // 1. Pega rápido (baixa precisão) para mostrar algo no mapa
-  // 2. Refina com alta precisão via watchPosition
-  // 3. Para o watch após obter boa precisão ou timeout
-  const getUserLocation = useCallback(async () => {
-    setLocationError(null)
-
-    if (!navigator.geolocation) {
-      setLocationError('Geolocalização não é suportada pelo seu navegador.')
-      return
-    }
-
-    if (typeof window !== 'undefined' && window.isSecureContext === false) {
-      setLocationError('Geolocalização requer conexão segura (HTTPS).')
-      return
-    }
-
-    // Checa o estado da permissão via Permissions API
-    if (navigator.permissions) {
-      try {
-        const permStatus = await navigator.permissions.query({ name: 'geolocation' })
-        if (permStatus.state === 'denied') {
+    } catch (error) {
+      const msg = (error as Error).message
+      switch (msg) {
+        case 'NOT_SUPPORTED':
+          setLocationError('Seu navegador não suporta geolocalização.')
+          break
+        case 'PERMISSION_DENIED':
           setLocationError(
-            'Localização bloqueada pelo navegador. Clique no ícone de cadeado (🔒) na barra de endereço, mude "Localização" para "Permitir" e recarregue a página.'
+            'Permissão de localização negada. Habilite nas configurações do navegador.'
           )
-          return
-        }
-      } catch {
-        // Permissions API pode não suportar geolocation query em alguns browsers
+          break
+        case 'TIMEOUT':
+          setLocationError('Tempo esgotado ao buscar localização. Tente novamente.')
+          break
+        default:
+          setLocationError(
+            'Não foi possível obter sua localização. Verifique se os serviços de localização estão ativos no sistema.'
+          )
       }
+    } finally {
+      setIsLocating(false)
     }
-
-    // Limpa watch anterior
-    if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current)
-      watchIdRef.current = null
-    }
-
-    setIsLocating(true)
-
-    // Passo 1: posição rápida (cache ou rede) para feedback imediato
-    navigator.geolocation.getCurrentPosition(
-      pos => applyUserLocation(pos, true),
-      () => {
-        /* ignora erro, o watch abaixo vai tentar */
-      },
-      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
-    )
-
-    // Passo 2: watch com alta precisão para refinar continuamente
-    let refinementCount = 0
-    const watchId = navigator.geolocation.watchPosition(
-      pos => {
-        refinementCount++
-        const isFirstResult = !userLocation
-        applyUserLocation(pos, isFirstResult)
-
-        // Para o watch se já obteve boa precisão ou após 5 atualizações
-        if (pos.coords.accuracy < 50 || refinementCount >= 5) {
-          navigator.geolocation.clearWatch(watchId)
-          watchIdRef.current = null
-        }
-      },
-      error => {
-        // Só mostra erro se não temos nenhuma localização ainda
-        if (!userLocation) {
-          handleGeolocationError(error)
-        }
-        navigator.geolocation.clearWatch(watchId)
-        watchIdRef.current = null
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    )
-    watchIdRef.current = watchId
-
-    // Timeout de segurança: para o watch após 20s
-    setTimeout(() => {
-      if (watchIdRef.current === watchId) {
-        navigator.geolocation.clearWatch(watchId)
-        watchIdRef.current = null
-        setIsLocating(false)
-      }
-    }, 20000)
-  }, [applyUserLocation, handleGeolocationError, userLocation])
+  }, [])
 
   // Clique no mapa (modo seleção)
   const handleMapClick = useCallback(
@@ -355,7 +256,7 @@ export default function WorkshopMapLeaflet({
       {/* Botão de localização */}
       {!selectLocationMode && (
         <Button
-          onClick={getUserLocation}
+          onClick={handleGetLocation}
           disabled={isLocating}
           className="absolute left-4 top-4 z-[10] bg-white text-black shadow-md hover:bg-gray-100"
           size="sm"
@@ -369,7 +270,7 @@ export default function WorkshopMapLeaflet({
         </Button>
       )}
 
-      {/* Mensagem de erro de localização */}
+      {/* Mensagem de erro/aviso de localização */}
       {locationError && (
         <div className="absolute left-4 top-16 z-[10] flex max-w-[320px] items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 shadow-lg">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />

@@ -86,6 +86,74 @@ export async function geocodeAddress(address: string): Promise<GeocodingResult[]
   }
 }
 
+// ===== Geolocalização nativa =====
+
+export interface UserLocationResult {
+  lat: number
+  lng: number
+  accuracy: number
+  source: 'gps' | 'network'
+}
+
+/**
+ * Obtém a localização do usuário via navigator.geolocation.
+ * Tenta primeiro com baixa precisão (rede/WiFi, mais rápido),
+ * depois refina com alta precisão (GPS) se disponível.
+ *
+ * No Linux, requer o serviço GeoClue configurado corretamente.
+ * Em Chromium/Brave, o app deve estar na whitelist do GeoClue.
+ */
+export async function getUserLocation(): Promise<UserLocationResult> {
+  if (!navigator.geolocation) {
+    throw new Error('NOT_SUPPORTED')
+  }
+
+  const getPosition = (highAccuracy: boolean, timeout: number) =>
+    new Promise<GeolocationPosition>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: highAccuracy,
+        timeout,
+        maximumAge: 60000,
+      })
+    })
+
+  // Tenta com baixa precisão primeiro (WiFi/rede, mais rápido)
+  try {
+    const position = await getPosition(false, 8000)
+    return {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      source: position.coords.accuracy < 100 ? 'gps' : 'network',
+    }
+  } catch (lowAccError) {
+    console.warn('Geolocalização (baixa precisão) falhou, tentando alta precisão...', lowAccError)
+  }
+
+  // Fallback: tenta com alta precisão (GPS)
+  try {
+    const position = await getPosition(true, 15000)
+    return {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      source: position.coords.accuracy < 100 ? 'gps' : 'network',
+    }
+  } catch (error) {
+    const geoError = error as GeolocationPositionError
+    switch (geoError?.code) {
+      case 1: // PERMISSION_DENIED
+        throw new Error('PERMISSION_DENIED')
+      case 2: // POSITION_UNAVAILABLE
+        throw new Error('POSITION_UNAVAILABLE')
+      case 3: // TIMEOUT
+        throw new Error('TIMEOUT')
+      default:
+        throw new Error('LOCATION_UNAVAILABLE')
+    }
+  }
+}
+
 // ===== Estilo de mapa OpenStreetMap raster =====
 
 export const OSM_STYLE = {
