@@ -17,35 +17,22 @@ export default function AdminLogin() {
   const [isBlocked, setIsBlocked] = useState(false)
   const router = useRouter()
 
-  // Verificar se já está logado
+  // Verificar se já está logado como admin
   useEffect(() => {
     const checkSession = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
       if (session) {
-        // Verificar se é admin
-        const { data: userData } = await supabase
+        const { data: adminUser } = await supabase
           .from('usuarios')
-          .select('role')
+          .select('tipo')
           .eq('id', session.user.id)
-          .eq('role', 'admin')
+          .eq('tipo', 'admin')
           .single()
 
-        if (userData) {
+        if (adminUser) {
           router.push('/admin')
-        } else {
-          // Não é admin, limpar sessão
-          const { data: fallbackData } = await supabase
-            .from('usuarios')
-            .select('tipo')
-            .eq('id', session.user.id)
-            .eq('tipo', 'admin')
-            .single()
-
-          if (fallbackData) {
-            router.push('/admin')
-          }
         }
       }
     }
@@ -83,9 +70,9 @@ export default function AdminLogin() {
         // Verificar se o usuário é admin
         const { data: userData, error: userError } = await supabase
           .from('usuarios')
-          .select('role, nome, email')
+          .select('tipo, nome, email')
           .eq('id', authData.user.id)
-          .eq('role', 'admin')
+          .eq('tipo', 'admin')
           .single()
 
         if (userError || !userData) {

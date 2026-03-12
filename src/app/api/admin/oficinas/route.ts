@@ -1,32 +1,25 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-// Criar cliente Supabase com service role key para operações admin
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role-key',
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-)
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-// Verificar se o usuário é admin
-async function isAdmin(userId: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from('usuarios')
-      .select('tipo')
-      .eq('id', userId)
-      .single()
+// Verificar se o usuário autenticado é admin
+async function getAdminUser() {
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-    if (error) return false
-    return data?.tipo === 'admin'
-  } catch {
-    return false
-  }
+  if (!user) return null
+
+  const { data } = await supabase
+    .from('usuarios')
+    .select('tipo')
+    .eq('id', user.id)
+    .eq('tipo', 'admin')
+    .single()
+
+  return data ? user : null
 }
 
 // GET - Listar oficinas
@@ -36,7 +29,6 @@ export async function GET(request: Request) {
     const oficinaId = searchParams.get('id')
 
     if (oficinaId) {
-      // Buscar oficina específica
       const { data, error } = await supabaseAdmin
         .from('oficinas')
         .select('*')
@@ -50,7 +42,6 @@ export async function GET(request: Request) {
 
       return NextResponse.json({ oficina: data })
     } else {
-      // Listar todas as oficinas
       const { data, error } = await supabaseAdmin.from('oficinas').select('*').order('nome')
 
       if (error) {
@@ -69,15 +60,14 @@ export async function GET(request: Request) {
 // POST - Criar nova oficina
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { userId, ...oficinaData } = body
-
-    // Verificar se é admin
-    if (!userId || !(await isAdmin(userId))) {
+    const adminUser = await getAdminUser()
+    if (!adminUser) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
-    // Criar oficina
+    const body = await request.json()
+    const { userId: _userId, ...oficinaData } = body
+
     const { data, error } = await supabaseAdmin
       .from('oficinas')
       .insert(oficinaData)
@@ -99,19 +89,18 @@ export async function POST(request: Request) {
 // PATCH - Atualizar oficina
 export async function PATCH(request: Request) {
   try {
+    const adminUser = await getAdminUser()
+    if (!adminUser) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    }
+
     const body = await request.json()
-    const { id, userId, ...updateData } = body
+    const { id, userId: _userId, ...updateData } = body
 
     if (!id) {
       return NextResponse.json({ error: 'ID da oficina é obrigatório' }, { status: 400 })
     }
 
-    // Verificar se é admin
-    if (!userId || !(await isAdmin(userId))) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
-    }
-
-    // Atualizar oficina com bypass de RLS
     const { data, error } = await supabaseAdmin
       .from('oficinas')
       .update(updateData)
@@ -121,10 +110,7 @@ export async function PATCH(request: Request) {
 
     if (error) {
       console.error('Erro ao atualizar oficina:', error)
-      return NextResponse.json(
-        { error: 'Erro ao atualizar oficina', details: error },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Erro ao atualizar oficina', details: error }, { status: 500 })
     }
 
     return NextResponse.json({ oficina: data })
@@ -137,20 +123,18 @@ export async function PATCH(request: Request) {
 // DELETE - Excluir oficina
 export async function DELETE(request: Request) {
   try {
+    const adminUser = await getAdminUser()
+    if (!adminUser) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    }
+
     const { searchParams } = new URL(request.url)
     const oficinaId = searchParams.get('id')
-    const userId = searchParams.get('userId')
 
     if (!oficinaId) {
       return NextResponse.json({ error: 'ID da oficina é obrigatório' }, { status: 400 })
     }
 
-    // Verificar se é admin
-    if (!userId || !(await isAdmin(userId))) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
-    }
-
-    // Excluir oficina com bypass de RLS
     const { error } = await supabaseAdmin.from('oficinas').delete().eq('id', oficinaId)
 
     if (error) {
