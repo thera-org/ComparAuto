@@ -1,6 +1,7 @@
 'use client'
 
 import type { User } from '@supabase/supabase-js'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -37,16 +38,22 @@ export default function Header() {
   }
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white px-6 py-4">
-      <div className="mx-auto flex max-w-7xl items-center justify-between">
+    <header className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white px-4 py-2">
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="material-icons-outlined text-3xl text-primary">build_circle</span>
-          <span className="text-xl font-bold tracking-tight text-primary">ComparAuto</span>
+        <Link href="/" className="flex items-center justify-self-start">
+          <Image
+            src="/logo-nova.png"
+            alt="ComparAuto"
+            width={500}
+            height={500}
+            className="-my-15 h-40 w-auto"
+            priority
+          />
         </Link>
 
         {/* Search Bar - Desktop */}
-        <div className="hidden items-center gap-4 divide-x divide-gray-300 rounded-full border border-gray-300 bg-white px-4 py-2.5 shadow-sm transition-shadow hover:shadow-md md:flex">
+        <div className="hidden items-center gap-3 divide-x divide-gray-300 justify-self-center rounded-full border border-gray-300 bg-white px-3 py-1.5 shadow-sm transition-shadow hover:shadow-md md:flex">
           <button
             onClick={() => {
               router.push('/#oficinas')
@@ -85,18 +92,18 @@ export default function Header() {
             className="flex items-center gap-2 px-2 text-sm text-gray-500 transition hover:text-primary"
           >
             Buscar
-            <div className="flex items-center justify-center rounded-full bg-primary p-2 text-white">
+            <div className="flex items-center justify-center rounded-full bg-primary p-1.5 text-white">
               <span className="material-icons text-sm">search</span>
             </div>
           </button>
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 justify-self-end">
           {/* CTA Button */}
           <Link
             href="/cadastro-oficina"
-            className="hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-gray-100 md:block"
+            className="hidden rounded-full px-3 py-1.5 text-sm font-medium transition hover:bg-gray-100 md:block"
           >
             Cadastrar sua Oficina
           </Link>
@@ -157,7 +164,7 @@ export default function Header() {
       </div>
 
       {/* Mobile Search Section */}
-      <div className="mt-4 md:hidden">
+      <div className="mt-2 md:hidden">
         <button
           onClick={() => {
             router.push('/?view=map#oficinas')
@@ -166,7 +173,7 @@ export default function Header() {
               100
             )
           }}
-          className="flex w-full items-center justify-between rounded-full border border-gray-300 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md"
+          className="flex w-full items-center justify-between rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm transition-shadow hover:shadow-md"
         >
           <div className="flex items-center gap-3">
             <span className="material-icons text-primary">search</span>

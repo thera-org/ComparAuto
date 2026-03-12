@@ -68,4 +68,3 @@ export { customRender as render }
 // Mock environment variables
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key'
-process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY = 'test-maps-key'

@@ -9,10 +9,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Design system colors (Airbnb-inspired)
+        // Design system colors (ComparAuto blue)
         primary: {
-          DEFAULT: "#FF385C",
-          hover: "#d9324e",
+          DEFAULT: "#0077B6",
+          hover: "#005F8A",
           foreground: "#FFFFFF",
         },
         "background-light": "#FFFFFF",

@@ -6,9 +6,9 @@
    ======================================== */
 
 @theme {
-  /* Primary Colors - Airbnb inspired */
-  --color-primary: #ff385c;
-  --color-primary-hover: #e31c5f;
+  /* Primary Colors - ComparAuto blue */
+  --color-primary: #0077b6;
+  --color-primary-hover: #005f8a;
   --color-primary-foreground: #ffffff;
 
   /* Background Colors */
@@ -91,17 +91,17 @@ body {
 
 /* Primary color as CSS variable */
 :root {
-  --primary: #ff385c;
-  --primary-hover: #d9324e;
+  --primary: #0077b6;
+  --primary-hover: #005f8a;
 }
 
 /* Gradientes personalizados */
 .gradient-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
 }
 
 .gradient-primary {
-  background: linear-gradient(to right, #ff385c, #d9324e);
+  background: linear-gradient(to right, #0077b6, #005f8a);
 }
 
 .glass-effect {
@@ -1176,13 +1176,13 @@ body {
 /* Mesh gradient background */
 .gradient-mesh {
   background:
-    radial-gradient(at 27% 37%, #667eea 0px, transparent 50%),
-    radial-gradient(at 97% 21%, #764ba2 0px, transparent 50%),
-    radial-gradient(at 52% 99%, #f093fb 0px, transparent 50%),
-    radial-gradient(at 10% 29%, #fad0c4 0px, transparent 50%),
-    radial-gradient(at 97% 96%, #a8edea 0px, transparent 50%),
-    radial-gradient(at 33% 50%, #fed6e3 0px, transparent 50%),
-    radial-gradient(at 79% 53%, #d299c2 0px, transparent 50%);
+    radial-gradient(at 27% 37%, #0077b6 0px, transparent 50%),
+    radial-gradient(at 97% 21%, #005f8a 0px, transparent 50%),
+    radial-gradient(at 52% 99%, #48cae4 0px, transparent 50%),
+    radial-gradient(at 10% 29%, #90e0ef 0px, transparent 50%),
+    radial-gradient(at 97% 96%, #caf0f8 0px, transparent 50%),
+    radial-gradient(at 33% 50%, #ade8f4 0px, transparent 50%),
+    radial-gradient(at 79% 53%, #00b4d8 0px, transparent 50%);
 }
 
 /* Carousel de categorias - Melhorias específicas */

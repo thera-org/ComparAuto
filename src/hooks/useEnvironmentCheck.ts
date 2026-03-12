@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 
 interface EnvironmentCheck {
   isSupabaseConfigured: boolean
-  isMapsConfigured: boolean
   isStripeConfigured: boolean
   hasRequiredEnvVars: boolean
   missingVars: string[]
@@ -11,7 +10,6 @@ interface EnvironmentCheck {
 export function useEnvironmentCheck(): EnvironmentCheck {
   const [check, setCheck] = useState<EnvironmentCheck>({
     isSupabaseConfigured: false,
-    isMapsConfigured: false,
     isStripeConfigured: false,
     hasRequiredEnvVars: false,
     missingVars: [],
@@ -36,12 +34,6 @@ export function useEnvironmentCheck(): EnvironmentCheck {
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY !== 'undefined'
       )
 
-      const isMapsConfigured = Boolean(
-        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY &&
-          process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY !== '' &&
-          process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY !== 'undefined'
-      )
-
       const isStripeConfigured = Boolean(
         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY &&
           process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY !== '' &&
@@ -50,7 +42,6 @@ export function useEnvironmentCheck(): EnvironmentCheck {
 
       setCheck({
         isSupabaseConfigured,
-        isMapsConfigured,
         isStripeConfigured,
         hasRequiredEnvVars: missingRequired.length === 0,
         missingVars: missingRequired,
@@ -58,10 +49,6 @@ export function useEnvironmentCheck(): EnvironmentCheck {
 
       // Log warnings for missing optional variables (apenas no desenvolvimento)
       if (process.env.NODE_ENV === 'development') {
-        if (!isMapsConfigured) {
-          console.warn('Google Maps API key not configured. Maps may not work.')
-        }
-
         if (!isStripeConfigured) {
           console.warn('Stripe not configured. Payment features will be disabled.')
         }

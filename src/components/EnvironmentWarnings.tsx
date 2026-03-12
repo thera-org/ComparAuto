@@ -6,8 +6,7 @@ import { useState } from 'react'
 import { useEnvironmentCheck } from '@/hooks/useEnvironmentCheck'
 
 export function EnvironmentWarnings() {
-  const { hasRequiredEnvVars, missingVars, isMapsConfigured, isStripeConfigured } =
-    useEnvironmentCheck()
+  const { hasRequiredEnvVars, missingVars, isStripeConfigured } = useEnvironmentCheck()
   const [dismissed, setDismissed] = useState<string[]>([])
 
   const warnings = []
@@ -35,16 +34,6 @@ export function EnvironmentWarnings() {
   }
 
   // Avisos opcionais apenas se realmente faltando
-  if (!isMapsConfigured && !dismissed.includes('maps')) {
-    warnings.push({
-      id: 'maps',
-      type: 'warning' as const,
-      title: 'Google Maps Não Configurado',
-      message: 'As funcionalidades de mapa podem não funcionar corretamente.',
-      dismissible: true,
-    })
-  }
-
   if (!isStripeConfigured && !dismissed.includes('stripe')) {
     warnings.push({
       id: 'stripe',
@@ -71,16 +60,13 @@ export function EnvironmentWarnings() {
             ${
               warning.type === 'error'
                 ? 'border-red-500 bg-red-50/95 text-red-700'
-                : warning.type === 'warning'
-                  ? 'border-yellow-500 bg-yellow-50/95 text-yellow-700'
-                  : 'border-blue-500 bg-blue-50/95 text-blue-700'
+                : 'border-blue-500 bg-blue-50/95 text-blue-700'
             }
           `}
         >
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex-shrink-0">
               {warning.type === 'error' && <AlertTriangle className="h-5 w-5" />}
-              {warning.type === 'warning' && <AlertTriangle className="h-5 w-5" />}
               {warning.type === 'info' && <Info className="h-5 w-5" />}
             </div>
 

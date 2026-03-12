@@ -3,29 +3,26 @@
 import { useEffect } from 'react'
 
 /**
- * Componente que injeta o CSS do Leaflet globalmente.
+ * Componente que injeta o CSS do MapLibre GL globalmente.
  * Deve ser renderizado uma vez na árvore de componentes que usa mapas.
  */
-export default function LeafletCSS() {
+export default function MapLibreCSS() {
   useEffect(() => {
     // Verifica se o CSS já foi injetado
-    if (document.getElementById('leaflet-css')) return
+    if (document.getElementById('maplibre-css')) return
 
     const link = document.createElement('link')
-    link.id = 'leaflet-css'
+    link.id = 'maplibre-css'
     link.rel = 'stylesheet'
-    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-    link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='
-    link.crossOrigin = ''
+    link.href = 'https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css'
     document.head.appendChild(link)
 
-    // CSS customizado para os marcadores
+    // CSS customizado para os marcadores e popups
     const style = document.createElement('style')
-    style.id = 'leaflet-custom-css'
+    style.id = 'maplibre-custom-css'
     style.textContent = `
-      .leaflet-container {
+      .maplibregl-map {
         font-family: inherit;
-        z-index: 1;
       }
       .custom-marker-pin {
         width: 36px;
@@ -54,6 +51,7 @@ export default function LeafletCSS() {
       .workshop-marker {
         background: none;
         border: none;
+        cursor: pointer;
       }
       .workshop-marker-content {
         display: flex;
@@ -92,10 +90,6 @@ export default function LeafletCSS() {
         border-right: 2px solid #e5e7eb;
         border-bottom: 2px solid #e5e7eb;
       }
-      .location-picker-marker {
-        background: none;
-        border: none;
-      }
       .location-pulse {
         width: 14px;
         height: 14px;
@@ -110,24 +104,52 @@ export default function LeafletCSS() {
         70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
         100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
       }
-      .leaflet-popup-content-wrapper {
+      .maplibre-popup-content {
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         padding: 0;
         overflow: hidden;
       }
-      .leaflet-popup-content {
-        margin: 0;
-        min-width: 220px;
+      .maplibregl-popup-content {
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        padding: 0 !important;
+        overflow: hidden;
       }
-      .leaflet-popup-tip {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      .maplibregl-popup-tip {
+        border-top-color: white;
+      }
+      .maplibregl-popup-close-button {
+        font-size: 18px;
+        padding: 4px 8px;
+        color: #6b7280;
+        z-index: 10;
+      }
+      .maplibregl-popup-close-button:hover {
+        background: #f3f4f6;
+        color: #111827;
+      }
+      .default-marker {
+        width: 25px;
+        height: 41px;
+        background-image: url('https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+      }
+      .selection-marker {
+        width: 25px;
+        height: 41px;
+        background-image: url('https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
       }
     `
     document.head.appendChild(style)
 
     return () => {
-      // Cleanup opcional (normalmente não removemos pois outros componentes podem precisar)
+      // Cleanup opcional
     }
   }, [])
 

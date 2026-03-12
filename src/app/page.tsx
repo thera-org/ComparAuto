@@ -144,7 +144,7 @@ function HomeContent() {
       <Header />
 
       {/* Spacer for fixed header */}
-      <div className="pt-24 md:pt-20"></div>
+      <div className="pt-20 md:pt-14"></div>
 
       {/* Category Tabs */}
       <div className="border-b border-gray-200 bg-white">

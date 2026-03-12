@@ -15,7 +15,7 @@ Instruções detalhadas para configurar o ambiente de desenvolvimento local do C
 
 ---
 
-## ✅ Pré-requisitos
+### ✅ Pré-requisitos
 
 ### Software Necessário
 
@@ -118,13 +118,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ0eXAiOiJKV1QiLCJhbGc6IkhTMjU2In0...
 
 Estas variáveis permitirão funcionalidades extras:
 
-#### Google Maps
-
-```env
-# Para funcionalidade de mapas
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSy...
-```
-
 #### Stripe (Pagamentos)
 
 ```env
@@ -150,7 +143,6 @@ NEXT_PUBLIC_SUPABASE_URL=https://xyzabc123.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
 
 # ============ OPCIONAL ============
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyCd7vf-h0Z5e_Aj3f3EZX...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51H...
 STRIPE_SECRET_KEY=sk_test_4eC39HqL...
 NEXT_PUBLIC_FACEBOOK_APP_ID=123456789
@@ -395,10 +387,10 @@ lsof -i :3000
 kill -9 <PID>
 ```
 
-### Problemas com Leaflet/Mapas
+### Problemas com MapLibre/Mapas
 
 ```bash
-npm install leaflet @react-leaflet/core
+npm install maplibre-gl react-map-gl
 ```
 
 ### Erro ao fazer build
