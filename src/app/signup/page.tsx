@@ -121,7 +121,23 @@ export default function SignupPage() {
         if (formData.cep) userData.cep = formData.cep
         if (formData.cpf) userData.cpf = formData.cpf
 
-        await supabase.from('usuarios').insert(userData)
+        if (data.session) {
+          // Sessão ativa: inserção direta funciona pois auth.uid() === id satisfaz o RLS
+          const { error: insertError } = await supabase.from('usuarios').insert(userData)
+          if (insertError) throw insertError
+        } else {
+          // Fluxo de confirmação de e-mail: sem sessão, auth.uid() seria NULL e o RLS
+          // bloquearia o INSERT. Delegamos ao servidor (service role) para contornar isso.
+          const res = await fetch('/api/auth/register-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData),
+          })
+          if (!res.ok) {
+            const json = (await res.json()) as { error?: string }
+            throw new Error(json.error ?? 'Erro ao criar perfil')
+          }
+        }
       }
 
       if (data?.session) {
