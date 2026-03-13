@@ -115,7 +115,10 @@ export async function PATCH(request: Request) {
 
     if (error) {
       console.error('Erro ao atualizar oficina:', error)
-      return NextResponse.json({ error: 'Erro ao atualizar oficina', details: error }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Erro ao atualizar oficina', details: error },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({ oficina: data })

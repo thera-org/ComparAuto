@@ -138,7 +138,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Atualizar sessão
   const refreshSession = useCallback(async () => {
     try {
-      const { data: { session: currentSession }, error } = await supabase.auth.refreshSession()
+      const {
+        data: { session: currentSession },
+        error,
+      } = await supabase.auth.refreshSession()
       if (error) {
         console.error('Erro ao atualizar sessão:', error)
         return

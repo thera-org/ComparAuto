@@ -15,7 +15,7 @@ Instruções detalhadas para configurar o ambiente de desenvolvimento local do C
 
 ---
 
-#### ✅ Pré-requisitos
+##### ✅ Pré-requisitos
 
 ### Software Necessário
 

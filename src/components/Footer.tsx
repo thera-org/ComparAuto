@@ -21,22 +21,34 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/sobre" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/sobre"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   ComparAuto Cover para Oficinas
                 </Link>
               </li>
               <li>
-                <Link href="/ajuda/cancelamento" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/ajuda/cancelamento"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Cancelamento
                 </Link>
               </li>
               <li>
-                <Link href="/ajuda/opcoes-cancelamento" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/ajuda/opcoes-cancelamento"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Opções de cancelamento
                 </Link>
               </li>
               <li>
-                <Link href="/ajuda/denuncia" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/ajuda/denuncia"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Denunciar um problema
                 </Link>
               </li>
@@ -48,12 +60,18 @@ export default function Footer() {
             <h5 className="mb-4 font-bold text-gray-900">Comunidade</h5>
             <ul className="space-y-3 text-sm text-gray-600">
               <li>
-                <Link href="/comunidade/ajuda-desastres" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/comunidade/ajuda-desastres"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   ComparAuto.org: ajuda em desastres
                 </Link>
               </li>
               <li>
-                <Link href="/comunidade/combate-discriminacao" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/comunidade/combate-discriminacao"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Combate à discriminação
                 </Link>
               </li>
@@ -73,22 +91,34 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/oficinas/cover" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/oficinas/cover"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   ComparAuto Cover para mecânicos
                 </Link>
               </li>
               <li>
-                <Link href="/oficinas/recursos" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/oficinas/recursos"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Recursos para oficinas
                 </Link>
               </li>
               <li>
-                <Link href="/forum" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/forum"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Fórum da comunidade
                 </Link>
               </li>
               <li>
-                <Link href="/oficinas/hospedagem" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/oficinas/hospedagem"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Hospedagem responsável
                 </Link>
               </li>
@@ -100,27 +130,42 @@ export default function Footer() {
             <h5 className="mb-4 font-bold text-gray-900">ComparAuto</h5>
             <ul className="space-y-3 text-sm text-gray-600">
               <li>
-                <Link href="/newsroom" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/newsroom"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Newsroom
                 </Link>
               </li>
               <li>
-                <Link href="/recursos" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/recursos"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Saiba mais sobre novos recursos
                 </Link>
               </li>
               <li>
-                <Link href="/sobre/fundadores" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/sobre/fundadores"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Carta dos fundadores
                 </Link>
               </li>
               <li>
-                <Link href="/carreiras" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/carreiras"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Carreiras
                 </Link>
               </li>
               <li>
-                <Link href="/investidores" className="transition-colors hover:text-primary hover:underline">
+                <Link
+                  href="/investidores"
+                  className="transition-colors hover:text-primary hover:underline"
+                >
                   Investidores
                 </Link>
               </li>
@@ -134,7 +179,10 @@ export default function Footer() {
           <div className="mb-4 flex flex-wrap justify-center gap-2 md:mb-0 md:justify-start">
             <span>© 2025 ComparAuto, Inc.</span>
             <span className="hidden md:inline">·</span>
-            <Link href="/privacidade" className="transition-colors hover:text-primary hover:underline">
+            <Link
+              href="/privacidade"
+              className="transition-colors hover:text-primary hover:underline"
+            >
               Privacidade
             </Link>
             <span className="hidden md:inline">·</span>
@@ -158,10 +206,20 @@ export default function Footer() {
               BRL
             </button>
             <div className="ml-2 flex gap-3">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary"
+              >
                 <span className="material-icons text-lg">facebook</span>
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary"
+              >
                 <span className="material-icons text-lg">camera_alt</span>
               </a>
             </div>

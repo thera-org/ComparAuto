@@ -120,10 +120,11 @@ export default function MensagensPage() {
                 <div
                   key={conv.id}
                   onClick={() => setSelectedConversation(conv)}
-                  className={`flex cursor-pointer items-start gap-4 p-4 transition-colors ${selectedConversation.id === conv.id
+                  className={`flex cursor-pointer items-start gap-4 p-4 transition-colors ${
+                    selectedConversation.id === conv.id
                       ? 'border-r-4  border-primary bg-gray-100'
                       : ':bg-gray-800 border-b border-gray-100 hover:bg-gray-50 '
-                    }`}
+                  }`}
                 >
                   {conv.avatar ? (
                     <Image
@@ -229,10 +230,11 @@ export default function MensagensPage() {
                   )}
                   <div>
                     <div
-                      className={`rounded-2xl p-4 shadow-sm ${msg.isOwn
+                      className={`rounded-2xl p-4 shadow-sm ${
+                        msg.isOwn
                           ? 'rounded-br-none bg-primary text-white'
                           : 'rounded-bl-none  border border-gray-200  bg-white  text-gray-900'
-                        }`}
+                      }`}
                     >
                       <p>{msg.content}</p>
                     </div>

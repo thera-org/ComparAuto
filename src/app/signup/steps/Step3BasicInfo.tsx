@@ -90,9 +90,7 @@ export function Step3BasicInfo({ formData, onChange, onNext, onPrev }: StepProps
               </span>
             </button>
           </div>
-          {passwordMismatch && (
-            <p className="mt-1 text-xs text-red-500">Senhas não coincidem</p>
-          )}
+          {passwordMismatch && <p className="mt-1 text-xs text-red-500">Senhas não coincidem</p>}
         </div>
       </div>
 

@@ -5,8 +5,33 @@ import { formatCPF, formatCNPJ, formatCEP } from '@/lib/validations'
 import type { StepProps } from '../_types'
 
 const ESTADOS_BR = [
-  'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG',
-  'PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO',
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
 ]
 
 export function Step4Details({ formData, onChange, onNext, onPrev, isLoading }: StepProps) {
@@ -114,7 +139,9 @@ export function Step4Details({ formData, onChange, onNext, onPrev, isLoading }: 
           >
             <option value="">UF</option>
             {ESTADOS_BR.map(uf => (
-              <option key={uf} value={uf}>{uf}</option>
+              <option key={uf} value={uf}>
+                {uf}
+              </option>
             ))}
           </select>
         </div>
