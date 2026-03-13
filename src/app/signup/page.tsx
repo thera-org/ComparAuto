@@ -172,15 +172,6 @@ export default function SignupPage() {
           <span className="material-icons text-3xl text-primary">build_circle</span>
           <span className="text-xl font-bold text-gray-900">ComparAuto</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <span className="hidden text-sm text-gray-600 sm:block">Já tem uma conta?</span>
-          <Link
-            href="/login"
-            className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/5"
-          >
-            Entrar
-          </Link>
-        </div>
       </header>
 
       <main className="flex flex-grow items-center justify-center px-4 py-8">
@@ -191,7 +182,7 @@ export default function SignupPage() {
               <span className="text-sm text-gray-500">
                 Etapa {currentStep} de {totalSteps}
               </span>
-              <span className="text-sm font-medium text-primary">{progressPercent}%</span>
+              <span className="text-sm font-medium text-primary">{progressPercent}% concluído</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-gray-200">
               <div
