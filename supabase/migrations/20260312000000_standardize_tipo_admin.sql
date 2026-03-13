@@ -29,6 +29,20 @@ CREATE POLICY "Users can read own profile"
   ON usuarios FOR SELECT
   USING (auth.uid() = id);
 
+-- Admins podem ler todos os usuários (necessário para telas que listam usuários/oficinas).
+-- Atenção: isso assume que apenas o backend (service role) consegue atribuir tipo='admin'.
+DROP POLICY IF EXISTS "Admins can read all users" ON usuarios;
+CREATE POLICY "Admins can read all users"
+  ON usuarios FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1
+      FROM usuarios u_admin
+      WHERE u_admin.id = auth.uid()
+        AND u_admin.tipo = 'admin'
+    )
+  );
+
 DROP POLICY IF EXISTS "Users can update own profile" ON usuarios;
 CREATE POLICY "Users can update own profile"
   ON usuarios FOR UPDATE
