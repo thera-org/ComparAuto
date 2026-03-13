@@ -27,5 +27,6 @@ export interface StepProps {
   onChange: (partial: Partial<SignupFormData>) => void
   onNext: () => void
   onPrev: () => void
+  onOAuth?: (provider: 'google' | 'facebook') => void
   isLoading?: boolean
 }
