@@ -3,6 +3,12 @@
 
 -- 1. Permitir valor 'admin' no campo tipo
 ALTER TABLE usuarios DROP CONSTRAINT IF EXISTS usuarios_tipo_check;
+
+-- Normalizar valores legados de tipo antes de recriar o CHECK
+UPDATE usuarios
+  SET tipo = 'oficina'
+  WHERE tipo = 'mechanic';
+
 ALTER TABLE usuarios ADD CONSTRAINT usuarios_tipo_check
   CHECK (tipo IN ('cliente', 'oficina', 'admin'));
 
