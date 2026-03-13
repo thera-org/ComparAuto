@@ -32,7 +32,8 @@ CREATE POLICY "Users can read own profile"
 DROP POLICY IF EXISTS "Users can update own profile" ON usuarios;
 CREATE POLICY "Users can update own profile"
   ON usuarios FOR UPDATE
-  USING (auth.uid() = id);
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 -- INSERT: permite ao próprio usuário inserir seu perfil.
 -- auth.uid() pode ser NULL no fluxo de confirmação de e-mail (sessão ainda não existe),

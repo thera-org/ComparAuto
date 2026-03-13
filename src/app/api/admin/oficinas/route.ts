@@ -25,6 +25,11 @@ async function getAdminUser() {
 // GET - Listar oficinas
 export async function GET(request: Request) {
   try {
+    const adminUser = await getAdminUser()
+    if (!adminUser) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    }
+
     const { searchParams } = new URL(request.url)
     const oficinaId = searchParams.get('id')
 
