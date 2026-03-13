@@ -1,28 +1,62 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // Verificar se é uma rota administrativa
-  if (req.nextUrl.pathname.startsWith('/admin')) {
-    // Permitir acesso à página de login
-    if (req.nextUrl.pathname === '/admin/login') {
-      return NextResponse.next()
-    }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    // Para outras rotas admin, verificação será feita no componente AdminAuthGate
-    // Este middleware serve apenas como uma primeira camada de proteção
-    const accessToken = req.cookies.get('sb-access-token')?.value
-    const refreshToken = req.cookies.get('sb-refresh-token')?.value
-    
-    if (!accessToken && !refreshToken) {
-      // Redirecionar para login se não houver tokens de sessão
-      return NextResponse.redirect(new URL('/admin/login', req.url))
-    }
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY são obrigatórias')
   }
 
-  return NextResponse.next()
+  let res = NextResponse.next({ request: { headers: req.headers } })
+
+  const supabase = createServerClient(
+    supabaseUrl,
+    supabaseAnonKey,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
+          res = NextResponse.next({ request: { headers: req.headers } })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            res.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  // getUser() valida o JWT no servidor — não pode ser forjado via cookie
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { pathname } = req.nextUrl
+
+  // Proteger /conta/*
+  if (pathname.startsWith('/conta') && !user) {
+    const loginUrl = new URL('/login', req.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // Proteger /admin/* (exceto /admin/login)
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login' && !user) {
+    return NextResponse.redirect(new URL('/admin/login', req.url))
+  }
+
+  // Redirecionar usuário autenticado que tenta acessar login/signup
+  if (user && (pathname === '/login' || pathname === '/signup')) {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  return res
 }
 
 export const config = {
-  matcher: ['/admin/:path*']
+  matcher: ['/admin/:path*', '/conta/:path*', '/login', '/signup'],
 }

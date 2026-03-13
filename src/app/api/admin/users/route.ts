@@ -1,47 +1,33 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-// Criar cliente Supabase com service role key para operações admin
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role-key',
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-)
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    // Verificar autorização com método mais robusto
-    const authHeader = request.headers.get('Authorization')
+    // Verificar autenticação via sessão JWT
+    const supabase = await createSupabaseServerClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 })
+    if (!user) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    // Extrair token do cabeçalho Bearer
-    const providedToken = authHeader.slice(7) // Remove "Bearer "
-    const expectedToken = process.env.ADMIN_API_KEY
+    // Verificar se é admin
+    const { data: adminCheck } = await supabase
+      .from('usuarios')
+      .select('tipo')
+      .eq('id', user.id)
+      .eq('tipo', 'admin')
+      .single()
 
-    if (!expectedToken) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 })
+    if (!adminCheck) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
-    // Usar comparação segura contra timing attacks
-    let isValid = true
-    for (let i = 0; i < providedToken.length; i++) {
-      if (providedToken[i] !== expectedToken[i]) {
-        isValid = false
-      }
-    }
-
-    if (!isValid) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 401 })
-    }
-    // Buscar todos os usuários da tabela usuarios
+    // Buscar usuários da tabela
     const { data: usuarios, error: usuariosError } = await supabaseAdmin
       .from('usuarios')
       .select('*')
@@ -60,22 +46,19 @@ export async function GET(request: Request) {
 
     if (authError) {
       console.error('Erro ao buscar auth users:', authError)
-      // Continue sem os dados de auth se houver erro
     }
 
-    // Criar um mapa de lookup para authUsers
     const authUserMap = new Map(authUsers?.map(au => [au.id, au]))
 
-    // Combinar dados
     const formattedUsers =
-      usuarios?.map(user => {
-        const authUser = authUserMap.get(user.id)
+      usuarios?.map(u => {
+        const authUser = authUserMap.get(u.id)
         return {
-          id: user.id,
-          nome: user.nome || 'Sem nome',
-          email: authUser?.email || user.email || 'Email não disponível',
-          tipo: user.tipo || 'user',
-          criado_em: user.criado_em,
+          id: u.id,
+          nome: u.nome || 'Sem nome',
+          email: authUser?.email || u.email || 'Email não disponível',
+          tipo: u.tipo || 'user',
+          criado_em: u.criado_em,
         }
       }) || []
 

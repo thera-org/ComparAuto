@@ -1,11 +1,34 @@
 import { NextResponse } from 'next/server'
 
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function GET() {
   try {
-    // Buscar todos os usuários da tabela usuarios
-    const { data: usuarios, error: usuariosError } = await supabase
+    // Verificar autenticação via sessão
+    const supabase = await createSupabaseServerClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+    }
+
+    // Verificar se é admin
+    const { data: adminCheck } = await supabase
+      .from('usuarios')
+      .select('tipo')
+      .eq('id', user.id)
+      .eq('tipo', 'admin')
+      .single()
+
+    if (!adminCheck) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    }
+
+    // Buscar usuários com service role
+    const { data: usuarios, error: usuariosError } = await supabaseAdmin
       .from('usuarios')
       .select('*')
       .order('criado_em', { ascending: false })
@@ -15,19 +38,14 @@ export async function GET() {
       return NextResponse.json({ error: 'Erro ao buscar usuários' }, { status: 500 })
     }
 
-    // Como não temos acesso direto aos auth users sem service role key,
-    // vamos trabalhar apenas com os dados da tabela usuarios
-    // Certifique-se de que o email está sendo salvo na tabela usuarios durante o cadastro
     const formattedUsers =
-      usuarios?.map(user => {
-        return {
-          id: user.id,
-          nome: user.nome || 'Sem nome',
-          email: user.email || 'Email não disponível',
-          tipo: user.tipo || 'user',
-          criado_em: user.criado_em,
-        }
-      }) || []
+      usuarios?.map(u => ({
+        id: u.id,
+        nome: u.nome || 'Sem nome',
+        email: u.email || 'Email não disponível',
+        tipo: u.tipo || 'user',
+        criado_em: u.criado_em,
+      })) || []
 
     return NextResponse.json({ users: formattedUsers })
   } catch (error) {

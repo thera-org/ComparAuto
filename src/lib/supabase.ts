@@ -1,37 +1,13 @@
-// src/lib/supabase.ts
-import { createClient } from '@supabase/supabase-js'
+// Shim de compatibilidade — preserva `import { supabase } from '@/lib/supabase'`
+// Novo código deve importar de:
+//   @/lib/supabase/browser  — client components
+//   @/lib/supabase/server   — server components / actions
+//   @/lib/supabase/admin    — API routes (service role)
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key'
+import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  console.warn('⚠️  Variáveis de ambiente do Supabase não configuradas!')
-  console.warn('Certifique-se de definir:')
-  console.warn('- NEXT_PUBLIC_SUPABASE_URL')
-  console.warn('- NEXT_PUBLIC_SUPABASE_ANON_KEY')
-
-  // Em desenvolvimento, mostrar erro mais detalhado
-  if (process.env.NODE_ENV === 'development') {
-    console.warn('Crie um arquivo .env.local baseado no .env.example')
-  }
-}
-
-// Configurações do cliente Supabase
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    // Persistir sessão no localStorage
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-  // Configurações de rede
-  global: {
-    headers: {
-      'x-application-name': 'ComparAuto',
-    },
-  },
-})
+// Singleton para client components
+export const supabase = createSupabaseBrowserClient()
 
 // Função helper para verificar conexão
 export async function testSupabaseConnection(): Promise<boolean> {
@@ -42,19 +18,5 @@ export async function testSupabaseConnection(): Promise<boolean> {
     return !error
   } catch {
     return false
-  }
-}
-
-// Função helper para logout seguro
-export async function signOut() {
-  try {
-    await supabase.auth.signOut()
-    // Limpar dados locais
-    localStorage.removeItem('admin')
-    localStorage.removeItem('adminData')
-    return { success: true }
-  } catch (error) {
-    console.error('Erro ao fazer logout:', error)
-    return { success: false, error }
   }
 }
