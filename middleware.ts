@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
     throw new Error('Variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY são obrigatórias')
   }
 
-  let res = NextResponse.next({ request: req })
+  let res = NextResponse.next({ request: { headers: req.headers } })
 
   const supabase = createServerClient(
     supabaseUrl,
@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
-          res = NextResponse.next({ request: req })
+          res = NextResponse.next({ request: { headers: req.headers } })
           cookiesToSet.forEach(({ name, value, options }) =>
             res.cookies.set(name, value, options)
           )
