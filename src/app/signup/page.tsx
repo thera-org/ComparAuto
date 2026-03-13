@@ -55,9 +55,35 @@ export default function SignupPage() {
     }
   }
 
+  const handleOAuth = async (provider: 'google' | 'facebook') => {
+    try {
+      setLoading(true)
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/` },
+      })
+      if (oauthError) throw oauthError
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao autenticar'
+      setError(message)
+      showError('Erro', message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
+
+    // Guarda contra submissão em etapa intermediária (ex: Enter acidental)
+    const isCliente = formData.tipoUsuario === 'cliente'
+    const isOficina = formData.tipoUsuario === 'oficina'
+    const lastStep = isCliente ? 5 : isOficina ? 4 : null
+    if (currentStep !== lastStep) return
+
+    if (!formData.email || !formData.password || !formData.nome || !formData.telefone) return
+    if (isCliente && !formData.aceitaTermos) return
 
     try {
       setLoading(true)
@@ -114,7 +140,14 @@ export default function SignupPage() {
     }
   }
 
-  const stepProps = { formData, onChange, onNext: nextStep, onPrev: prevStep, isLoading: loading }
+  const stepProps = {
+    formData,
+    onChange,
+    onNext: nextStep,
+    onPrev: prevStep,
+    onOAuth: handleOAuth,
+    isLoading: loading,
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-white">

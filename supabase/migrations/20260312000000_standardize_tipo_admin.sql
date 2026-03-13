@@ -33,3 +33,12 @@ DROP POLICY IF EXISTS "Users can update own profile" ON usuarios;
 CREATE POLICY "Users can update own profile"
   ON usuarios FOR UPDATE
   USING (auth.uid() = id);
+
+-- INSERT: permite ao próprio usuário inserir seu perfil.
+-- auth.uid() pode ser NULL no fluxo de confirmação de e-mail (sessão ainda não existe),
+-- por isso o fallback para service_role garante que a inserção feita pelo servidor
+-- (via trigger ou API route com service role) também seja permitida.
+DROP POLICY IF EXISTS "Users can insert own profile" ON usuarios;
+CREATE POLICY "Users can insert own profile"
+  ON usuarios FOR INSERT
+  WITH CHECK (auth.uid() = id OR auth.role() = 'service_role');

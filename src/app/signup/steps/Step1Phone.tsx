@@ -6,7 +6,7 @@ import { formatPhone } from '@/lib/validations'
 
 import type { StepProps } from '../_types'
 
-export function Step1Phone({ formData, onChange, onNext }: StepProps) {
+export function Step1Phone({ formData, onChange, onNext, onOAuth }: StepProps) {
   const isValid = formData.telefone.replace(/\D/g, '').length === 11
 
   return (
@@ -46,6 +46,7 @@ export function Step1Phone({ formData, onChange, onNext }: StepProps) {
       <div className="space-y-3">
         <button
           type="button"
+          onClick={() => onOAuth?.('google')}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-300 px-4 py-3 font-medium transition hover:bg-gray-50"
         >
           <Image src="/google-icon.svg" alt="Google" width={20} height={20} />
@@ -53,6 +54,7 @@ export function Step1Phone({ formData, onChange, onNext }: StepProps) {
         </button>
         <button
           type="button"
+          onClick={() => onOAuth?.('facebook')}
           className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#1877F2] px-4 py-3 font-medium text-white transition hover:bg-[#166FE5]"
         >
           <span className="material-icons">facebook</span>
