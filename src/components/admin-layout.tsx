@@ -60,8 +60,6 @@ export default function AdminLayout({
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    localStorage.removeItem('admin')
-    localStorage.removeItem('adminData')
     window.location.href = '/admin/login'
   }
 
