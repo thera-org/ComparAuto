@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 // Verificar se o usuário autenticado é admin
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     const oficinaId = searchParams.get('id')
 
     if (oficinaId) {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await getSupabaseAdmin()
         .from('oficinas')
         .select('*')
         .eq('id', oficinaId)
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
       return NextResponse.json({ oficina: data })
     } else {
-      const { data, error } = await supabaseAdmin.from('oficinas').select('*').order('nome')
+      const { data, error } = await getSupabaseAdmin().from('oficinas').select('*').order('nome')
 
       if (error) {
         console.error('Erro ao buscar oficinas:', error)
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { userId: _userId, ...oficinaData } = body
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('oficinas')
       .insert(oficinaData)
       .select()
@@ -106,7 +106,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'ID da oficina é obrigatório' }, { status: 400 })
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('oficinas')
       .update(updateData)
       .eq('id', id)
@@ -143,7 +143,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'ID da oficina é obrigatório' }, { status: 400 })
     }
 
-    const { error } = await supabaseAdmin.from('oficinas').delete().eq('id', oficinaId)
+    const { error } = await getSupabaseAdmin().from('oficinas').delete().eq('id', oficinaId)
 
     if (error) {
       console.error('Erro ao excluir oficina:', error)

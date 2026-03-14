@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function GET() {
@@ -28,7 +28,7 @@ export async function GET() {
     }
 
     // Buscar usuários da tabela
-    const { data: usuarios, error: usuariosError } = await supabaseAdmin
+    const { data: usuarios, error: usuariosError } = await getSupabaseAdmin()
       .from('usuarios')
       .select('*')
       .order('criado_em', { ascending: false })
@@ -42,7 +42,7 @@ export async function GET() {
     const {
       data: { users: authUsers },
       error: authError,
-    } = await supabaseAdmin.auth.admin.listUsers()
+    } = await getSupabaseAdmin().auth.admin.listUsers()
 
     if (authError) {
       console.error('Erro ao buscar auth users:', authError)

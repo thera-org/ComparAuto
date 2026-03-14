@@ -199,37 +199,37 @@ function HomeContent() {
         </div>
       </div>
 
-     {/* Value Proposition Section */}
-<div className="border-y border-gray-100 bg-white py-8">
-  <div className="mx-auto max-w-7xl px-6">
-    <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-      <div className="text-center">
-        <span className="material-icons-outlined text-5xl text-gray-900">verified</span>
-        <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
-          Oficinas Verificadas
+      {/* Value Proposition Section */}
+      <div className="border-y border-gray-100 bg-white py-8">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            <div className="text-center">
+              <span className="material-icons-outlined text-5xl text-gray-900">verified</span>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Oficinas Verificadas
+              </div>
+            </div>
+            <div className="text-center">
+              <span className="material-icons-outlined text-5xl text-gray-900">request_quote</span>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Orçamento Grátis
+              </div>
+            </div>
+            <div className="text-center">
+              <span className="material-icons-outlined text-5xl text-gray-900">support_agent</span>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Suporte Dedicado
+              </div>
+            </div>
+            <div className="text-center">
+              <span className="material-icons-outlined text-5xl text-gray-900">shield</span>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+                Segurança Total
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="text-center">
-        <span className="material-icons-outlined text-5xl text-gray-900">request_quote</span>
-        <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
-          Orçamento Grátis
-        </div>
-      </div>
-      <div className="text-center">
-        <span className="material-icons-outlined text-5xl text-gray-900">support_agent</span>
-        <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
-          Suporte Dedicado
-        </div>
-      </div>
-      <div className="text-center">
-        <span className="material-icons-outlined text-5xl text-gray-900">shield</span>
-        <div className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
-          Segurança Total
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
       {/* Active filters */}
       {(searchTerm || selectedCategory) && (
