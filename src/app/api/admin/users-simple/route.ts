@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function GET() {
@@ -28,7 +28,7 @@ export async function GET() {
     }
 
     // Buscar usuários com service role
-    const { data: usuarios, error: usuariosError } = await supabaseAdmin
+    const { data: usuarios, error: usuariosError } = await getSupabaseAdmin()
       .from('usuarios')
       .select('*')
       .order('criado_em', { ascending: false })

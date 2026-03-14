@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 const ALLOWED_TIPOS = ['cliente', 'oficina'] as const
 type TipoUsuario = (typeof ALLOWED_TIPOS)[number]
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar que o usuário realmente existe no Auth e que o e-mail corresponde
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(id)
+    const { data: authData, error: authError } = await getSupabaseAdmin().auth.admin.getUserById(id)
     if (authError || !authData?.user) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
     }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Idempotente: se o perfil já existe, retornar sucesso sem duplicar
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await getSupabaseAdmin()
       .from('usuarios')
       .select('id')
       .eq('id', id)
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Inserir perfil com service role (ignora RLS)
-    const { error: insertError } = await supabaseAdmin.from('usuarios').insert(profileData)
+    const { error: insertError } = await getSupabaseAdmin().from('usuarios').insert(profileData)
 
     if (insertError) {
       console.error('Erro ao criar perfil de usuário:', insertError)
